@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
+import { loadCatalog } from './catalog.mjs'
 
 const root = process.argv[2] ?? 'pages'
 
@@ -9,7 +10,7 @@ const walk = (dir) => {
     const path = join(dir, name)
     if (name === 'public') continue
     if (statSync(path).isDirectory()) walk(path)
-    else if (name.endsWith('.md')) files.push(path)
+    else if (name.endsWith('.md') && !name.includes('[')) files.push(path)
   }
 }
 walk(root)
@@ -35,8 +36,22 @@ const route = (file) =>
 const isFence = (line) => /^\s*(```|~~~)/.test(line)
 
 const pages = new Map()
-for (const file of files) {
-  const text = readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n/, '')
+const inputs = files.map((file) => ({
+  file,
+  text: readFileSync(file, 'utf8').replace(/<!-- @include: (.+?) -->/g, (_, path) =>
+    readFileSync(resolve(dirname(file), path), 'utf8'),
+  ),
+  catalog: false,
+}))
+inputs.push(
+  ...loadCatalog().entries.map(({ slug, content }) => ({
+    file: join(root, 'modules', `${slug}.md`),
+    text: content,
+    catalog: true,
+  })),
+)
+for (const { file, text: source, catalog } of inputs) {
+  const text = source.replace(/^---\n[\s\S]*?\n---\n/, '')
   const anchors = new Set()
   const seen = new Map()
   let fence = false
@@ -57,7 +72,7 @@ for (const file of files) {
     if (count) slug = `${slug}-${count}`
     anchors.add(slug)
   }
-  pages.set(route(file), { file, text, anchors })
+  pages.set(route(file), { file, text, anchors, catalog })
 }
 
 const banned = [
@@ -85,8 +100,10 @@ for (const [path, page] of pages) {
     if (open && !fence) {
       fence = open[1]
       const info = open[2].trim() || '(no language)'
-      if (!group) report(page, n, `code block outside a code group: ${info}`)
-      else if (!/\[[^\]]+\]/.test(info)) report(page, n, `code block without a label: ${info}`)
+      if (!page.catalog) {
+        if (!group) report(page, n, `code block outside a code group: ${info}`)
+        else if (!/\[[^\]]+\]/.test(info)) report(page, n, `code block without a label: ${info}`)
+      }
       return
     }
     if (fence) {
@@ -97,7 +114,8 @@ for (const [path, page] of pages) {
     else if (/^:::\s*$/.test(line)) group = false
 
     const prose = line.replace(/`[^`]*`/g, '')
-    for (const word of banned) {
+    // Catalog prose is checked in its own repository; keep checking its links here.
+    for (const word of page.catalog ? [] : banned) {
       const match = prose.match(word)
       if (match) report(page, n, `style: "${match[0]}"`)
     }

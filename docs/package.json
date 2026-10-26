@@ -4,10 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "catalog": "node scripts/catalog.mjs",
+    "predev": "npm run catalog",
     "dev": "vitepress dev",
+    "prebuild": "npm run catalog",
     "build": "vitepress build",
     "preview": "vitepress preview",
-    "test": "node scripts/check-pages.mjs pages",
+    "pretest": "npm run catalog",
+    "test": "node --test scripts/catalog.test.mjs && node scripts/check-pages.mjs pages",
     "lint": "prettier --check pages .vitepress scripts",
     "format": "prettier --write pages .vitepress scripts"
   },

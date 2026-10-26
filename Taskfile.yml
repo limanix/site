@@ -23,7 +23,7 @@ tasks:
         vars:
           NODE_DIR: app
           CONTAINER_PORTS: "127.0.0.1:5173:5173"
-          CMD: "sh -c 'npm install && exec ./node_modules/.bin/vite --host 0.0.0.0 --port 5173'"
+          CMD: "sh -c 'npm install && exec npm run dev -- --host 0.0.0.0 --port 5173'"
 
   run/docs:
     desc: Run the docs at http://localhost:5174
@@ -32,7 +32,7 @@ tasks:
         vars:
           NODE_DIR: docs
           CONTAINER_PORTS: "127.0.0.1:5174:5174"
-          CMD: "sh -c 'npm install && exec ./node_modules/.bin/vitepress dev --host 0.0.0.0 --port 5174'"
+          CMD: "sh -c 'npm install && exec npm run dev -- --host 0.0.0.0 --port 5174'"
 
   ci/node/build:
     desc: Lint and build APP into APP/dist

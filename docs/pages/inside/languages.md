@@ -18,118 +18,32 @@ lmx help go
 
 The card shows the installed version, the commands on your `PATH` and common tasks. The topics are `go`, `rust`, `python` and `nodejs`.
 
-| Toolchain | Installs                                                                                  |
-| --------- | ----------------------------------------------------------------------------------------- |
-| Go        | Go, the gopls language server, the Delve debugger and GCC for cgo                         |
-| Rust      | rustup with Cargo, rustc, rustfmt, Clippy and rust-analyzer, plus GCC, pkg-config and GDB |
-| Python    | Python with venv, virtualenv and the Pyright language server                              |
-| Node.js   | Node.js with npm and npx, and the TypeScript language server                              |
+The module pages describe the installed tools and their use:
 
 ## Go
 
-Run these from a directory that contains `go.mod`:
-
-::: code-group
-
-```sh [VM]
-go build ./...
-go test ./...
-go test -race ./...
-```
-
-:::
-
-GCC enables cgo and the race detector. The Delve debugger runs as `dlv`.
-
-When a project's `go.mod` or `go.work` requires a newer Go, Go can download that toolchain and run it instead. To use only the installed Go, set `GOTOOLCHAIN` in `limanix.toml` and apply it with `limanix update`; a project that requires a newer Go then fails to build:
-
-::: code-group
-
-```toml [limanix.toml]
-[env]
-GOTOOLCHAIN = "local"
-```
-
-:::
+See [Go](/modules/go#use) for building, testing, cgo, debugging and toolchain downloads.
 
 ## Rust
 
-Rust comes from rustup. When the VM starts after you choose or change the toolchain in `limanix.toml`, it downloads that toolchain, which needs network access. Until the download finishes, Cargo reports that no default toolchain is configured. Follow it with:
-
-::: code-group
-
-```sh [VM]
-systemctl --user status rust-toolchain
-```
-
-:::
-
-A failed download is tried again; `systemctl --user restart rust-toolchain` starts it at once. Then, from a directory that contains `Cargo.toml`:
-
-::: code-group
-
-```sh [VM]
-cargo build
-cargo test
-cargo fmt
-cargo clippy
-```
-
-:::
-
-| Task                      | Command                                               |
-| ------------------------- | ----------------------------------------------------- |
-| Show the toolchain in use | `rustup show`                                         |
-| Debug a program           | `rust-gdb`                                            |
-| List or remove toolchains | `rustup toolchain list`, `rustup toolchain uninstall` |
-
-A channel does not move on its own: `rustup update` fetches its newest release. A default you set with `rustup default` stays until the value in `limanix.toml` changes. A project selects its own toolchain with a `rust-toolchain.toml` file; rustup installs it on first use. Toolchains in `~/.rustup` and crates in `~/.cargo` stay across VM updates. Commands from `cargo install` go to `~/.cargo/bin`, which comes first on your `PATH`.
+See [Rust](/modules/rust#toolchains) for the first download, project toolchains and updates.
+The [use examples](/modules/rust#use) cover Cargo, formatting and Clippy.
 
 ## Python
 
-Create a virtual environment in the project directory, activate it and install the project's dependencies:
-
-::: code-group
-
-```sh [VM]
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-```
-
-:::
-
-The environment includes pip, and `virtualenv .venv` creates an equivalent one. Run `deactivate` to leave it. A virtual environment keeps the interpreter that created it: create it again after you change the Python version.
+See [Python](/modules/python#use) for virtual environments and project dependencies.
+The page also explains interpreter changes and Pyright configuration.
 
 ## Node.js
 
-From a directory that contains `package.json`:
-
-::: code-group
-
-```sh [VM]
-npm install
-npm run build
-```
-
-:::
-
-`npm install` installs the project's dependencies, and `npm run build` runs its `build` script. Packages that build native addons with node-gyp also need Python, make and a C/C++ compiler, which the toolchain does not install.
+See [Node.js](/modules/nodejs#use) for npm and [native dependencies](/modules/nodejs#native-dependencies) for packages that compile code.
 
 ## Language servers in AstroNvim
 
-AstroNvim, the editor of the `terminal` preset, turns on the language server of each toolchain you choose:
-
-| Toolchain | Language server            | Good to know                                                                                                                                    |
-| --------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Go        | gopls                      |                                                                                                                                                 |
-| Rust      | rust-analyzer              | rustup runs the rust-analyzer of the project's toolchain, which matches the compiler                                                            |
-| Python    | Pyright                    | When it cannot find the project's dependencies, configure the environment in `pyrightconfig.json` or under `[tool.pyright]` in `pyproject.toml` |
-| Node.js   | typescript-language-server | Uses the project's own TypeScript when the project configures one                                                                               |
-
-Open the project at its path in the VM, such as `/workspace`: the language servers then see its Linux dependencies. The Tree-sitter parsers for these languages come with the toolchains; add one for another language with `:TSInstall LANGUAGE`, which needs network access.
-
-A language server on your `PATH` alone does not start in the editor. To turn on another one, such as a server from a project environment, add it to the `servers` option of AstroLSP in your Neovim configuration. With `editor = "neovim"`, plain Neovim starts no language server until you configure its LSP client.
+AstroNvim uses the language servers of your selected toolchains.
+Open the project at its path in the VM, such as `/workspace`, where its Linux dependencies are available.
+See [AstroNvim language servers](/modules/astronvim#language-servers) for configuration and [packages and state](/modules/astronvim#packages-and-state) for syntax parsers.
+Plain [Neovim](/modules/neovim#language-servers) needs your own LSP configuration.
 
 ## Native libraries
 

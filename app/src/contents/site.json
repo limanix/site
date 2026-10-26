@@ -171,14 +171,16 @@
           "icon": "braces",
           "tone": "pink",
           "title": "Your languages, wired in",
-          "text": "Go, Rust, Python and Node.js, each with its language server already connected to the editor.",
+          "text": "Pick the languages and versions a project needs. Each comes with its build tools and a language server already connected to the editor.",
           "window": "limanix.toml",
           "code": [
             "[toolchains]",
             "go = \"1.27\"",
             "rust = \"stable\"",
-            "python = \"3.14\"",
-            "nodejs = \"26\""
+            "python = \"3.15\"",
+            "nodejs = \"26\"",
+            "java = \"21\"",
+            "gradle = \"9\""
           ]
         },
         {

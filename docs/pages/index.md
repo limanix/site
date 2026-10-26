@@ -51,8 +51,8 @@ Project folders you share stay on the Mac and appear in the VM as you edit them.
 
 - [`limanix`](/vms/): one binary for the Mac, with Lima built in, that creates, updates, starts, stops and deletes VMs and opens a shell in them.
 - [Shell](/config/shell): Zsh with Oh My Zsh and the Pure prompt, AstroNvim, tmux, Lazygit, Yazi and the GitHub CLI, or Bash with the command-line tools.
-- [Toolchains](/config/toolchains): Go, Rust, Python and Node.js, each with its language server.
-- [Modules](/modules/): Docker, PostgreSQL, Google Cloud CLI, Claude Code, Posting and Harlequin.
+- [Toolchains](/config/toolchains): Go, Rust, Python, Node.js and Java, each with its language server, and Maven and Gradle for Java.
+- [Modules](/modules/): Docker, PostgreSQL, Google Cloud CLI, Claude Code, Posting, Harlequin and Quarkus.
 - [Packages](/config/modules#install-packages): any command from nixpkgs, or a newer release from nixos-unstable.
 - [Shared folders](/config/mounts) and [dotfiles](/config/dotfiles): your project and your settings from the Mac, in every VM.
 - [`lmx`](/inside/lmx): status, checks and help inside the VM.

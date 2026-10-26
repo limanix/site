@@ -1,5 +1,5 @@
 ---
-description: Build, test and edit Go, Rust, Python and Node.js projects inside a VM.
+description: Build, test and edit Go, Rust, Python, Node.js and Java projects inside a VM.
 ---
 
 # Languages
@@ -16,7 +16,7 @@ lmx help go
 
 :::
 
-The card shows the installed version, the commands on your `PATH` and common tasks. The topics are `go`, `rust`, `python` and `nodejs`.
+The card shows the installed version, the commands on your `PATH` and common tasks. The topics are `go`, `rust`, `python`, `nodejs`, `java`, `maven` and `gradle`.
 
 The module pages describe the installed tools and their use:
 
@@ -37,6 +37,11 @@ The page also explains interpreter changes and Pyright configuration.
 ## Node.js
 
 See [Node.js](/modules/nodejs#use) for npm and [native dependencies](/modules/nodejs#native-dependencies) for packages that compile code.
+
+## Java
+
+See [Java](/modules/java#use) for compiling and running classes, and [other JDKs](/modules/java#other-tools-and-jdks) for tools that look for a JDK or download one.
+Build projects with [Maven](/modules/maven#use) or [Gradle](/modules/gradle#use); both run on the selected JDK.
 
 ## Language servers in AstroNvim
 

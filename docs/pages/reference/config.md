@@ -148,6 +148,8 @@ go = "1.27"
 rust = "stable"
 python = "3.14"
 nodejs = "26"
+java = "21"
+gradle = "9"
 ```
 
 :::
@@ -158,8 +160,11 @@ nodejs = "26"
 | `rust`   | string | `""`    | Default toolchain of rustup, which installs it at the first start after a change: `stable`, `beta`, `nightly`, a dated channel such as `nightly-2026-10-01`, or a Rust version such as `1.90.0`. |
 | `python` | string | `""`    | Python line, with virtualenv and Pyright.                                                                                                                                                        |
 | `nodejs` | string | `""`    | Node.js line, with npm, npx and the TypeScript language server.                                                                                                                                  |
+| `java`   | string | `""`    | OpenJDK line, with the jdtls language server; `JAVA_HOME` points to it.                                                                                                                          |
+| `maven`  | string | `""`    | Apache Maven line, which runs on the `java` line and needs it.                                                                                                                                   |
+| `gradle` | string | `""`    | Gradle line, which runs on the `java` line and needs it; the build stops when the Gradle line does not support that Java.                                                                        |
 
-A line is a version such as `1.27` and must exist in the catalog of your client: `limanix modules list` shows each line as a selector of kind `toolchains`, such as `lmx:go-1.27`. An unknown line fails with the lines the catalog has.
+A line is a version such as `1.27` and must exist in the catalog of your client: `limanix modules list` shows each line as a selector of kind `toolchains`, such as `lmx:go-1.27`. An unknown line fails with the lines the catalog has. `maven` or `gradle` without `java` fails with `toolchains.gradle: needs a JDK: add java to [toolchains], such as java = "21"`.
 
 Guide: [Toolchains](/config/toolchains).
 

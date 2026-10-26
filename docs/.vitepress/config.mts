@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import { defineConfig, type HeadConfig } from 'vitepress'
 
 const site = 'https://limanix.dev'
@@ -64,6 +65,10 @@ export default defineConfig({
         '<script src="/head.js"></script>',
       )
       .replace(/<script id="check-mac-os">[\s\S]*?<\/script>/, '')
+  },
+
+  vite: {
+    envDir: fileURLToPath(new URL('..', import.meta.url)),
   },
 
   markdown: {

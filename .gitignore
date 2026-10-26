@@ -13,6 +13,8 @@
 .env
 .env.*
 !.env.example
+!/app/.env.production
+!/docs/.env.production
 
 # Task: remote Taskfiles and container caches
 /.task/

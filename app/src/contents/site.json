@@ -242,118 +242,105 @@
     "howItWorks": {
       "id": "how-it-works",
       "title": "From a file to a *running machine*",
-      "lead": "`limanix` is the only thing you install on the Mac. It runs the VM with [Lima](https://lima-vm.io) built in, and `lmxd` inside the VM builds and checks its [NixOS](https://nixos.org) system. Pick a command to follow it through.",
-      "mac": "Your Mac",
-      "vm": "Linux VM",
+      "lead": "`limanix` is the only thing you install on the Mac. Pick a command and follow it between your Mac and the VM.",
       "commandsLabel": "Follow a command",
-      "hint": "Pick a command to follow it through the diagram.",
-      "rows": [
-        {
-          "id": "config",
-          "mac": {
-            "name": "`limanix`",
-            "text": "Reads `limanix.toml` and prepares the inputs of the system from the catalog."
-          },
-          "link": {
-            "label": "inputs, read-only",
-            "direction": "right"
-          },
-          "vm": {
-            "name": "`lmxd`",
-            "text": "Builds the NixOS system from them."
-          }
+      "prefix": "limanix",
+      "places": {
+        "mac": {
+          "name": "Your Mac",
+          "short": "Mac"
         },
-        {
-          "id": "vm",
-          "mac": {
-            "name": "Lima",
-            "text": "Built into `limanix`; runs the VM on Apple Virtualization."
-          },
-          "link": {
-            "label": "virtual machine",
-            "direction": "right"
-          },
-          "vm": {
-            "name": "NixOS",
-            "text": "Restarts into a new system only after it builds."
-          }
-        },
-        {
-          "id": "files",
-          "mac": {
-            "name": "Your folders",
-            "text": "The project, and the VM home kept under `~/.limanix`."
-          },
-          "link": {
-            "label": "shared, read-write",
-            "direction": "both"
-          },
-          "vm": {
-            "name": "`/workspace`, `/home/dev`",
-            "text": "The same files, seen from Linux."
-          }
-        },
-        {
-          "id": "shell",
-          "mac": {
-            "name": "Terminal",
-            "text": "`limanix shell api --session work`"
-          },
-          "link": {
-            "label": "SSH",
-            "direction": "right"
-          },
-          "vm": {
-            "name": "Zsh in tmux",
-            "text": "A session that keeps running after you disconnect."
-          }
-        },
-        {
-          "id": "clipboard",
-          "mac": {
-            "name": "Clipboard",
-            "text": "What you copy in the VM lands here."
-          },
-          "link": {
-            "label": "OSC 52",
-            "direction": "left"
-          },
-          "vm": {
-            "name": "`pbcopy`, `pbpaste`",
-            "text": "Directly or inside tmux."
-          }
-        },
-        {
-          "id": "status",
-          "mac": {
-            "name": "`limanix`",
-            "text": "Waits until the VM is ready; `limanix doctor` checks it later."
-          },
-          "link": {
-            "label": "status",
-            "direction": "left"
-          },
-          "vm": {
-            "name": "`lmxd`",
-            "text": "Checks the new system and reports when it is ready."
-          }
+        "vm": {
+          "name": "Linux VM",
+          "short": "VM"
         }
-      ],
+      },
       "commands": [
         {
-          "name": "limanix create",
-          "rows": ["config", "vm", "files", "status"],
-          "text": "Prepares the inputs, starts a new VM with Lima and shares your folders. `lmxd` builds NixOS, the VM restarts into it, and `limanix` waits until it is ready."
+          "name": "create",
+          "title": "A new machine from the file",
+          "steps": [
+            {
+              "where": "mac",
+              "name": "`limanix`",
+              "text": "Reads `limanix.toml` and gathers the system from the catalog."
+            },
+            {
+              "where": "mac",
+              "name": "Lima",
+              "text": "Starts a new VM on Apple Virtualization and shares your folders."
+            },
+            {
+              "where": "vm",
+              "name": "`lmxd`",
+              "text": "Builds the NixOS system."
+            },
+            {
+              "where": "vm",
+              "name": "NixOS",
+              "text": "The VM restarts into the new system."
+            },
+            {
+              "where": "mac",
+              "name": "`limanix`",
+              "text": "Waits until the VM reports ready."
+            }
+          ],
+          "outcome": "A new VM, built from the file. Nothing to install by hand."
         },
         {
-          "name": "limanix update",
-          "rows": ["config", "vm", "status"],
-          "text": "Prepares new inputs, and `lmxd` builds them while the VM keeps its current system. The VM restarts only when the build succeeds."
+          "name": "update",
+          "title": "Change the file, rebuild",
+          "steps": [
+            {
+              "where": "mac",
+              "name": "`limanix`",
+              "text": "Reads the changed `limanix.toml`."
+            },
+            {
+              "where": "vm",
+              "name": "`lmxd`",
+              "text": "Builds the new system while the VM keeps running the old one."
+            },
+            {
+              "where": "vm",
+              "name": "NixOS",
+              "text": "The VM restarts into it only if the build succeeds."
+            },
+            {
+              "where": "mac",
+              "name": "`limanix`",
+              "text": "Waits until the VM reports ready."
+            }
+          ],
+          "outcome": "A failed build leaves the VM as it was."
         },
         {
-          "name": "limanix shell",
-          "rows": ["files", "shell", "clipboard"],
-          "text": "Connects over SSH as the development user. With `--session`, tmux keeps the session running, and `pbcopy` reaches the Mac clipboard."
+          "name": "shell",
+          "title": "Work inside",
+          "steps": [
+            {
+              "where": "mac",
+              "name": "Terminal",
+              "text": "`limanix shell` connects over SSH."
+            },
+            {
+              "where": "vm",
+              "name": "Zsh in tmux",
+              "text": "With `--session`, it keeps running after you disconnect."
+            },
+            {
+              "where": "vm",
+              "name": "`/workspace`",
+              "text": "Your project from the Mac, read-write."
+            },
+            {
+              "where": "mac",
+              "name": "Clipboard",
+              "text": "What you copy with `pbcopy` in the VM lands on the Mac."
+            }
+          ],
+          "outcome": "Close the terminal; the session is still there next time."
         }
       ]
     },

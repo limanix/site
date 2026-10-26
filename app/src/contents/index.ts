@@ -2,7 +2,7 @@ import site from './site.json'
 
 export type Tone = 'amber' | 'sky' | 'green' | 'pink' | 'purple' | 'rose'
 export type FeatureIcon = 'terminal' | 'braces' | 'layers' | 'folder' | 'sliders' | 'pulse'
-export type FlowDirection = 'right' | 'left' | 'both'
+export type FlowPlace = 'mac' | 'vm'
 
 type Site = typeof site
 type Home = Site['home']
@@ -12,14 +12,14 @@ export type Feature = Omit<Home['features']['items'][number], 'icon' | 'tone'> &
   tone: Tone
 }
 
-type Row = Home['howItWorks']['rows'][number]
-export type FlowRow = Omit<Row, 'link'> & {
-  link: Omit<Row['link'], 'direction'> & { direction: FlowDirection }
+type Command = Home['howItWorks']['commands'][number]
+export type FlowCommand = Omit<Command, 'steps'> & {
+  steps: (Omit<Command['steps'][number], 'where'> & { where: FlowPlace })[]
 }
 
 export type HomeContent = Omit<Home, 'features' | 'howItWorks'> & {
   features: Omit<Home['features'], 'items'> & { items: Feature[] }
-  howItWorks: Omit<Home['howItWorks'], 'rows'> & { rows: FlowRow[] }
+  howItWorks: Omit<Home['howItWorks'], 'commands'> & { commands: FlowCommand[] }
 }
 export type SiteContent = Omit<Site, 'home'> & { home: HomeContent }
 

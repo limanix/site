@@ -20,7 +20,7 @@ locals {
   tags = {
     ManagedBy  = "Terraform"
     Project    = "limanix"
-    Repository = "limanix/docs"
+    Repository = "limanix/site"
     Site       = var.domain_name
   }
 }

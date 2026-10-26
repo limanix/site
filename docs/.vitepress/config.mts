@@ -167,7 +167,7 @@ export default defineConfig({
     search: { provider: 'local' },
     socialLinks: [{ icon: 'github', link: 'https://github.com/limanix' }],
     editLink: {
-      pattern: 'https://github.com/limanix/docs/edit/main/docs/pages/:path',
+      pattern: 'https://github.com/limanix/site/edit/main/docs/pages/:path',
       text: 'Edit this page on GitHub',
     },
     outline: { level: [2, 3], label: 'On this page' },

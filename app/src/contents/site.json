@@ -348,37 +348,38 @@
       "id": "catalog",
       "title": "A catalog that *fits together*",
       "lead": "Shell components, toolchains and services share one theme and know about each other. Anything else comes from nixpkgs.",
-      "items": [
-        "Zsh",
-        "Oh My Zsh",
-        "Pure",
-        "Starship",
-        "AstroNvim",
-        "Neovim",
-        "tmux",
-        "Lazygit",
-        "Yazi",
-        "GitHub CLI",
-        "ripgrep",
-        "fd",
-        "fzf",
-        "bat",
-        "delta",
-        "jq",
-        "btop",
-        "Go",
-        "Rust",
-        "Python",
-        "Node.js",
-        "Docker",
-        "PostgreSQL",
-        "Google Cloud CLI",
-        "Claude Code",
-        "Posting",
-        "Harlequin",
-        "Any package from nixpkgs",
-        "Fresh releases from nixos-unstable"
-      ]
+      "hint": "Pick a module to see what it works with.",
+      "layout": {
+        "astronvim": [-170, 0],
+        "neovim": [-250, -95],
+        "lazygit": [-80, -100],
+        "tmux": [-60, 85],
+        "nodejs": [-330, -125],
+        "go": [-400, -35],
+        "rust": [-390, 55],
+        "python": [-330, 125],
+        "theme": [50, 0],
+        "zsh": [250, 0],
+        "ohmyzsh": [340, -85],
+        "pure": [200, -105],
+        "starship": [190, 105],
+        "fzf": [380, 30],
+        "yazi": [310, 110],
+        "bat": [40, 135],
+        "delta": [140, 150],
+        "harlequin": [-120, 155],
+        "postgres": [-235, 175],
+        "posting": [60, -140],
+        "docker": [440, -160],
+        "claude": [-460, -165],
+        "gcloud": [420, 170],
+        "gh": [-455, 170],
+        "ripgrep": [470, -40],
+        "fd": [-170, -170],
+        "jq": [160, -170],
+        "btop": [300, -170]
+      },
+      "more": ["Any package from nixpkgs", "Fresh releases from nixos-unstable"]
     },
     "faq": {
       "id": "faq",
@@ -457,6 +458,10 @@
       {
         "label": "Issues",
         "href": "https://github.com/limanix/client/issues"
+      },
+      {
+        "label": "info@limanix.dev",
+        "href": "mailto:info@limanix.dev"
       }
     ]
   }

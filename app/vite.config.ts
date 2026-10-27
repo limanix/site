@@ -13,7 +13,7 @@ export default defineConfig({
   },
   build: {
     rolldownOptions: {
-      input: { index: page('index'), download: page('download') },
+      input: { index: page('index'), download: page('download'), catalog: page('catalog') },
       output: {
         codeSplitting: {
           groups: [{ name: 'vue', test: /node_modules[\\/](?:@vue|vue|vue-router)[\\/]/ }],

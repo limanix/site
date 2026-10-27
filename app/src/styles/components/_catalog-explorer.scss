@@ -1,43 +1,15 @@
 @use '../tools';
 
 @layer components {
-  :root:has(.c-catalog-dialog[open]) {
-    overflow: hidden;
-  }
-
-  .c-catalog-dialog {
-    width: 100%;
-    max-width: none;
-    height: 100%;
-    max-height: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    color: var(--color-text);
-    background: var(--color-page);
-  }
-
-  .c-catalog-dialog[open] {
+  .c-catalog-explorer {
     display: grid;
+    flex: 1 1 0%;
     grid-template-rows: auto minmax(0, 1fr);
-    animation: catalog-dialog-in var(--motion-base) var(--ease-settle);
-
-    @include tools.reduced-motion {
-      animation: none;
-    }
+    min-height: 0;
+    color: var(--color-text);
   }
 
-  .c-catalog-dialog::backdrop {
-    background: var(--color-page);
-  }
-
-  @keyframes catalog-dialog-in {
-    from {
-      opacity: 0;
-    }
-  }
-
-  .c-catalog-dialog__bar {
+  .c-catalog-explorer__bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -51,7 +23,7 @@
     }
   }
 
-  .c-catalog-dialog__title {
+  .c-catalog-explorer__title {
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.5rem;
@@ -63,7 +35,7 @@
     }
   }
 
-  .c-catalog-dialog__search {
+  .c-catalog-explorer__search {
     position: relative;
     flex: 1 1 220px;
     max-width: 360px;
@@ -73,7 +45,7 @@
     }
   }
 
-  .c-catalog-dialog__lens {
+  .c-catalog-explorer__lens {
     position: absolute;
     top: 50%;
     left: 13px;
@@ -82,7 +54,7 @@
     pointer-events: none;
   }
 
-  .c-catalog-dialog__input {
+  .c-catalog-explorer__input {
     width: 100%;
     height: 38px;
     padding: 0 14px 0 40px;
@@ -104,7 +76,7 @@
     }
   }
 
-  .c-catalog-dialog__results {
+  .c-catalog-explorer__results {
     position: absolute;
     top: calc(100% + 6px);
     right: 0;
@@ -118,7 +90,7 @@
       0 16px 40px rgb(0 0 0 / 35%);
   }
 
-  .c-catalog-dialog__result {
+  .c-catalog-explorer__result {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -143,13 +115,13 @@
     }
   }
 
-  .c-catalog-dialog__empty {
+  .c-catalog-explorer__empty {
     padding: 8px 10px;
     font-size: 0.9375rem;
     color: var(--color-muted);
   }
 
-  .c-catalog-dialog__legend {
+  .c-catalog-explorer__legend {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 16px;
@@ -161,13 +133,13 @@
     }
   }
 
-  .c-catalog-dialog__kind {
+  .c-catalog-explorer__kind {
     display: inline-flex;
     align-items: center;
     gap: 7px;
   }
 
-  .c-catalog-dialog__dot {
+  .c-catalog-explorer__dot {
     display: inline-block;
     width: 8px;
     height: 8px;
@@ -176,13 +148,13 @@
     background: var(--tone-to);
   }
 
-  .c-catalog-dialog__tools {
+  .c-catalog-explorer__tools {
     display: flex;
     gap: 4px;
     margin-left: auto;
   }
 
-  .c-catalog-dialog__tool {
+  .c-catalog-explorer__tool {
     display: grid;
     place-items: center;
     width: 38px;
@@ -198,19 +170,19 @@
     }
   }
 
-  .c-catalog-dialog__stage {
+  .c-catalog-explorer__stage {
     position: relative;
     min-height: 0;
   }
 
-  .c-catalog-dialog__panel {
+  .c-catalog-explorer__panel {
     position: absolute;
     bottom: 20px;
     left: 20px;
     width: min(420px, calc(100% - 40px));
     max-height: 45%;
     overflow-y: auto;
-    padding: 16px 18px;
+    padding: 16px 44px 16px 18px;
     border-radius: var(--radius-card);
     background: var(--color-card);
     box-shadow: inset 0 0 0 1px var(--color-ring);
@@ -224,7 +196,34 @@
     }
   }
 
-  .c-catalog-dialog__name {
+  .c-catalog-explorer__dismiss {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    color: var(--color-muted);
+    transition:
+      color var(--motion-fast) var(--ease-settle),
+      background-color var(--motion-fast) var(--ease-settle);
+
+    @media (hover: hover) {
+      &:hover {
+        color: var(--color-heading);
+        background: var(--color-hover);
+      }
+    }
+
+    .c-map-icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .c-catalog-explorer__name {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -242,13 +241,13 @@
     }
   }
 
-  .c-catalog-dialog__meta {
+  .c-catalog-explorer__meta {
     font-size: 0.8125rem;
     font-weight: 400;
     color: var(--color-muted);
   }
 
-  .c-catalog-dialog__text {
+  .c-catalog-explorer__text {
     margin-top: 6px;
     font-size: 0.9375rem;
     line-height: 1.5;
@@ -259,19 +258,26 @@
     }
   }
 
-  .c-catalog-dialog__related {
+  .c-catalog-explorer__hint {
+    margin-top: 10px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+
+  .c-catalog-explorer__related {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
     margin-top: 12px;
 
-    .c-catalog-dialog__meta {
+    .c-catalog-explorer__meta {
       margin-right: 4px;
     }
   }
 
-  .c-catalog-dialog__chip {
+  .c-catalog-explorer__chip {
     height: 28px;
     padding: 0 12px;
     border-radius: 9999px;
@@ -296,7 +302,7 @@
     }
   }
 
-  .c-catalog-dialog__guide {
+  .c-catalog-explorer__guide {
     display: inline-block;
     margin-top: 12px;
     font-size: 0.9375rem;

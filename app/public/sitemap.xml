@@ -8,4 +8,8 @@
     <loc>https://limanix.dev/download</loc>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://limanix.dev/catalog</loc>
+    <priority>0.6</priority>
+  </url>
 </urlset>

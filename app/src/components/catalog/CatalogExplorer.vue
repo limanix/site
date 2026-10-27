@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId } from 'vue'
+import { computed, ref, watch } from 'vue'
 import CatalogMap from '@/components/catalog/CatalogMap.vue'
 import MapIcon from '@/components/catalog/MapIcon.vue'
 import InlineText from '@/components/ui/InlineText.vue'
@@ -7,6 +7,7 @@ import { siteContent, type CatalogContent, type CatalogModule } from '@/contents
 import type { MapLink } from '@/utils/catalog-map'
 
 const props = defineProps<{ content: CatalogContent; modules: CatalogModule[]; links: MapLink[] }>()
+const chosen = defineModel<string | null>('chosen', { default: null })
 
 const LIMIT = 8
 const PAGES: Record<string, string> = { claude: 'claude-code' }
@@ -17,13 +18,10 @@ const MOVES: Record<string, [number, number]> = {
   ArrowDown: [0, -80],
 }
 
-const dialog = ref<HTMLDialogElement | null>(null)
 const map = ref<InstanceType<typeof CatalogMap> | null>(null)
 const search = ref<HTMLInputElement | null>(null)
-const open = ref(false)
-const chosen = ref<string | null>(null)
 const query = ref('')
-const titleId = `catalog-map-${useId()}`
+const open = ref(true)
 
 const byId = computed(() => new Map(props.modules.map((module) => [module.id, module])))
 const current = computed(() => (chosen.value ? byId.value.get(chosen.value) : undefined))
@@ -56,13 +54,14 @@ const guide = computed(() => {
   return module ? `${siteContent.links.docs}/modules/${PAGES[module] ?? module}` : null
 })
 
-function show(id: string | null) {
-  chosen.value = id
-  query.value = ''
-  open.value = true
-  dialog.value?.showModal()
-  if (window.matchMedia('(pointer: fine)').matches) nextTick(() => search.value?.focus())
+function dismiss() {
+  open.value = false
+  chosen.value = null
 }
+
+watch(chosen, (id) => {
+  if (id) open.value = true
+})
 
 function pick(id: string) {
   query.value = ''
@@ -77,29 +76,22 @@ function keys(event: KeyboardEvent) {
   else if (event.key === '-') map.value?.zoomBy(0.8)
   else if (event.key === '0') map.value?.fit()
   else if (event.key === '/') search.value?.focus()
+  else if (event.key === 'Escape' && open.value) dismiss()
   else return
   event.preventDefault()
 }
-
-defineExpose({ show })
 </script>
 
 <template>
-  <dialog
-    ref="dialog"
-    class="c-catalog-dialog"
-    :aria-labelledby="titleId"
-    @close="open = false"
-    @keydown="keys"
-  >
-    <header class="c-catalog-dialog__bar">
-      <h2 :id="titleId" class="c-catalog-dialog__title">{{ content.map }}</h2>
-      <div class="c-catalog-dialog__search">
-        <MapIcon class="c-catalog-dialog__lens" name="search" />
+  <div class="c-catalog-explorer" @keydown="keys">
+    <header class="c-catalog-explorer__bar">
+      <h1 class="c-catalog-explorer__title">{{ content.map }}</h1>
+      <div class="c-catalog-explorer__search">
+        <MapIcon class="c-catalog-explorer__lens" name="search" />
         <input
           ref="search"
           v-model="query"
-          class="c-catalog-dialog__input"
+          class="c-catalog-explorer__input"
           type="search"
           autocomplete="off"
           spellcheck="false"
@@ -107,31 +99,31 @@ defineExpose({ show })
           :aria-label="content.search"
           @keydown.enter.prevent="found[0] && pick(found[0].id)"
         />
-        <ul v-if="query.trim()" class="c-catalog-dialog__results">
+        <ul v-if="query.trim()" class="c-catalog-explorer__results">
           <li v-for="module in found.slice(0, LIMIT)" :key="module.id">
-            <button type="button" class="c-catalog-dialog__result" @click="pick(module.id)">
+            <button type="button" class="c-catalog-explorer__result" @click="pick(module.id)">
               <span
                 v-if="module.kind"
-                class="c-catalog-dialog__dot"
+                class="c-catalog-explorer__dot"
                 :class="`u-tone-${content.kinds[module.kind].tone}`"
                 aria-hidden="true"
               />
               <InlineText :text="module.name" />
             </button>
           </li>
-          <li v-if="!found.length" class="c-catalog-dialog__empty">{{ content.empty }}</li>
+          <li v-if="!found.length" class="c-catalog-explorer__empty">{{ content.empty }}</li>
         </ul>
       </div>
-      <ul class="c-catalog-dialog__legend">
-        <li v-for="(kind, key) in content.kinds" :key="key" class="c-catalog-dialog__kind">
-          <span class="c-catalog-dialog__dot" :class="`u-tone-${kind.tone}`" aria-hidden="true" />
+      <ul class="c-catalog-explorer__legend">
+        <li v-for="(kind, key) in content.kinds" :key="key" class="c-catalog-explorer__kind">
+          <span class="c-catalog-explorer__dot" :class="`u-tone-${kind.tone}`" aria-hidden="true" />
           {{ kind.label }}
         </li>
       </ul>
-      <div class="c-catalog-dialog__tools">
+      <div class="c-catalog-explorer__tools">
         <button
           type="button"
-          class="c-catalog-dialog__tool"
+          class="c-catalog-explorer__tool"
           :aria-label="content.zoomOut"
           :title="content.zoomOut"
           @click="map?.zoomBy(0.8)"
@@ -140,7 +132,7 @@ defineExpose({ show })
         </button>
         <button
           type="button"
-          class="c-catalog-dialog__tool"
+          class="c-catalog-explorer__tool"
           :aria-label="content.zoomIn"
           :title="content.zoomIn"
           @click="map?.zoomBy(1.25)"
@@ -149,27 +141,17 @@ defineExpose({ show })
         </button>
         <button
           type="button"
-          class="c-catalog-dialog__tool"
+          class="c-catalog-explorer__tool"
           :aria-label="content.fit"
           :title="content.fit"
           @click="map?.fit()"
         >
           <MapIcon name="fit" />
         </button>
-        <button
-          type="button"
-          class="c-catalog-dialog__tool"
-          :aria-label="content.close"
-          :title="content.close"
-          @click="dialog?.close()"
-        >
-          <MapIcon name="close" />
-        </button>
       </div>
     </header>
-    <div class="c-catalog-dialog__stage">
+    <div class="c-catalog-explorer__stage">
       <CatalogMap
-        v-if="open"
         ref="map"
         v-model:chosen="chosen"
         full
@@ -178,39 +160,51 @@ defineExpose({ show })
         :kinds="content.kinds"
         :matches="matches"
       />
-      <section class="c-catalog-dialog__panel" aria-live="polite">
+      <section v-show="open" class="c-catalog-explorer__panel" aria-live="polite">
+        <button
+          type="button"
+          class="c-catalog-explorer__dismiss"
+          :aria-label="content.dismiss"
+          :title="content.dismiss"
+          @click="dismiss"
+        >
+          <MapIcon name="close" />
+        </button>
         <template v-if="current">
-          <p class="c-catalog-dialog__name">
+          <p class="c-catalog-explorer__name">
             <span
               v-if="current.kind"
-              class="c-catalog-dialog__dot"
+              class="c-catalog-explorer__dot"
               :class="`u-tone-${content.kinds[current.kind].tone}`"
               aria-hidden="true"
             />
             <InlineText :text="current.name" />
-            <span v-if="current.kind" class="c-catalog-dialog__meta">
+            <span v-if="current.kind" class="c-catalog-explorer__meta">
               {{ content.kinds[current.kind].label }}
             </span>
           </p>
-          <p class="c-catalog-dialog__text"><InlineText :text="current.text" /></p>
-          <div v-if="related.length" class="c-catalog-dialog__related">
-            <span class="c-catalog-dialog__meta">{{ content.related }}</span>
+          <p class="c-catalog-explorer__text"><InlineText :text="current.text" /></p>
+          <div v-if="related.length" class="c-catalog-explorer__related">
+            <span class="c-catalog-explorer__meta">{{ content.related }}</span>
             <button
               v-for="module in related"
               :key="module.id"
               type="button"
-              class="c-catalog-dialog__chip"
+              class="c-catalog-explorer__chip"
               @click="pick(module.id)"
             >
               <InlineText :text="module.name" />
             </button>
           </div>
-          <a v-if="guide" class="c-catalog-dialog__guide c-inline-link" :href="guide">
+          <a v-if="guide" class="c-catalog-explorer__guide c-inline-link" :href="guide">
             {{ content.guide }}
           </a>
         </template>
-        <p v-else class="c-catalog-dialog__text">{{ content.mapHint }}</p>
+        <template v-else>
+          <p class="c-catalog-explorer__text">{{ content.about }}</p>
+          <p class="c-catalog-explorer__hint">{{ content.mapHint }}</p>
+        </template>
       </section>
     </div>
-  </dialog>
+  </div>
 </template>

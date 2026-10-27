@@ -1,4 +1,5 @@
 import { createRouter, type RouterHistory } from 'vue-router'
+import CatalogView from '@/views/CatalogView.vue'
 import DownloadView from '@/views/DownloadView.vue'
 import HomeView from '@/views/HomeView.vue'
 
@@ -19,6 +20,12 @@ export function createAppRouter(history: RouterHistory) {
         path: '/download',
         name: 'download',
         component: DownloadView,
+      },
+      {
+        path: '/catalog',
+        name: 'catalog',
+        component: CatalogView,
+        meta: { fill: true },
       },
       {
         path: '/:pathMatch(.*)*',

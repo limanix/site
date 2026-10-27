@@ -10,4 +10,14 @@
     flex: 1 1 0%;
     min-width: 0;
   }
+
+  .o-app-layout--fill {
+    height: 100dvh;
+  }
+
+  .o-app-layout--fill .o-app-layout__main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
 }

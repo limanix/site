@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import CatalogDialog from '@/components/catalog/CatalogDialog.vue'
 import CatalogMap from '@/components/catalog/CatalogMap.vue'
 import MapIcon from '@/components/catalog/MapIcon.vue'
 import ActionLink from '@/components/ui/ActionLink.vue'
@@ -16,9 +15,7 @@ const props = defineProps<{
 }>()
 
 const chosen = ref<string | null>(null)
-const dialog = ref<InstanceType<typeof CatalogDialog> | null>(null)
-const links = computed(() => mapLinks(props.modules))
-const docs = `${props.links.docs}/modules/`
+const edges = computed(() => mapLinks(props.modules))
 const current = computed(() => props.modules.find((module) => module.id === chosen.value))
 </script>
 
@@ -32,20 +29,15 @@ const current = computed(() => props.modules.find((module) => module.id === chos
             {{ kind.label }}
           </li>
         </ul>
-        <button
-          type="button"
-          class="catalog__expand"
-          aria-haspopup="dialog"
-          @click="dialog?.show(chosen)"
-        >
+        <a class="catalog__expand" :href="links.catalog">
           <MapIcon name="expand" />
           {{ content.expand }}
-        </button>
+        </a>
       </div>
       <CatalogMap
         v-model:chosen="chosen"
         :modules="modules"
-        :links="links"
+        :links="edges"
         :kinds="content.kinds"
       />
       <p class="catalog__caption" aria-live="polite">
@@ -57,9 +49,10 @@ const current = computed(() => props.modules.find((module) => module.id === chos
         </li>
       </ul>
       <div class="catalog__docs">
-        <ActionLink :href="docs" variant="text">{{ content.browse }}</ActionLink>
+        <ActionLink :href="`${links.docs}/modules/`" variant="text">{{
+          content.browse
+        }}</ActionLink>
       </div>
     </div>
-    <CatalogDialog ref="dialog" :content="content" :modules="modules" :links="links" />
   </PageSection>
 </template>

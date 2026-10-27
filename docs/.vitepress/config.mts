@@ -1,5 +1,8 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig, type HeadConfig } from 'vitepress'
+import { kinds, loadCatalog } from '../scripts/catalog.mjs'
+
+const catalog = loadCatalog()
 
 const site = 'https://limanix.dev'
 const docs = 'https://docs.limanix.dev'
@@ -143,12 +146,13 @@ export default defineConfig({
         text: 'Modules',
         items: [
           { text: 'The catalog', link: '/modules/' },
-          { text: 'Docker', link: '/modules/docker' },
-          { text: 'PostgreSQL', link: '/modules/postgres' },
-          { text: 'Google Cloud CLI', link: '/modules/gcloud' },
-          { text: 'Claude Code', link: '/modules/claude-code' },
-          { text: 'Posting', link: '/modules/posting' },
-          { text: 'Harlequin', link: '/modules/harlequin' },
+          ...Object.entries(kinds).map(([kind, text]) => ({
+            text,
+            collapsed: true,
+            items: catalog.entries
+              .filter((entry) => entry.kind === kind)
+              .map((entry) => ({ text: entry.title, link: `/modules/${entry.slug}` })),
+          })),
           { text: 'Your own modules', link: '/modules/custom' },
         ],
       },
@@ -172,7 +176,10 @@ export default defineConfig({
     search: { provider: 'local' },
     socialLinks: [{ icon: 'github', link: 'https://github.com/limanix' }],
     editLink: {
-      pattern: 'https://github.com/limanix/site/edit/main/docs/pages/:path',
+      pattern: ({ frontmatter, relativePath }) =>
+        frontmatter.catalogSource
+          ? `https://github.com/limanix/modules/edit/main/${frontmatter.catalogSource}`
+          : `https://github.com/limanix/site/edit/main/docs/pages/${relativePath}`,
       text: 'Edit this page on GitHub',
     },
     outline: { level: [2, 3], label: 'On this page' },

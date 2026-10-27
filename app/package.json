@@ -4,11 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "graph": "node scripts/graph.mjs",
+    "predev": "npm run graph",
     "dev": "vite",
+    "prebuild": "npm run graph",
     "build": "npm run type-check && vite build && npm run prerender",
     "prerender": "vite build --ssr src/entry-server.ts --outDir dist-ssr && node scripts/prerender.mjs",
     "preview": "vite preview",
     "type-check": "vue-tsc --build",
+    "pretest": "npm run graph",
     "test": "npm run type-check",
     "lint": "eslint . && prettier --check src scripts public index.html download.html",
     "format": "prettier --write src scripts public index.html download.html"

@@ -12,7 +12,7 @@ The `[toolchains]` table installs one version of each language you need, with it
 [toolchains]
 go = "1.27"
 rust = "stable"
-python = "3.14"
+python = "3.15"
 nodejs = "26"
 ```
 
@@ -22,24 +22,21 @@ Leave a key out, or set it to `""`, to install none of that language. Apply a ch
 
 ## What each key installs
 
-| Key      | Value                                    | Installs                                                                                  |
-| -------- | ---------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `go`     | A line, such as `1.27`                   | Go, the gopls language server, the Delve debugger (`dlv`) and GCC for cgo                 |
-| `rust`   | A channel or a version, such as `stable` | rustup with Cargo, rustc, rustfmt, Clippy and rust-analyzer, plus GCC, pkg-config and GDB |
-| `python` | A line, such as `3.14`                   | Python with venv, virtualenv and the Pyright language server                              |
-| `nodejs` | A line, such as `26`                     | Node.js with npm and npx, and the TypeScript language server                              |
+| Key      | Value                  | Module guide               |
+| -------- | ---------------------- | -------------------------- |
+| `go`     | A version line         | [Go](/modules/go)          |
+| `rust`   | A channel or a version | [Rust](/modules/rust)      |
+| `python` | A version line         | [Python](/modules/python)  |
+| `nodejs` | A version line         | [Node.js](/modules/nodejs) |
 
-[Languages](/inside/languages) shows how to work with each one in the VM.
+The module guides list the installed tools, supported lines and examples.
+[Languages](/inside/languages) covers working with projects in the VM.
 
 ## Go, Python and Node.js lines
 
-A line is a release series. `go = "1.27"` installs Go 1.27.x, and each catalog release brings the line's patch releases. The current catalog has these lines:
-
-| Key      | Lines                                              |
-| -------- | -------------------------------------------------- |
-| `go`     | `1.27` (recommended), `1.26`, `1.25` (end of life) |
-| `python` | `3.14` (recommended), `3.13`, `3.12`               |
-| `nodejs` | `26` (recommended), `24`, `22`                     |
+A line is a release series.
+For example, `go = "1.27"` selects the 1.27 line.
+The [Go](/modules/go#versions), [Python](/modules/python#versions) and [Node.js](/modules/nodejs#versions) pages list the lines of the published catalog.
 
 The catalog comes with your `limanix` client. List the lines it has on the Mac:
 
@@ -55,25 +52,8 @@ Each line appears as a row of kind `toolchains`, such as `lmx:go-1.27`. A line t
 
 ## Rust channels and versions
 
-`rust` sets the default toolchain of rustup:
-
-| Value                       | Toolchain                                          |
-| --------------------------- | -------------------------------------------------- |
-| `stable`, `beta`, `nightly` | The newest release of the channel when it installs |
-| `nightly-2026-10-01`        | The channel as it was on that date                 |
-| `1.90`, `1.90.0`            | A Rust release                                     |
-
-rustup downloads the toolchain when the VM starts after the value changes, from `static.rust-lang.org`. A failed download is tried again. Until the toolchain is installed, Cargo reports that no default toolchain is configured. Follow the download in the VM:
-
-::: code-group
-
-```sh [VM]
-systemctl --user status rust-toolchain
-```
-
-:::
-
-A channel does not move on its own: run `rustup update` for its newest release. A project's `rust-toolchain.toml` selects its own toolchain, which rustup installs on first use.
+`rust` sets the default rustup toolchain, such as `stable`, `nightly` or a release number.
+See [Rust](/modules/rust#toolchains) for accepted values, downloads and project overrides.
 
 ## Language servers in the editor
 
@@ -85,15 +65,5 @@ Open the project at its path in the VM, such as `/workspace`, for the language s
 
 ## Keep Go on the installed version
 
-When a project's `go.mod` or `go.work` requires a newer Go, Go can download that toolchain. To use only the installed one, set `GOTOOLCHAIN` in [`[env]`](/config/environment#set-environment-variables):
-
-::: code-group
-
-```toml [limanix.toml]
-[env]
-GOTOOLCHAIN = "local"
-```
-
-:::
-
-A project that requires a newer Go then fails to build instead of downloading one.
+Go can download another toolchain when a project requires it.
+See [Go toolchain downloads](/modules/go#toolchain-downloads) to control this with `GOTOOLCHAIN`.

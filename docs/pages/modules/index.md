@@ -49,31 +49,18 @@ modules = ["lmx:docker"]
 
 Without these tables the VM gets the `terminal` preset, no toolchain and no other module. A shell component or a toolchain in `[nixos] modules` fails and names the table that chooses it, for example `lmx:go is a toolchain; choose its version in [toolchains], such as go = "1.27"`.
 
-## Modules
-
-| Module                              | Selector        | Adds                                                                         |
-| ----------------------------------- | --------------- | ---------------------------------------------------------------------------- |
-| [Docker](/modules/docker)           | `lmx:docker`    | Docker Engine, the Docker CLI, Compose and Lazydocker                        |
-| [PostgreSQL](/modules/postgres)     | `lmx:postgres`  | The PostgreSQL server and its tools, for manual use                          |
-| [Google Cloud CLI](/modules/gcloud) | `lmx:gcloud`    | The Google Cloud CLI                                                         |
-| [Claude Code](/modules/claude-code) | `lmx:claude`    | Anthropic's coding agent for the terminal, without self-updates              |
-| [Posting](/modules/posting)         | `lmx:posting`   | An HTTP client for the terminal, in the guest's theme                        |
-| [Harlequin](/modules/harlequin)     | `lmx:harlequin` | A SQL IDE for the terminal with the PostgreSQL adapter, in the guest's theme |
-
-Software that needs no configuration is a package, not a module: list it in `[nixos] packages`, as [Modules and packages](/config/modules) shows. For settings or services of your own, [write a module](/modules/custom) and select it as `third-party:NAME`.
+<!-- @include: ../../.catalog/index.md -->
 
 ## Versions
 
-Some modules offer version lines. `lmx:NAME` selects the module's default line. `lmx:NAME-LINE` selects a line explicitly and replaces the default.
+Some modules offer version lines.
+`lmx:NAME` selects the default; `lmx:NAME-LINE` selects a line explicitly.
+Each module page lists its lines, defaults, support status and rules for selecting several lines.
+A later catalog release may change a default.
+Select a line explicitly when you need to keep it.
 
-| Module     | Lines            | Default |
-| ---------- | ---------------- | ------- |
-| Docker     | `28`, `29`       | `29`    |
-| PostgreSQL | `16`, `17`, `18` | `18`    |
-
-The other modules have no lines and only the `lmx:NAME` selector. A future catalog release may change a default; to stay on a line, select it explicitly.
-
-Select several lines of one module only when its page allows it. PostgreSQL installs `lmx:postgres-16` and `lmx:postgres-18` side by side. Docker takes one line, and two lines stop the build with `docker: select one line`. Each module page lists the package versions of its lines and their support status. An end-of-life line prints a warning when the VM builds.
+For software that needs no module configuration, use `[nixos] packages`; see [Modules and packages](/config/modules).
+For your own settings or services, [write a module](/modules/custom) and select it as `third-party:NAME`.
 
 ## Help inside the VM
 

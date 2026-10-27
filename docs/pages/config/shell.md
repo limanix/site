@@ -27,7 +27,8 @@ These are the defaults: a file without a `[shell]` table gets the same shell. Ap
 | `terminal`, the default | Zsh with Oh My Zsh | Git, the CLI tools, Lazygit, Yazi and the GitHub CLI |
 | `minimal`               | Bash               | Git and the CLI tools                                |
 
-The CLI tools are `rg`, `fd`, `fzf`, `bat`, `eza`, `delta`, `jq`, `yq`, `xh`, `btop`, `dust`, `duf` and `tldr`. Zsh adds command suggestions, syntax highlighting, completion search with Tab, history search with Ctrl-R, `z` to return to visited directories and direnv for project environments. [The terminal](/inside/terminal) shows how to use them.
+See [CLI tools](/modules/cli-tools) for the shared commands and [Zsh](/modules/zsh) for shell features.
+[The terminal](/inside/terminal) shows how to use the tools together.
 
 The preset also sets the defaults of the other settings:
 
@@ -61,7 +62,7 @@ The prompt belongs to Zsh and needs the terminal preset.
 | `starship`          | Starship, which also shows the hostname, the language versions it detects and the exit status                         |
 | `none`              | No managed prompt: set `PROMPT` in your `~/.zshrc`                                                                    |
 
-Both prompts use the colors of the [theme](/config/environment#choose-a-theme). Outside tmux, they show the words of `lmx status --short` that need attention, such as `restart`; inside tmux, the status line shows them. A personal `~/.config/starship.toml` takes precedence over the managed Starship settings.
+See [Zsh prompts](/modules/zsh#prompt) for colors, VM status and personal settings.
 
 With `preset = "minimal"`, leave `prompt` out or set it to `none`: `limanix create` and `limanix update` reject a prompt there. Bash then shows your account, the VM's hostname and the directory in the theme's accent colors.
 
@@ -73,7 +74,7 @@ With `preset = "minimal"`, leave `prompt` out or set it to `none`: `limanix crea
 | `neovim`                 | Plain Neovim. `vi` and `vim` start it too; `EDITOR` stays `nano`, and you configure language servers yourself.                                                                                   |
 | `none`                   | No editor                                                                                                                                                                                        |
 
-Open files with `nvim`. Your own `~/.config/nvim/init.lua` or `init.vim`, for example from your [dotfiles](/config/dotfiles), replaces the bundled AstroNvim setup. To extend AstroNvim instead, add plugin specifications under `~/.config/nvim/lua/plugins/`.
+See [AstroNvim](/modules/astronvim) and [Neovim](/modules/neovim) for use and personal configuration.
 
 ## Choose a multiplexer
 
@@ -89,7 +90,7 @@ limanix shell dev-box --session work
 
 Run the same command to return after you detach with Ctrl-B d. Session names cannot contain `.` or `:`. Without tmux or a session provider from your own module, `limanix shell --session` names the setting that adds one and exits.
 
-[Shell and sessions](/vms/shell) covers sessions, and [The terminal](/inside/terminal) covers the tmux keys.
+[Shell and sessions](/vms/shell) covers sessions, and [tmux](/modules/tmux#use) lists its keys.
 
 ## Your own startup files
 

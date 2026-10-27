@@ -163,7 +163,7 @@ limanix delete dev-box
 - Run one command in the VM from the Mac: `limanix shell dev-box -- uname -a`. See [Shell and sessions](/vms/shell).
 - For Zsh, AstroNvim and tmux, set `preset = "terminal"` in `[shell]`. See [Shell](/config/shell).
 - With tmux, `limanix shell dev-box --session work` returns you to the same session after you disconnect. See [Shell and sessions](/vms/shell).
-- Add Go, Rust, Python or Node.js in `[toolchains]`. See [Toolchains](/config/toolchains).
+- Add Go, Rust, Python, Node.js or Java in `[toolchains]`. See [Toolchains](/config/toolchains).
 - `limanix modules list` shows what your client's catalog offers, such as `lmx:docker`. See [The catalog](/modules/).
 - Reach a server in the VM at the VM's address, not at `localhost`. See [Network](/vms/network).
 - `pbcopy` and `pbpaste` in the VM use the Mac clipboard. See [Clipboard](/inside/clipboard).

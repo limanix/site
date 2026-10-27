@@ -15,6 +15,7 @@ to `delete`.
 | `limanix start dev-box`                | Starts a stopped VM with the system it already has                             |
 | `limanix stop dev-box`                 | Shuts the VM down and keeps its disk and managed home                          |
 | `limanix shell dev-box`                | Opens a shell in the VM; see [Shell and sessions](/vms/shell)                  |
+| `ssh dev-box.limanix`                  | Connects with SSH, as editors do; see [Connect an editor](/vms/editors)        |
 | `limanix update --config limanix.toml` | Applies your edited `limanix.toml` to the VM; see [Changing a VM](/vms/update) |
 | `limanix list`                         | Lists your VMs with their state, address and disk usage                        |
 | `limanix doctor dev-box`               | Checks the VM and tells you what to fix                                        |

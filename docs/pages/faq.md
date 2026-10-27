@@ -34,7 +34,7 @@ Project folders stay on your Mac and are shared into the VM. Your home inside th
 
 ## Can I use my editor on the Mac?
 
-Yes. Share the project folder with the VM, edit it on the Mac and run builds and tests in the VM; both sides see the same files. For language servers to see the project's Linux dependencies, open the project at its path in the VM, with AstroNvim inside the VM or with your editor's remote development support, which you set up yourself. See [Shared folders](/config/mounts).
+Yes. VS Code, Cursor, Zed and JetBrains IDEs open a project in the VM over SSH: the window stays on the Mac, and the language servers see the project's Linux dependencies. See [Connect an editor from the Mac](/vms/editors). A shared project folder can also be edited on the Mac directly while builds and tests run in the VM; see [Shared folders](/config/mounts).
 
 ## How do I add a package?
 

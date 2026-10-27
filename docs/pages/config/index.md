@@ -34,7 +34,7 @@ Editing the file changes nothing by itself. Apply it with `limanix update --conf
 | `[user]`                       | Your account in the VM                                 | [Environment and theme](/config/environment#set-up-your-account)       |
 | `[home]`                       | Where your home folder in the VM is kept on the Mac    | [Files and storage](/vms/storage)                                      |
 | `[shell]`                      | Shell preset, prompt, editor, multiplexer and dotfiles | [Shell](/config/shell), [Dotfiles](/config/dotfiles)                   |
-| `[toolchains]`                 | Go, Rust, Python, Node.js and Java                     | [Toolchains](/config/toolchains)                                       |
+| `[toolchains]`                 | Go, Rust, Python, Node.js, Java, C and C++             | [Toolchains](/config/toolchains)                                       |
 | `[nixos]`                      | Catalog modules and packages                           | [Modules and packages](/config/modules)                                |
 | `[theme]`                      | Colors                                                 | [Environment and theme](/config/environment#choose-a-theme)            |
 | `[network]`, `[network.ports]` | Network mode and firewall ports                        | [Network](/vms/network)                                                |

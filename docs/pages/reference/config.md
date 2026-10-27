@@ -163,6 +163,8 @@ gradle = "9"
 | `java`   | string | `""`    | OpenJDK line, with the jdtls language server; `JAVA_HOME` points to it.                                                                                                                          |
 | `maven`  | string | `""`    | Apache Maven line, which runs on the `java` line and needs it.                                                                                                                                   |
 | `gradle` | string | `""`    | Gradle line, which runs on the `java` line and needs it; the build stops when the Gradle line does not support that Java.                                                                        |
+| `gcc`    | string | `""`    | GCC line for C and C++, with GDB, clangd, make, CMake, Ninja, Meson and pkg-config; the compilers find the headers and libraries of `[nixos] packages`.                                          |
+| `clang`  | string | `""`    | Clang line, with clangd, clang-format, clang-tidy and LLDB, next to GCC, which it brings; `cc` and `c++` stay GCC.                                                                               |
 
 A line is a version such as `1.27` and must exist in the catalog of your client: `limanix modules list` shows each line as a selector of kind `toolchains`, such as `lmx:go-1.27`. An unknown line fails with the lines the catalog has. `maven` or `gradle` without `java` fails with `toolchains.gradle: needs a JDK: add java to [toolchains], such as java = "21"`.
 
@@ -366,6 +368,11 @@ go = ""
 rust = ""
 python = ""
 nodejs = ""
+java = ""
+maven = ""
+gradle = ""
+gcc = ""
+clang = ""
 
 [nixos]
 modules = []

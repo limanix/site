@@ -99,9 +99,15 @@ limanix update --config limanix.toml
 
 ## A library listed in packages cannot be imported
 
-Cause: `[nixos] packages` is for packages that bring their own commands. A library such as `python3Packages.requests` installs, but a program cannot import it.
+Cause: `[nixos] packages` installs commands, and C libraries for the compilers of `gcc`. A language library such as `python3Packages.requests` installs, but a program cannot import it.
 
 Fix: install the library in the project's environment, such as a Python venv, or use a module. See [Modules and packages](/config/modules).
+
+## A build cannot find a header or a library
+
+Cause: the library is not in `[nixos] packages`, or `[toolchains]` has no `gcc`. The GCC that comes with Go and Rust does not search `[nixos] packages`. The build stops with an error such as `fatal error: zlib.h: No such file or directory` or `cannot find -lz`.
+
+Fix: add `gcc` to `[toolchains]` and the library to `[nixos] packages`, then run `limanix update --config limanix.toml`. See [Native libraries](/inside/languages#native-libraries).
 
 ## limanix create fails for a guest of the other architecture
 

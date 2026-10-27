@@ -1,5 +1,5 @@
 ---
-description: Build, test and edit Go, Rust, Python, Node.js and Java projects inside a VM.
+description: Build, test and edit Go, Rust, Python, Node.js, Java, C and C++ projects inside a VM.
 ---
 
 # Languages
@@ -16,7 +16,7 @@ lmx help go
 
 :::
 
-The card shows the installed version, the commands on your `PATH` and common tasks. The topics are `go`, `rust`, `python`, `nodejs`, `java`, `maven` and `gradle`.
+The card shows the installed version, the commands on your `PATH` and common tasks. The topics are `go`, `rust`, `python`, `nodejs`, `java`, `maven`, `gradle`, `gcc` and `clang`.
 
 The module pages describe the installed tools and their use:
 
@@ -33,6 +33,7 @@ The [use examples](/modules/rust#use) cover Cargo, formatting and Clippy.
 
 See [Python](/modules/python#use) for virtual environments and project dependencies.
 The page also explains interpreter changes and Pyright configuration.
+Wheels with native code, such as NumPy, load as on other Linux systems; see [Binary wheels and native code](/modules/python#binary-wheels-and-native-code).
 
 ## Node.js
 
@@ -43,6 +44,11 @@ See [Node.js](/modules/nodejs#use) for npm and [native dependencies](/modules/no
 See [Java](/modules/java#use) for compiling and running classes, and [other JDKs](/modules/java#other-tools-and-jdks) for tools that look for a JDK or download one.
 Build projects with [Maven](/modules/maven#use) or [Gradle](/modules/gradle#use); both run on the selected JDK.
 
+## C and C++
+
+See [GCC](/modules/gcc#use) for compiling, CMake and GDB, and [Clang](/modules/clang#use) for Clang, clang-format and clang-tidy.
+clangd reads `compile_commands.json`, which CMake writes with `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`.
+
 ## Language servers in AstroNvim
 
 AstroNvim uses the language servers of your selected toolchains.
@@ -52,4 +58,18 @@ Plain [Neovim](/modules/neovim#language-servers) needs your own LSP configuratio
 
 ## Native libraries
 
-GCC comes with the Go and Rust toolchains, and Rust also has pkg-config. Code that links to a C library still needs that library and its headers: a Go package with cgo, a crate such as `openssl-sys`, a Python package with a native extension or a Node.js native addon. Python and Node.js packages that compile code also need build tools, and a virtual environment does not provide system libraries. Add what a project needs with a module of your own; see [Your own modules](/modules/custom).
+Code that links to a C library needs that library and its headers: a Go package with cgo, a crate such as `openssl-sys`, a Python package with a native extension or a Node.js native addon. Select `gcc` in `[toolchains]` and add the library to `[nixos] packages`:
+
+::: code-group
+
+```toml [limanix.toml]
+[toolchains]
+gcc = "15"
+
+[nixos]
+packages = ["openssl", "libpq"]
+```
+
+:::
+
+The library comes with its headers. The compilers, `pkg-config` and CMake find it without extra flags, and the programs they build find it when they run. node-gyp also needs Python: add `python` to `[toolchains]`. Go and Rust bring a GCC of their own, which does not search `[nixos] packages`. See [Native libraries](/modules/gcc#native-libraries) for the details.

@@ -4,7 +4,7 @@ const dist = new URL('../dist/', import.meta.url)
 const server = new URL('../dist-ssr/', import.meta.url)
 const { render } = await import(new URL('entry-server.js', server).href)
 
-const pages = { '/': 'index.html', '/download': 'download.html' }
+const pages = { '/': 'index.html', '/download': 'download.html', '/catalog': 'catalog.html' }
 const mount = '<div id="app"></div>'
 
 for (const [url, file] of Object.entries(pages)) {

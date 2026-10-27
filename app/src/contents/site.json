@@ -6,6 +6,7 @@
   "links": {
     "home": "/",
     "download": "/download",
+    "catalog": "/catalog",
     "guide": "https://docs.limanix.dev",
     "docs": "https://docs.limanix.dev",
     "github": "https://github.com/limanix",
@@ -277,7 +278,8 @@
       },
       "expand": "Expand",
       "map": "Catalog map",
-      "mapHint": "Drag to look around. Pinch, or scroll with Ctrl held, to zoom.",
+      "about": "Every module and tool in the catalog. A line joins two that work together: a language server reaches the editor, a key in one opens the other, one theme colors them all.",
+      "mapHint": "Pick one to see what it works with. Drag to move around; pinch, or scroll with Ctrl held, to zoom.",
       "search": "Find a module or tool",
       "empty": "Nothing in the catalog matches",
       "related": "Works with",
@@ -286,7 +288,7 @@
       "zoomIn": "Zoom in",
       "zoomOut": "Zoom out",
       "fit": "Show the whole map",
-      "close": "Close the map",
+      "dismiss": "Close",
       "more": [
         { "label": "Any package from nixpkgs", "href": "https://search.nixos.org/packages" },
         {

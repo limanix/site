@@ -61,6 +61,7 @@ onBeforeUnmount(() => window.clearTimeout(timer))
         <p>
           <strong>{{ content.install.approval.title }}</strong>
           {{ content.install.approval.text }}
+          <span class="download__path">{{ content.install.approval.path }}</span>
         </p>
       </div>
     </div>

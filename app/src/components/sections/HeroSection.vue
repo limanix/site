@@ -10,6 +10,7 @@ defineProps<{ content: HeroContent; demo: DemoContent; links: LinksContent }>()
 <template>
   <section class="hero" aria-labelledby="hero-title">
     <div class="o-container">
+      <p v-if="content.badge" class="hero__badge">{{ content.badge }}</p>
       <h1 id="hero-title">
         <template v-for="(line, index) in content.title" :key="index">
           <span class="hero__line"><InlineText :text="line" /></span>{{ ' ' }}

@@ -9,9 +9,9 @@
 
   .download__lead {
     margin-top: 16px;
-    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
-    line-height: 1.33;
-    letter-spacing: var(--tracking-2xl);
+    font-size: 1.125rem;
+    line-height: 1.5;
+    letter-spacing: var(--tracking-md);
     color: var(--color-lead);
   }
 
@@ -83,6 +83,13 @@
       font-weight: 600;
       color: var(--color-strong);
     }
+  }
+
+  .download__path {
+    display: block;
+    margin-top: 4px;
+    font-weight: 500;
+    color: var(--color-accent-to);
   }
 
   .download__shield {

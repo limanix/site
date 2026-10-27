@@ -3,7 +3,6 @@ import site from './site.json'
 
 export type Tone = 'amber' | 'sky' | 'green' | 'pink' | 'purple' | 'rose'
 export type FeatureIcon = 'terminal' | 'braces' | 'layers' | 'folder' | 'sliders' | 'pulse'
-export type FlowPlace = 'mac' | 'vm'
 export type CatalogKind = 'shell' | 'toolchains' | 'modules'
 
 type Site = typeof site
@@ -14,9 +13,10 @@ export type Feature = Omit<Home['features']['items'][number], 'icon' | 'tone'> &
   tone: Tone
 }
 
-type Command = Home['howItWorks']['commands'][number]
-export type FlowCommand = Omit<Command, 'steps'> & {
-  steps: (Omit<Command['steps'][number], 'where'> & { where: FlowPlace })[]
+export interface Step {
+  title: string
+  text: string
+  command?: string
 }
 
 export interface CatalogModule {
@@ -37,9 +37,10 @@ interface GraphNode {
   module?: string | null
 }
 
-export type HomeContent = Omit<Home, 'features' | 'howItWorks' | 'catalog'> & {
+export type HomeContent = Omit<Home, 'hero' | 'features' | 'steps' | 'catalog'> & {
+  hero: Omit<Home['hero'], 'badge'> & { badge?: string }
   features: Omit<Home['features'], 'items'> & { items: Feature[] }
-  howItWorks: Omit<Home['howItWorks'], 'commands'> & { commands: FlowCommand[] }
+  steps: Omit<Home['steps'], 'items'> & { items: Step[] }
   catalog: Omit<Home['catalog'], 'kinds'> & {
     kinds: Record<CatalogKind, { label: string; tone: Tone }>
   }
@@ -51,7 +52,7 @@ export type HeroContent = HomeContent['hero']
 export type DemoContent = HomeContent['demo']
 export type WelcomeContent = DemoContent['welcome']
 export type FeaturesContent = HomeContent['features']
-export type HowItWorksContent = HomeContent['howItWorks']
+export type StepsContent = HomeContent['steps']
 export type CatalogContent = HomeContent['catalog']
 export type FaqContent = HomeContent['faq']
 export type ClosingContent = HomeContent['closing']

@@ -107,6 +107,11 @@
     .c-demo__panes {
       --pane-pad: 12px;
     }
+
+    .c-demo__shell {
+      overflow-x: auto;
+      font-size: min(13px, (100cqi - 2 * var(--pane-pad)) / 26.6);
+    }
   }
 
   @keyframes c-demo-blink {

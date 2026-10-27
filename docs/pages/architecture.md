@@ -60,5 +60,6 @@ LimaNix keeps only the applied system generation on the guest disk. `lmxd` colle
 | Managed home                       | `home.root` on the Mac, `~/.limanix` by default                                         | Kept by `limanix delete`; `--remove-home` removes it            |
 | Shared project folders             | Their own folders on the Mac                                                            | Changes in the VM change the original files                     |
 | Applied system                     | The guest disk and its Nix store; only the applied generation is kept                   | Rebuilt from the saved generation inputs                        |
+| SSH settings for editors           | `ssh/config` in the LimaNix state directory                                             | Rewritten on create, update, start and delete                   |
 
 A lock per VM keeps two commands from changing the same VM at once; `limanix shell` does not take it. `limanix list --json` reports Lima's power state and the last LimaNix operation as separate values. A failed operation keeps the records and inputs needed to diagnose it. `LIMANIX_HOME` and `LIMA_HOME` do not move existing VMs: use the same values whenever you work with them. Read [Troubleshooting](/troubleshooting) before you remove any state by hand.

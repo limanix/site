@@ -114,6 +114,7 @@ export default defineConfig({
         items: [
           { text: 'Using virtual machines', link: '/vms/' },
           { text: 'Shell and sessions', link: '/vms/shell' },
+          { text: 'Connect an editor from the Mac', link: '/vms/editors' },
           { text: 'Changing a VM', link: '/vms/update' },
           { text: 'Files and storage', link: '/vms/storage' },
           { text: 'Resources and architecture', link: '/vms/resources' },

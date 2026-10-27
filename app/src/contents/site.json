@@ -418,6 +418,21 @@
         "asset": "limanix-amd64"
       }
     ],
+    "install": {
+      "window": "Install in Terminal",
+      "copy": "Copy",
+      "copied": "Copied",
+      "lines": [
+        "$ mkdir -p ~/.local/bin",
+        "$ install -m 755 ~/Downloads/{asset} ~/.local/bin/limanix",
+        "$ export PATH=\"$HOME/.local/bin:$PATH\"  # add to ~/.zshrc to keep it",
+        "$ limanix --version"
+      ],
+      "approval": {
+        "title": "macOS may block the first run.",
+        "text": "Apple has not notarized the binary. Check that it came from limanix.dev or the GitHub releases, then allow it in System Settings\u00a0> Privacy\u00a0&\u00a0Security."
+      }
+    },
     "guide": "Getting started",
     "notes": "What's new"
   },

@@ -153,7 +153,7 @@
     "features": {
       "id": "features",
       "title": "Everything a project needs, nothing it does not",
-      "lead": "A few lines of `limanix.toml` turn into tools you use every day. Pick one to see the lines and what they give you.",
+      "lead": "A few lines of `limanix.toml` turn into tools you use every day.",
       "items": [
         {
           "icon": "terminal",

@@ -76,7 +76,7 @@ With `preset = "minimal"`, leave `prompt` out or set it to `none`: `limanix crea
 
 See [AstroNvim](/modules/astronvim) and [Neovim](/modules/neovim) for use and personal configuration.
 Editors on the Mac, such as VS Code, work with any of these values; see
-[Connect an editor from the Mac](/vms/editors).
+[Editors and IDEs](/vms/editors).
 
 ## Choose a multiplexer
 

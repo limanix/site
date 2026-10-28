@@ -42,7 +42,7 @@ Results go to standard output. Errors, as `limanix: MESSAGE`, and the build outp
 | `LIMANIX_HOME` | `~/Library/Application Support/Limanix` | LimaNix state: VM records, prepared configurations and imported modules.                            |
 | `LIMA_HOME`    | `~/.lima`                               | Lima's instances, each in a directory with its host agent logs `ha.stdout.log` and `ha.stderr.log`. |
 
-Neither variable moves existing VMs or homes. Use the same values for every command that works on an existing VM.
+Neither variable moves existing VMs or homes. Use the same values for every command that works on an existing VM. [Paths and ports](/reference/paths) lists what each folder holds.
 
 ## `limanix create`
 

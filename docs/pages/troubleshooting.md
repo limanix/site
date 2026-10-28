@@ -466,7 +466,7 @@ limanix list --json
 
 - `limanix doctor dev-box --json` prints the same checks as JSON.
 - Lima writes the output of its host agent to `ha.stdout.log` and `ha.stderr.log` in the directory of each instance under `~/.lima`, or under `LIMA_HOME`. `lima_name` in `limanix list --json` names the instance.
-- LimaNix keeps its state in `~/Library/Application Support/Limanix`, or in `LIMANIX_HOME` when you set it. Use the same `LIMANIX_HOME` and `LIMA_HOME` for every command: a different value shows different VMs.
+- LimaNix keeps its state in `~/Library/Application Support/Limanix`, or in `LIMANIX_HOME` when you set it. Use the same `LIMANIX_HOME` and `LIMA_HOME` for every command: a different value shows different VMs. See [Paths and ports](/reference/paths).
 
 In the VM:
 

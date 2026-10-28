@@ -67,7 +67,7 @@ code --remote ssh-remote+dev-box.limanix /workspace
 
 :::
 
-See [Connect an editor from the Mac](/vms/editors). You can also edit a shared project folder on the Mac directly while builds and tests run in the VM; see [Shared folders](/config/mounts).
+See [Editors and IDEs](/vms/editors). You can also edit a shared project folder on the Mac directly while builds and tests run in the VM; see [Shared folders](/config/mounts).
 
 ## How do I add a package?
 

@@ -106,7 +106,7 @@ export default defineConfig({
           { text: 'What is LimaNix?', link: '/' },
           { text: 'Quick start', link: '/quick-start' },
           { text: 'Install', link: '/install' },
-          { text: 'Frequently asked questions', link: '/faq' },
+          { text: 'FAQ', link: '/faq' },
         ],
       },
       {

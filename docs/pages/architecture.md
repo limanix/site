@@ -1,65 +1,82 @@
 ---
-description: How limanix, Lima, the catalog and lmx build and run a VM, and where LimaNix keeps its state.
+description: What runs on the Mac and in the VM, how limanix reaches a VM, how a change in limanix.toml reaches it, and where LimaNix keeps its state.
 ---
 
 # How it works
 
-This page shows what runs where, how a change in `limanix.toml` reaches the VM, and where LimaNix keeps its state. Read it to understand what a command does, or before you recover from a failed one.
+LimaNix is one program on your Mac, `limanix`, and a NixOS system in each VM that it builds from your `limanix.toml`. This page shows what runs where, how `limanix` reaches a VM, how a change reaches it and what happens when a step fails.
 
-## The parts
+## What runs where
 
-| Part        | Runs on                   | What it does                                                                                                                  |
-| ----------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `limanix`   | Mac                       | Reads `limanix.toml`, prepares the VM's system and runs every VM command.                                                     |
-| Lima        | Mac, built into `limanix` | Runs the VM with Apple's Virtualization framework for a guest of the Mac's architecture, or with QEMU for the other one.      |
-| The catalog | Mac, built into `limanix` | Shell components, toolchains and modules, with the Nixpkgs revision they build from. Each client bundles one catalog release. |
-| NixOS       | VM                        | The Linux system of the VM, built from your file and the catalog.                                                             |
-| `lmx`       | VM                        | The guest command: the welcome, `lmx status`, `lmx doctor`, `lmx help` and the clipboard commands.                            |
-| `lmxd`      | VM                        | A root daemon under systemd that builds and checks each new system and keeps the Nix store from filling the disk.             |
+<LimanixOverview variant="parts" />
 
-`limanix` reaches the VM over SSH. `limanix shell` connects as your development account, and `limanix list` and `limanix doctor` ask `lmx` in the VM for its address, disk usage and checks. `lmxd` listens on no network port: the Mac reaches it only through SSH and `sudo lmx`.
+<div class="parts">
 
-A new VM boots from the base image of the bundled catalog release, which `limanix` downloads if needed. The client pins an `lmx` release, and the VM downloads it while it builds its system.
+- **`limanix`**\
+  The command on the Mac. It reads `limanix.toml`, prepares each new system and runs every VM command; see [the limanix command](/reference/cli).
+- **Lima**\
+  Runs the VM: Apple Virtualization for a guest of your Mac's architecture, QEMU for the other one. While a VM runs, a `limanix` process stays in the background as [Lima's](https://lima-vm.io) host agent.
+- **The catalog**\
+  NixOS modules for the shell, toolchains and services, pinned to one nixpkgs revision. Each `limanix` carries one [catalog](/modules/) release, and a new VM first boots from its base image.
+- **NixOS**\
+  The system of the VM. The VM builds it from your file, the catalog and your own modules.
+- **`lmx`**\
+  The command in the VM, for you and for `limanix`: the welcome, status, checks, help, the dotfile links and the Mac clipboard; see [the lmx command](/inside/lmx).
+- **`lmxd`**\
+  A root daemon under systemd. It builds each new system, checks it after the restart, removes the older one and keeps the Nix store from filling the disk.
+
+</div>
+
+## How limanix reaches a VM
+
+<LimanixOverview variant="connections" />
+
+`limanix` asks `lmx` for builds, status and checks, and reads its answers as JSON. The management account belongs to LimaNix; your shell, your files and your editors use your own account. [SSH ports](/reference/paths#ssh-ports) shows how each VM gets its port.
 
 ## How a change reaches the VM
 
-`limanix create` and `limanix update` take the same path. Each run prepares a new generation: the complete system that your file describes.
+`limanix create` and `limanix update` take the same steps. Each run builds a new generation: the complete system that your file describes.
 
-1. **Check.** `limanix` parses and validates `limanix.toml`, then checks the Mac: the macOS version, a native binary, `ssh`, and QEMU when the guest needs it.
-1. **Prepare.** It copies the selected modules into the inputs of the generation, pinned to the catalog's Nixpkgs revision. `create` also allocates the managed home and creates the VM. `update` keeps the VM and its home, checks the disk size, and stops a running VM before it changes the VM's Lima settings.
-1. **Start.** It starts the VM with the inputs mounted read-only at `/mnt/limanix`.
-1. **Hand over.** It stops the VM's own `lmx`, builds the `lmx` release that the generation pins, and runs that release's `lmxd` for the build. Because the build uses the new generation's `lmxd`, a new VM and one made by an older client take the same steps.
-1. **Build.** That `lmxd` installs the environment files from `[env]`, makes room in the Nix store and builds the NixOS system for the next boot. `limanix` prints the build output.
-1. **Restart.** After a successful build, `limanix` restarts the VM into the new system.
-1. **Check and clean up.** `lmxd` checks the platform services, the shared folders and the development account. Then it removes the older system generations and their boot entries, and collects store paths that nothing references.
-1. **Ready.** `limanix` waits until `lmxd` reports the generation converged, saves the VM as `ready` and removes old inputs.
+<LimanixFlow />
 
-A successful update leaves the VM running, even if it was stopped before. Editing `limanix.toml` alone changes nothing, and `limanix start` boots the saved system without reading the file.
+Step 5 runs the `lmxd` of the new generation: a new VM, a VM made by an older client and a current VM take the same steps. A successful update leaves the VM running, even if it was stopped before. Editing `limanix.toml` alone changes nothing, and `limanix start` boots the saved system without reading the file.
+
+## Generations
+
+The inputs of each generation are a folder in the [state folder](/reference/paths#the-limanix-state-folder) on the Mac:
+
+::: code-group
+
+```text [Mac]
+instances/dev-box/generations/35b2edf4547e/
+├── flake/            the NixOS configuration
+│   ├── flake.nix     base modules and the catalog's nixpkgs pin
+│   ├── lmx.json      the lmx release to build
+│   ├── runtime.json  account, shell, toolchains, ports, packages
+│   └── modules/      the modules you chose, catalog and your own
+├── lima.yaml         CPU, memory, disk and mounts
+├── environment       [env] for services
+└── environment.sh    [env] for login shells
+```
+
+:::
+
+The VM sees the folder read-only at `/mnt/limanix` and builds its system from it. The guest disk keeps only the applied system. After a successful run, `limanix` removes the inputs of older generations; a failed run keeps its inputs for diagnosis.
 
 ## When a step fails
 
-| What fails                      | What happens                                                                                                                                     |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| The build                       | The VM does not restart and keeps its current system, and its own `lmxd` takes over again. The error is in the output on your Mac.               |
-| The build, canceled with Ctrl-C | `limanix` cancels the build and brings back the VM's own `lmxd`. The VM keeps the system it ran, and the command ends with status 130.           |
-| A check after the restart       | The new system runs, but the command fails with `Generation … is booted but unhealthy` and the reason. `limanix doctor dev-box` shows the check. |
-| Only the cleanup                | The VM is ready with a warning, and `lmxd` tries again later.                                                                                    |
+| What fails                                  | What happens                                                                                                                                     |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The check or the preparation, steps 1 and 2 | The VM keeps its system and its settings, and `create` makes no VM. Fix the file or the Mac and run the command again.                           |
+| The build, steps 5 and 6                    | The VM does not restart and keeps its current system, and its own `lmxd` takes over again. The error is in the output on your Mac.               |
+| The build, canceled with Ctrl-C             | `limanix` cancels the build and brings back the VM's own `lmxd`. The VM keeps the system it ran, and the command ends with status 130.           |
+| A check after the restart, step 8           | The new system runs, but the command fails with `Generation … is booted but unhealthy` and the reason. `limanix doctor dev-box` shows the check. |
+| Only the cleanup, step 8                    | The VM is ready with a warning, and `lmxd` tries again later.                                                                                    |
 
 An update is not a transaction: completed steps are not undone. The VM may already be stopped, its Lima settings may have changed, or new environment files may be installed. Fix the cause and run `limanix update` again; [Troubleshooting](/troubleshooting) covers each case.
 
-## The guest disk
-
-LimaNix keeps only the applied system generation on the guest disk. `lmxd` collects unused Nix store paths when less than 20% of the disk is free, and below 10% the welcome and `limanix update` warn; your own roots, such as `nix-direnv` shells and `result` links, are never removed. [Files and storage](/vms/storage) shows how to make room or grow the disk.
-
 ## Where state lives
 
-| State                              | Where it lives                                                                          | What to know                                                    |
-| ---------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| VM identity and operation progress | The LimaNix state directory: `~/Library/Application Support/Limanix`, or `LIMANIX_HOME` | The identity stays readable when the progress record is damaged |
-| The VM and its guest disk          | Lima's storage: `~/.lima`, or `LIMA_HOME`                                               | `limanix delete` removes the VM before LimaNix's own records    |
-| Managed home                       | `home.root` on the Mac, `~/.limanix` by default                                         | Kept by `limanix delete`; `--remove-home` removes it            |
-| Shared project folders             | Their own folders on the Mac                                                            | Changes in the VM change the original files                     |
-| Applied system                     | The guest disk and its Nix store; only the applied generation is kept                   | Rebuilt from the saved generation inputs                        |
-| SSH settings for editors           | `ssh/config` in the LimaNix state directory                                             | Rewritten on create, update, start and delete                   |
+Three folders on the Mac hold everything outside the VMs: the state folder with the generations, Lima's folder with the guest disks, and the managed homes. [Paths and ports](/reference/paths) lists what each holds, and [Files and storage](/vms/storage) what each command keeps.
 
-A lock per VM keeps two commands from changing the same VM at once; `limanix shell` does not take it. `limanix list --json` reports Lima's power state and the last LimaNix operation as separate values. A failed operation keeps the records and inputs needed to diagnose it. `LIMANIX_HOME` and `LIMA_HOME` do not move existing VMs: use the same values whenever you work with them. Read [Troubleshooting](/troubleshooting) before you remove any state by hand. [Paths and ports](/reference/paths) lists the folders on the Mac and how each VM gets its SSH port.
+A lock per VM keeps two commands from changing the same VM at once; `limanix shell` does not take it. `limanix list --json` reports Lima's power state and the last LimaNix operation as separate values. `LIMANIX_HOME` and `LIMA_HOME` do not move existing VMs: use the same values whenever you work with them.

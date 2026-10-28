@@ -4,7 +4,7 @@ description: Choose the shell preset, prompt, editor and multiplexer of a VM.
 
 # Shell
 
-The `[shell]` table chooses what you work in when you open a shell in the VM: the login shell and its tools, the prompt, the editor and the terminal multiplexer.
+The `[shell]` table chooses what you work in when you open a shell in the VM: the login shell and its tools, the prompt, the editor and the terminal multiplexer. Pick the `terminal` preset to work in the VM's terminal, and `minimal` when you mostly work in an editor on the Mac.
 
 ::: code-group
 
@@ -22,23 +22,25 @@ These are the defaults: a file without a `[shell]` table gets the same shell. Ap
 
 ## Choose a preset
 
-| Preset                  | Login shell        | Always included                                      |
-| ----------------------- | ------------------ | ---------------------------------------------------- |
-| `terminal`, the default | Zsh with Oh My Zsh | Git, the CLI tools, Lazygit, Yazi and the GitHub CLI |
-| `minimal`               | Bash               | Git and the CLI tools                                |
+<div class="parts">
+
+- **`terminal`, the default**\
+  For work in the VM's terminal.
+  - Zsh with Oh My Zsh
+  - the Pure prompt, AstroNvim and tmux
+  - Git, the CLI tools, Lazygit, Yazi and the GitHub CLI
+- **`minimal`**\
+  For a VM you use from an editor on the Mac: a smaller system.
+  - Bash
+  - no prompt, editor or multiplexer until you name one
+  - Git and the CLI tools
+
+</div>
 
 See [CLI tools](/modules/cli-tools) for the shared commands and [Zsh](/modules/zsh) for shell features.
 [The terminal](/inside/terminal) shows how to use the tools together.
 
-The preset also sets the defaults of the other settings:
-
-| Setting       | Choices                       | `terminal` default | `minimal` default |
-| ------------- | ----------------------------- | ------------------ | ----------------- |
-| `prompt`      | `pure`, `starship`, `none`    | `pure`             | `none`            |
-| `editor`      | `astronvim`, `neovim`, `none` | `astronvim`        | `none`            |
-| `multiplexer` | `tmux`, `none`                | `tmux`             | `none`            |
-
-`none` leaves the component out of the VM. With `minimal`, name an editor or a multiplexer to add it:
+`none` leaves a component out of the VM. With `minimal`, name an editor or a multiplexer to add it:
 
 ::: code-group
 
@@ -54,7 +56,7 @@ The minimal preset has no GitHub CLI: add it with `packages = ["gh"]` in [`[nixo
 
 ## Choose a prompt
 
-The prompt belongs to Zsh and needs the terminal preset.
+The prompt belongs to Zsh and needs the `terminal` preset. With `minimal`, leave `prompt` out or set it to `none`: `limanix create` and `limanix update` reject a prompt there, and Bash shows your account, the VM's hostname and the directory in the theme's accent colors.
 
 | `prompt`            | What you get                                                                                                          |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------- |
@@ -63,8 +65,6 @@ The prompt belongs to Zsh and needs the terminal preset.
 | `none`              | No managed prompt: set `PROMPT` in your `~/.zshrc`                                                                    |
 
 See [Zsh prompts](/modules/zsh#prompt) for colors, VM status and personal settings.
-
-With `preset = "minimal"`, leave `prompt` out or set it to `none`: `limanix create` and `limanix update` reject a prompt there. Bash then shows your account, the VM's hostname and the directory in the theme's accent colors.
 
 ## Choose an editor
 
@@ -90,10 +90,12 @@ limanix shell dev-box --session work
 
 :::
 
-Run the same command to return after you detach with Ctrl-B d. Session names cannot contain `.` or `:`. Without tmux or a session provider from your own module, `limanix shell --session` names the setting that adds one and exits.
+- Detach with Ctrl-B, then `d`, and run the same command to return.
+- Session names cannot contain `.` or `:`.
+- Without tmux or a session provider from your own module, `--session` names the setting that adds one and exits.
 
 [Shell and sessions](/vms/shell) covers sessions, and [tmux](/modules/tmux#use) lists its keys.
 
 ## Your own startup files
 
-Your startup files, such as `~/.zshrc`, load after the catalog's configuration. Keep them in your [dotfiles](/config/dotfiles) to share them between VMs.
+Your startup files, such as `~/.zshrc`, load after the catalog's configuration: your settings override the catalog's. Keep them in your [dotfiles](/config/dotfiles) to share them between VMs.

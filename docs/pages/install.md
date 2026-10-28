@@ -118,7 +118,7 @@ rm ~/.local/bin/limanix
 
 :::
 
-These stay on your Mac:
+These stay on your Mac; [Paths and ports](/reference/paths) describes each folder:
 
 | What                                                                                   | Where                                                                  |
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |

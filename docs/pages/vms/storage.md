@@ -126,3 +126,4 @@ removed from your own `nix profile` stay on disk until `nix profile wipe-history
 Lima keeps the guest disk under `~/.lima`, or `LIMA_HOME` when set. LimaNix keeps its records of
 each VM in `~/Library/Application Support/Limanix`, or `LIMANIX_HOME` when set. Leave both to the
 `limanix` commands, and read [Troubleshooting](/troubleshooting) before you change anything there.
+[Paths and ports](/reference/paths) lists what each folder holds.

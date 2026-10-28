@@ -33,7 +33,7 @@ Editing the file changes nothing by itself. Apply it with `limanix update --conf
 | `[user]`                       | Your account in the VM                                 | [Environment and theme](/config/environment#set-up-your-account)       |
 | `[home]`                       | Where your home folder in the VM is kept on the Mac    | [Files and storage](/vms/storage)                                      |
 | `[shell]`                      | Shell preset, prompt, editor, multiplexer and dotfiles | [Shell](/config/shell), [Dotfiles](/config/dotfiles)                   |
-| `[toolchains]`                 | Go, Rust, Python, Node.js, Java, C and C++             | [Toolchains](/config/toolchains)                                       |
+| `[toolchains]`                 | Language toolchains, one version per language          | [Toolchains](/config/toolchains)                                       |
 | `[nixos]`                      | Catalog modules and packages                           | [Modules and packages](/config/modules)                                |
 | `[theme]`                      | Colors                                                 | [Environment and theme](/config/environment#choose-a-theme)            |
 | `[network]`, `[network.ports]` | Network mode and firewall ports                        | [Network](/vms/network)                                                |
@@ -46,14 +46,13 @@ The [limanix.toml reference](/reference/config) lists every key with its type an
 
 The file uses TOML. In the [project example](#example-files) below:
 
-| In the file         | Meaning                                                                   |
-| ------------------- | ------------------------------------------------------------------------- |
-| `name = "dev-box"`  | A top-level setting; top-level settings come before the first table       |
-| `[resources]`       | A table; it holds the settings below it, up to the next table header      |
-| `[network.ports]`   | A table inside `network`                                                  |
-| `[[mounts]]`        | One entry in the list of shared folders; repeat the block for each folder |
-| `tcp = [8080]`      | A list in square brackets                                                 |
-| `# Save this file…` | A comment                                                                 |
+| In the file        | Meaning                                                                   |
+| ------------------ | ------------------------------------------------------------------------- |
+| `name = "dev-box"` | A top-level setting; top-level settings come before the first table       |
+| `[resources]`      | A table; it holds the settings below it, up to the next table header      |
+| `[network.ports]`  | A table inside `network`                                                  |
+| `[[mounts]]`       | One entry in the list of shared folders; repeat the block for each folder |
+| `tcp = [8080]`     | A list in square brackets                                                 |
 
 Values have types: `cpu = 4` is an integer, `sudo = true` a boolean and `mem = "8GiB"` a string. LimaNix rejects unknown keys and wrong types, and the error names the key. This catches typos such as `cpus` for `cpu` in `[resources]`.
 
@@ -112,7 +111,6 @@ Three starting points. Save one as `limanix.toml` in your project folder and cha
 ::: code-group
 
 ```toml [Project]
-# Save this file in your project directory as limanix.toml.
 name = "dev-box"
 
 [resources]

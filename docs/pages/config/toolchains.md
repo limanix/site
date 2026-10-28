@@ -1,5 +1,5 @@
 ---
-description: Install Go, Rust, Python, Node.js, Java, C and C++ with their language servers and build tools.
+description: Install programming languages with their language servers and build tools.
 ---
 
 # Toolchains
@@ -10,20 +10,20 @@ The `[toolchains]` table installs one version of each language you need, with it
 
 ```toml [limanix.toml]
 [toolchains]
-go = "1.27"
-rust = "stable"
+go     = "1.27"
+rust   = "stable"
 python = "3.15"
 nodejs = "26"
-java = "21"
+java   = "21"
 gradle = "9"
-gcc = "15"
+gcc    = "15"
 ```
 
 :::
 
 Leave a key out, or set it to `""`, to install none of that language. Apply a change with `limanix update --config limanix.toml`; see [Changing a VM](/vms/update).
 
-Each key has a page in the catalog with what it installs, its lines and examples: [Go](/modules/go), [Rust](/modules/rust), [Python](/modules/python), [Node.js](/modules/nodejs), [Java](/modules/java), [Maven](/modules/maven), [Gradle](/modules/gradle), [GCC](/modules/gcc) and [Clang](/modules/clang). [Languages](/inside/languages) covers working with projects in the VM.
+Each key is a toolchain of the catalog, with a page on what it installs, its lines and examples; [the catalog](/modules/#toolchains) lists them. [Languages](/inside/languages) covers working with projects in the VM.
 
 ## Version lines
 
@@ -45,7 +45,7 @@ limanix modules list
 
 ## Language servers {#language-servers-in-the-editor}
 
-With `editor = "astronvim"`, the default of the terminal preset, AstroNvim turns on the language server of each toolchain: gopls, rust-analyzer, Pyright, the TypeScript language server, jdtls and clangd. Its plugins and syntax parsers come with the VM instead of downloading when the editor first starts.
+With `editor = "astronvim"`, the default of the terminal preset, AstroNvim turns on the language server of each toolchain. Its plugins and syntax parsers come with the VM instead of downloading when the editor first starts.
 
 With `editor = "neovim"` or `"none"`, the language servers are still installed for any editor that speaks the Language Server Protocol. Plain Neovim needs your own LSP configuration; see [Shell](/config/shell#choose-an-editor).
 

@@ -193,6 +193,18 @@ limanix delete dev-box
 
   :::
 
+- [Dotfiles](/config/dotfiles)\
+  Bring your settings from the Mac into every VM:
+
+  ::: code-group
+
+  ```toml [limanix.toml]
+  [shell]
+  dotfiles = "~/dotfiles"
+  ```
+
+  :::
+
 - [Toolchains](/config/toolchains)\
   Add a language with its build tools and language server:
 
@@ -243,6 +255,21 @@ limanix delete dev-box
   :::
 
   Connect to the VM's address from `limanix list`, not to `localhost`.
+
+- [Scripts](/vms/#use-limanix-in-scripts)\
+  `limanix list -q` prints only the VM names:
+
+  ::: code-group
+
+  ```sh [Mac]
+  for vm in $(limanix list -q); do
+    limanix stop "$vm"
+  done
+  ```
+
+  :::
+
+  With `--json`, commands print their result as JSON.
 
 - [Troubleshooting](/troubleshooting)\
   When something looks wrong, check the VM:

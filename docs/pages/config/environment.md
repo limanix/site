@@ -28,7 +28,7 @@ The variables apply to the whole VM: login sessions and system and user services
 | Names use ASCII letters, digits and `_`, and do not start with a digit        | `APP_ENV`                                 |
 | Values are literal text: they do not read the Mac's variables or run commands | `TOKEN = "$TOKEN"` sets the text `$TOKEN` |
 
-Without an `[env]` table, the VM gets `APP_ENV = "development"` and `APP_LOG_LEVEL = "debug"`. A table with entries sets exactly those entries. For no variables, write an empty `[env]` table, or `env = {}` before the first table.
+Without an `[env]` table, the VM gets no variables. A table with entries sets exactly those entries.
 
 ::: warning
 `[env]` is plain text, not secret storage. The values are written to files under `/etc/limanix` in the VM, readable by root and your account's group.

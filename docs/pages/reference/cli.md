@@ -436,7 +436,7 @@ limanix first-config [PATH]
 | -------- | ------ | ----------------- | ------------------------------------------------ |
 | `PATH`   | string | current directory | Existing directory to write `limanix.toml` into. |
 
-`first-config` writes the [defaults](/reference/config#defaults) with a comment for each setting, then prints `Wrote` and the path of the file. It overwrites an existing `limanix.toml` in that directory, rejects one that is a symlink, and does not create missing directories. The example includes sample mounts and environment variables; check them before you run `create`.
+`first-config` writes the [defaults](/reference/config#defaults) with a comment for each setting, then prints `Wrote` and the path of the file. It overwrites an existing `limanix.toml` in that directory, rejects one that is a symlink, and does not create missing directories.
 
 Guide: [The limanix.toml file](/config/).
 

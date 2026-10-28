@@ -10,7 +10,7 @@ description: Every table and key of limanix.toml, with its type, allowed values 
 
 - The file is TOML in UTF-8. Top-level keys come before the first table.
 - Unknown keys and wrong types are rejected, including typos such as `resources.cpus`.
-- An omitted key keeps its default, listed in [Defaults](#defaults). Some defaults are examples: two shared folders, two environment variables and TCP port `8080`. Remove them with an empty list or table.
+- An omitted key keeps its default, listed in [Defaults](#defaults).
 - An empty string does not ask for a default: `source = ""` is an error, while `APP_ENV = ""` is an empty value.
 - An error names the key without its value, such as `limanix: resources.cpu: must be positive`.
 
@@ -25,12 +25,12 @@ name = "dev-box"
 
 :::
 
-| Key              | Type            | Default               | Description                                                                                                                                                                                                   |
-| ---------------- | --------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `schema_version` | integer         | `1`                   | Version of the file format, independent of the LimaNix release. Only `1` is supported.                                                                                                                        |
-| `name`           | string          | `"example-box"`       | VM name: 1 to 63 lowercase letters, digits and hyphens, starting and ending with a letter or digit. `create` and `update` select the VM by this name. Changing it selects another VM; it does not rename one. |
-| `mounts`         | array of tables | two example mounts    | Shared folders, see [`[[mounts]]`](#mounts). `mounts = []` shares none.                                                                                                                                       |
-| `env`            | table           | two example variables | Guest environment, see [`[env]`](#env). `env = {}` sets none.                                                                                                                                                 |
+| Key              | Type            | Default         | Description                                                                                                                                                                                                   |
+| ---------------- | --------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schema_version` | integer         | `1`             | Version of the file format, independent of the LimaNix release. Only `1` is supported.                                                                                                                        |
+| `name`           | string          | `"example-box"` | VM name: 1 to 63 lowercase letters, digits and hyphens, starting and ending with a letter or digit. `create` and `update` select the VM by this name. Changing it selects another VM; it does not rename one. |
+| `mounts`         | array of tables | `[]`            | Shared folders, see [`[[mounts]]`](#mounts).                                                                                                                                                                  |
+| `env`            | table           | `{}`            | Guest environment, see [`[env]`](#env).                                                                                                                                                                       |
 
 Guide: [The limanix.toml file](/config/).
 
@@ -67,7 +67,6 @@ Guest architecture and compute resources.
 
 ```toml [limanix.toml]
 [resources]
-arch = "arm64"
 cpu = 4
 mem = "8GiB"
 disk = "10GiB"
@@ -75,12 +74,12 @@ disk = "10GiB"
 
 :::
 
-| Key    | Type                   | Default   | Description                                                                                                                                                                                                                                                          |
-| ------ | ---------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `arch` | `"arm64"` or `"amd64"` | `"arm64"` | Guest architecture. Your Mac's own, `arm64` on Apple Silicon or `amd64` on Intel, runs with Apple's Virtualization framework. The other one runs with QEMU, which you install on the Mac, and needs [`limanix network setup`](/reference/cli#limanix-network-setup). |
-| `cpu`  | integer                | `4`       | Guest CPU count, a positive integer.                                                                                                                                                                                                                                 |
-| `mem`  | string                 | `"8GiB"`  | Guest memory size in whole GiB.                                                                                                                                                                                                                                      |
-| `disk` | string                 | `"10GiB"` | Guest system disk size in whole GiB. Shared folders are not on this disk. `update` can grow it but not shrink it.                                                                                                                                                    |
+| Key    | Type                   | Default    | Description                                                                                                                                                                                                                                                          |
+| ------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `arch` | `"arm64"` or `"amd64"` | your Mac's | Guest architecture. Your Mac's own, `arm64` on Apple Silicon or `amd64` on Intel, runs with Apple's Virtualization framework. The other one runs with QEMU, which you install on the Mac, and needs [`limanix network setup`](/reference/cli#limanix-network-setup). |
+| `cpu`  | integer                | `4`        | Guest CPU count, a positive integer.                                                                                                                                                                                                                                 |
+| `mem`  | string                 | `"8GiB"`   | Guest memory size in whole GiB.                                                                                                                                                                                                                                      |
+| `disk` | string                 | `"10GiB"`  | Guest system disk size in whole GiB. Shared folders are not on this disk. `update` can grow it but not shrink it.                                                                                                                                                    |
 
 A size is a positive whole number followed by `GiB`, such as `"8GiB"`. `"8GB"`, `"1.5GiB"`, `"0GiB"` and `"08GiB"` are rejected. `arch` is [fixed at creation](#fixed-at-creation).
 
@@ -245,10 +244,10 @@ udp = []
 
 :::
 
-| Key   | Type              | Default  | Description                                                                                                                                |
-| ----- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `tcp` | array of integers | `[8080]` | Inbound TCP ports in the guest firewall. Services listen on a guest network interface and are reached at `<guest-ip>:<port>` from the Mac. |
-| `udp` | array of integers | `[]`     | Inbound UDP ports in the guest firewall.                                                                                                   |
+| Key   | Type              | Default | Description                                                                                                                                |
+| ----- | ----------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `tcp` | array of integers | `[]`    | Inbound TCP ports in the guest firewall. Services listen on a guest network interface and are reached at `<guest-ip>:<port>` from the Mac. |
+| `udp` | array of integers | `[]`    | Inbound UDP ports in the guest firewall.                                                                                                   |
 
 A port is an integer from 1 to 65535. The lists only open the firewall: they do not start services or forward ports of the Mac, and `localhost` on the Mac does not reach them. Selected modules can open ports of their own, also when the lists are empty.
 
@@ -272,7 +271,7 @@ APP_PORT = "8080"
 | ------ | ------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NAME` | string | none    | The environment variable `NAME`. A name has ASCII letters, digits and `_`, and does not start with a digit. A value is a string, also for numbers, and may be empty. Values are literal: `"$TOKEN"` is the text `$TOKEN`, not a variable of the Mac. |
 
-Without `env` in the file, the guest gets `APP_ENV = "development"` and `APP_LOG_LEVEL = "debug"`. A table you write replaces them entirely. An empty `[env]` table, or `env = {}` before the first table, sets none.
+Without `env` in the file, the guest gets no variables.
 
 The values are plaintext. They are written to runtime files and installed under `/etc/limanix`, readable by root and by the development account's group. They stay outside the Nix store, but this is not encrypted secret storage.
 
@@ -301,7 +300,7 @@ mode = "rw"
 
 - Targets cannot overlap: `/workspace` and `/workspace/cache` cannot both be targets.
 - A target cannot be `user.home` or a directory above it. A target inside the home, such as `/home/dev/.config/nvim`, is allowed.
-- Without `mounts` in the file, the guest gets two example mounts: `~/projects/my-project` at `/workspace` (`rw`) and `~/.ssh/limanix` at `/mnt/git-keys` (`ro`). Their sources must exist. Your own `[[mounts]]` blocks replace them, and `mounts = []` before the first table removes them. The managed home is mounted in any case.
+- Without `[[mounts]]` in the file, the guest has no shared folders. The managed home is mounted in any case.
 
 A read-write mount shares the same files with the Mac: a change or a deletion on either side changes both.
 
@@ -348,7 +347,7 @@ home = "/home/dev"
 sudo = true
 
 [resources]
-arch = "arm64"
+arch = "arm64" # amd64 on an Intel Mac
 cpu = 4
 mem = "8GiB"
 disk = "10GiB"
@@ -385,24 +384,10 @@ flavor = "system"
 mode = "shared"
 
 [network.ports]
-tcp = [8080]
+tcp = []
 udp = []
-
-[env]
-APP_ENV = "development"
-APP_LOG_LEVEL = "debug"
-
-[[mounts]]
-mode = "rw"
-source = "~/projects/my-project"
-target = "/workspace"
-
-[[mounts]]
-mode = "ro"
-source = "~/.ssh/limanix"
-target = "/mnt/git-keys"
 ```
 
 :::
 
-The mounts, the environment variables and TCP port `8080` are examples. To start without them, put `mounts = []` and `env = {}` before the first table and set `tcp = []` in `[network.ports]`.
+The defaults share no folders and set no environment variables.

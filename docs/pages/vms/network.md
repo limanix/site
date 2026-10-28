@@ -74,11 +74,7 @@ udp = []
 `tcp` and `udp` list the inbound ports that the guest firewall opens, as whole numbers from `1` to
 `65535`. Keep the ports you already have and add new ones to the same lists. Apply a change with
 `limanix update --config limanix.toml`; the update restarts the VM. Afterwards, start again any
-service that you run by hand.
-
-::: warning
-Leaving `tcp` out keeps the default, TCP port `8080`. Write `tcp = []` to open no TCP ports.
-:::
+service that you run by hand. A list you leave out opens no ports.
 
 The lists only open the firewall: they do not start services, map Mac ports to guest ports or
 restrict who connects. The base system and modules can open ports of their own, even with empty

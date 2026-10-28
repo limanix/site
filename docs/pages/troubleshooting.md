@@ -50,27 +50,6 @@ See [Install](/install).
 | `toolchains.go: the bundled catalog has no go line "…"; choose one of …`                           | Choose one of the listed lines. `limanix modules list` shows them too, such as `lmx:go-1.27`.                                                          |
 | `… SSH socket path needs … bytes (maximum …); use a shorter VM name or storage path`               | Use a shorter VM name or a shorter `LIMA_HOME`. Changing `LIMA_HOME` does not move existing VMs.                                                       |
 
-## limanix create names a folder you did not configure
-
-The error names a path in your home on the Mac that ends in `projects/my-project` or `.ssh/limanix`, which you never set up.
-
-Cause: your `limanix.toml` has no `mounts` setting. An omitted setting keeps its default, and the default mounts are two examples: `~/projects/my-project` at `/workspace` and `~/.ssh/limanix` at `/mnt/git-keys`. Their folders must exist. The same applies to `[env]`, whose default has two example variables, and to `tcp` in `[network.ports]`, whose default opens port `8080`.
-
-Fix: write your own `[[mounts]]` blocks, or remove the examples with `mounts = []` before the first table:
-
-::: code-group
-
-```toml [limanix.toml]
-schema_version = 1
-name = "dev-box"
-mounts = []
-env = {}
-```
-
-:::
-
-See [Defaults](/reference/config#defaults) and [Shared folders](/config/mounts).
-
 ## limanix create or update fails while building the system
 
 The build runs in the VM after the checks. When it fails, the VM is not restarted and keeps the system it runs. The reason is in the output of the command; inside the VM, `sudo lmx logs apply` shows the build again.
@@ -162,12 +141,12 @@ Fix: wait. The command continues when the other operation is done, or stops when
 
 ## limanix update is rejected
 
-| Message                                                                                                    | Cause and fix                                                                                                                                        |
-| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `an update cannot change architecture, username, or managed-home paths; create a new VM for these changes` | `resources.arch`, `user.name`, `user.home` and `home.root` are fixed at creation. Revert the change, or create a new VM and copy the files you need. |
-| `shrinking the guest disk is not supported`                                                                | Set `resources.disk` to at least the current size. An earlier failed update may already have enlarged the disk.                                      |
-| `lima did not report the disk size; update was not started`                                                | LimaNix cannot check that the disk would not shrink. Read the Lima message in the output before you try again.                                       |
-| `another operation is running for VM "dev-box"`                                                            | Another `limanix` command is changing this VM. Let it finish, or cancel it in its own terminal. Do not delete lock files to get around it.           |
+| Message                                                                                                    | Cause and fix                                                                                                                                                                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `an update cannot change architecture, username, or managed-home paths; create a new VM for these changes` | `resources.arch`, `user.name`, `user.home` and `home.root` are fixed at creation. Revert the change, or create a new VM and copy the files you need. Without `arch`, the file asks for your Mac's architecture: to keep updating an `arm64` VM on an Intel Mac, write `arch = "arm64"`. |
+| `shrinking the guest disk is not supported`                                                                | Set `resources.disk` to at least the current size. An earlier failed update may already have enlarged the disk.                                                                                                                                                                         |
+| `lima did not report the disk size; update was not started`                                                | LimaNix cannot check that the disk would not shrink. Read the Lima message in the output before you try again.                                                                                                                                                                          |
+| `another operation is running for VM "dev-box"`                                                            | Another `limanix` command is changing this VM. Let it finish, or cancel it in its own terminal. Do not delete lock files to get around it.                                                                                                                                              |
 
 See [Changing a VM](/vms/update).
 

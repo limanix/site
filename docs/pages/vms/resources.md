@@ -13,7 +13,6 @@ covers the settings, how to change them, and what a guest of another architectur
 
 ```toml [limanix.toml]
 [resources]
-arch = "arm64"
 cpu = 4
 mem = "8GiB"
 disk = "40GiB"
@@ -21,16 +20,17 @@ disk = "40GiB"
 
 :::
 
-| Setting | Value                                                    | Default   |
-| ------- | -------------------------------------------------------- | --------- |
-| `arch`  | Guest architecture: `arm64` or `amd64`                   | `"arm64"` |
-| `cpu`   | Number of virtual CPUs, a positive whole number          | `4`       |
-| `mem`   | Memory in whole GiB, as a quoted string such as `"8GiB"` | `"8GiB"`  |
-| `disk`  | Size of the guest disk in whole GiB, such as `"40GiB"`   | `"10GiB"` |
+| Setting | Value                                                    | Default    |
+| ------- | -------------------------------------------------------- | ---------- |
+| `arch`  | Guest architecture: `arm64` or `amd64`                   | Your Mac's |
+| `cpu`   | Number of virtual CPUs, a positive whole number          | `4`        |
+| `mem`   | Memory in whole GiB, as a quoted string such as `"8GiB"` | `"8GiB"`   |
+| `disk`  | Size of the guest disk in whole GiB, such as `"40GiB"`   | `"10GiB"`  |
 
 `GiB` is the only unit: `"8GB"`, `"1.5GiB"`, `"0GiB"` and `"08GiB"` are rejected. A setting you
 leave out keeps its default: `[resources]` with only `cpu = 2` keeps the default architecture,
-memory and disk. On an Intel Mac, set `arch = "amd64"`.
+memory and disk. The default architecture is your Mac's own, which runs natively; set `arch` only
+for a guest of the other architecture.
 
 `disk` covers only the guest disk; the managed home and shared folders live on the Mac. Leave room
 for Docker images and volumes, Kubernetes clusters and build caches. See

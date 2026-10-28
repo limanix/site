@@ -4,24 +4,43 @@ description: Install LimaNix, create a NixOS VM from limanix.toml, open a shell 
 
 # Quick start
 
-This page takes you from the download to a shell in a NixOS VM, then through a change and cleanup. You need macOS 26 or newer on an Apple Silicon or Intel Mac.
+This page takes you from the download to a shell in a NixOS VM, then through a change and cleanup.
 
-## Install the client
-
-Download `limanix-arm64` for Apple Silicon or `limanix-amd64` for Intel from [limanix.dev/download](https://limanix.dev/download), then install it:
+:::: info Requirements
+macOS 26 or newer on an Apple Silicon or Intel Mac. To check, run:
 
 ::: code-group
 
 ```sh [Mac]
+sw_vers -productVersion  # 26.0 or newer
+uname -m                 # arm64 on Apple Silicon, x86_64 on Intel
+```
+
+:::
+
+::::
+
+## Install the client
+
+[Download](https://limanix.dev/download) the binary for your Mac, or get it from [GitHub releases](https://github.com/limanix/client/releases). Then install it:
+
+::: code-group
+
+```sh [Apple Silicon]
 mkdir -p ~/.local/bin
 install -m 755 ~/Downloads/limanix-arm64 ~/.local/bin/limanix
 export PATH="$HOME/.local/bin:$PATH"
 limanix --version
 ```
 
-:::
+```sh [Intel]
+mkdir -p ~/.local/bin
+install -m 755 ~/Downloads/limanix-amd64 ~/.local/bin/limanix
+export PATH="$HOME/.local/bin:$PATH"
+limanix --version
+```
 
-On Intel, use `~/Downloads/limanix-amd64`. [Install](/install) covers the requirements, the macOS approval prompt and updates.
+:::
 
 ## Write limanix.toml
 
@@ -30,52 +49,29 @@ Save this file as `limanix.toml` in your project folder, such as `~/projects/my-
 ::: code-group
 
 ```toml [limanix.toml]
-schema_version = 1
 name = "dev-box"
-mounts = []
-env = {}
-
-[user]
-name = "dev"
-home = "/home/dev"
-sudo = true
 
 [resources]
-arch = "arm64"
 cpu = 2
 mem = "4GiB"
 disk = "16GiB"
 
-[home]
-root = "~/.limanix"
-
 [shell]
 preset = "minimal"
-
-[nixos]
-modules = []
-
-[network]
-mode = "shared"
-
-[network.ports]
-tcp = []
-udp = []
 ```
 
 :::
 
-On Intel, change `arch` to `"amd64"`. The file declares a VM named `dev-box` with 2 CPUs, 4 GiB of memory and a 16 GiB disk, a `dev` account with passwordless `sudo` inside the VM, and the minimal shell: Bash with Git and the command-line tools.
+The file declares a VM named `dev-box` with 2 CPUs, 4 GiB of memory and a 16 GiB disk, and the minimal shell: Bash with Git and the command-line tools.
 
-Keep the empty lists and tables. A setting you leave out takes the built-in example's value, and that example shares two sample folders that must exist on your Mac. [The limanix.toml file](/config/) explains the layout and defaults.
+[The limanix.toml file](/config/) describes every setting.
 
 ## Create the VM
 
 ::: code-group
 
 ```sh [Mac]
-cd ~/projects/my-project
-limanix create --config limanix.toml
+limanix create --config ~/projects/my-project/limanix.toml
 ```
 
 :::
@@ -109,13 +105,12 @@ exit
 
 ## Change the VM
 
-Share your project with the VM and add a package. In `limanix.toml`, remove the line `mounts = []`, add `packages` to the `[nixos]` table, and add a `[[mounts]]` entry at the end of the file:
+Share your project with the VM and add a package. Add these tables at the end of `limanix.toml`:
 
 ::: code-group
 
 ```toml [limanix.toml]
 [nixos]
-modules = []
 packages = ["tree"]
 
 [[mounts]]
@@ -131,7 +126,7 @@ mode = "rw"
 ::: code-group
 
 ```sh [Mac]
-limanix update --config limanix.toml
+limanix update --config ~/projects/my-project/limanix.toml
 limanix shell dev-box -- tree --version
 limanix shell dev-box -- ls /workspace
 ```
@@ -160,12 +155,104 @@ limanix delete dev-box
 
 ## Tips
 
-- Run one command in the VM from the Mac: `limanix shell dev-box -- uname -a`. See [Shell and sessions](/vms/shell).
-- For Zsh, AstroNvim and tmux, set `preset = "terminal"` in `[shell]`. See [Shell](/config/shell).
-- With tmux, `limanix shell dev-box --session work` returns you to the same session after you disconnect. See [Shell and sessions](/vms/shell).
-- Add Go, Rust, Python, Node.js, Java, GCC or Clang in `[toolchains]`. See [Toolchains](/config/toolchains).
-- `limanix modules list` shows what your client's catalog offers, such as `lmx:docker`. See [The catalog](/modules/).
-- Reach a server in the VM at the VM's address, not at `localhost`. See [Network](/vms/network).
-- `pbcopy` and `pbpaste` in the VM use the Mac clipboard. See [Clipboard](/inside/clipboard).
-- Try a tool without changing the file: `nix shell nixpkgs#openssl`. See [Packages on the fly](/inside/packages).
-- When something looks wrong, run `limanix doctor dev-box`. See [Troubleshooting](/troubleshooting).
+<div class="parts">
+
+- [Editors and IDEs](/vms/editors)\
+  After one line in `~/.ssh/config`, each VM is an SSH host that your editor opens projects in:
+
+  ::: code-group
+
+  ```sh [Mac]
+  ssh dev-box.limanix
+  ```
+
+  :::
+
+- [Shell and sessions](/vms/shell)\
+  Run one command in the VM from the Mac:
+
+  ::: code-group
+
+  ```sh [Mac]
+  limanix shell dev-box -- uname -a
+  ```
+
+  :::
+
+  With tmux, `--session work` brings you back to the same session.
+
+- [Shell](/config/shell)\
+  For Zsh, AstroNvim and tmux, choose the terminal preset:
+
+  ::: code-group
+
+  ```toml [limanix.toml]
+  [shell]
+  preset = "terminal"
+  ```
+
+  :::
+
+- [Toolchains](/config/toolchains)\
+  Add a language with its build tools and language server:
+
+  ::: code-group
+
+  ```toml [limanix.toml]
+  [toolchains]
+  python = "3.15"
+  ```
+
+  :::
+
+- [Modules](/modules/)\
+  Add a service such as Docker:
+
+  ::: code-group
+
+  ```toml [limanix.toml]
+  [nixos]
+  modules = ["lmx:docker"]
+  ```
+
+  :::
+
+  `limanix modules list` shows what else the catalog offers.
+
+- [Packages on the fly](/inside/packages)\
+  Try a tool without changing the file:
+
+  ::: code-group
+
+  ```sh [VM]
+  nix shell nixpkgs#openssl
+  ```
+
+  :::
+
+- [Network](/vms/network)\
+  Open the port of a server in the VM:
+
+  ::: code-group
+
+  ```toml [limanix.toml]
+  [network.ports]
+  tcp = [8080]
+  ```
+
+  :::
+
+  Connect to the VM's address from `limanix list`, not to `localhost`.
+
+- [Troubleshooting](/troubleshooting)\
+  When something looks wrong, check the VM:
+
+  ::: code-group
+
+  ```sh [Mac]
+  limanix doctor dev-box
+  ```
+
+  :::
+
+</div>

@@ -79,7 +79,7 @@ architecture, or to match the servers where your code runs.
 ::: warning Use the Apple Silicon build of limanix
 On an Apple Silicon Mac, run the Apple Silicon `limanix`, also for an Intel guest. VM commands
 refuse the Intel build running through Rosetta; see
-[Troubleshooting](/troubleshooting#limanix-refuses-to-run-on-this-mac).
+[Troubleshooting](/troubleshooting#mac-checks-fail).
 :::
 
 LimaNix spells the architectures `arm64` and `amd64`, not Nix's `aarch64` and `x86_64`.
@@ -126,5 +126,5 @@ VM:
 
 `limanix create` and `limanix update` of such a guest offer the same installation in an interactive
 terminal; in a script, they stop and report that the setup is required.
-[Troubleshooting](/troubleshooting#limanix-create-fails-for-a-guest-of-the-other-architecture)
+[Troubleshooting](/troubleshooting#another-architecture)
 lists their messages.

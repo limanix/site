@@ -18,21 +18,21 @@ limanix doctor dev-box
 
 `limanix doctor` prints one row per check, with a hint under each problem, and exits with status `1` when a check failed. It does not repair or restart anything. [Collect diagnostics](#collect-diagnostics) lists the other places to look.
 
-## limanix refuses to run on this Mac
+## Before the build
+
+### Mac checks fail
 
 `create` and `update` check the Mac before they change anything, and every command that works on a VM refuses a binary for the wrong architecture. They stop with one of these messages:
 
-| Message                                                                                                   | Fix                                                                                                     |
-| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `host macOS is older than this build's minimum: need … or newer, found …`                                 | Update macOS. The current client needs macOS 26 or newer.                                               |
-| `this Limanix binary is running under Rosetta on Apple Silicon; use limanix-arm64 for VM operations`      | Install `limanix-arm64`. An Intel guest on Apple Silicon also uses it, with `resources.arch = "amd64"`. |
-| `this Limanix binary is built for …, but the host is …; use the matching native binary for VM operations` | Install the binary for your Mac: `limanix-arm64` on Apple Silicon, `limanix-amd64` on Intel.            |
-| `make the system SSH client available in PATH`                                                            | Add the directory of `ssh` to your `PATH`. `command -v ssh` prints its path once it is found.           |
-| `this Limanix build does not include the native macOS VZ driver`                                          | Install a release binary. A client you build yourself must be a native build that includes the driver.  |
+| Message                                                                                              | Fix                                                                                                     |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `host macOS is older than this build's minimum: need … or newer, found …`                            | Update macOS. The current client needs macOS 26 or newer.                                               |
+| `this Limanix binary is running under Rosetta on Apple Silicon; use limanix-arm64 for VM operations` | Install `limanix-arm64`. An Intel guest on Apple Silicon also uses it, with `resources.arch = "amd64"`. |
+| `make the system SSH client available in PATH`                                                       | Add the directory of `ssh` to your `PATH`. `command -v ssh` prints its path once it is found.           |
 
 See [Install](/install).
 
-## limanix create fails before the VM starts
+### The file is rejected
 
 `create` checks the file, the selected modules and the Mac, then prepares the managed home and the Lima instance. These messages stop it before the VM starts; `update` runs the same checks.
 
@@ -50,45 +50,7 @@ See [Install](/install).
 | `toolchains.go: the bundled catalog has no go line "…"; choose one of …`                           | Choose one of the listed lines. `limanix modules list` shows them too, such as `lmx:go-1.27`.                                                          |
 | `… SSH socket path needs … bytes (maximum …); use a shorter VM name or storage path`               | Use a shorter VM name or a shorter `LIMA_HOME`. Changing `LIMA_HOME` does not move existing VMs.                                                       |
 
-## limanix create or update fails while building the system
-
-The build runs in the VM after the checks. When it fails, the VM is not restarted and keeps the system it runs. The reason is in the output of the command; inside the VM, `sudo lmx logs apply` shows the build again.
-
-| Cause                                                                                         | Fix                                                                                                                                                                                                                  |
-| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A name in `[nixos] packages` is not a package                                                 | Correct it. Names are attribute paths in the guest's nixpkgs: search them at [search.nixos.org](https://search.nixos.org/packages) in the channel of the guest's NixOS release, or `unstable` for `unstable:` names. |
-| Two packages provide the same command                                                         | The error names both. Keep one of them.                                                                                                                                                                              |
-| A package's license is refused although you listed it                                         | Naming a package allows it by the last part of its name. When the package's own name differs, the nixpkgs error names it, and a NixOS module of yours can allow it with `nixpkgs.config.allowUnfreePackages`.        |
-| A module of your own does not build                                                           | Fix its files, then import them again: `limanix modules remove NAME`, `limanix modules add NAME DIRECTORY`.                                                                                                          |
-| `No space left on device`, or `guest disk is full; raise resources.disk or remove guest data` | See [The guest disk is full](#the-guest-disk-is-full).                                                                                                                                                               |
-
-A failed operation does not undo the steps before it: the VM may be stopped, its Lima settings may have changed, or new environment files may be installed. `limanix list` shows the VM with the state `error` and the saved error under its row.
-
-After you fix the cause, run `limanix update` with a file of the same VM name. This also applies after a failed `create`: a second `create` for a name with saved state is rejected.
-
-::: code-group
-
-```sh [Mac]
-limanix update --config limanix.toml
-```
-
-:::
-
-`limanix start` is not a retry. It boots the saved VM without your corrected file and keeps the error.
-
-## A library listed in packages cannot be imported
-
-Cause: `[nixos] packages` installs commands, and C libraries for the compilers of `gcc`. A language library such as `python3Packages.requests` installs, but a program cannot import it.
-
-Fix: install the library in the project's environment, such as a Python venv, or use a module. See [Modules and packages](/config/modules).
-
-## A build cannot find a header or a library
-
-Cause: the library is not in `[nixos] packages`, or `[toolchains]` has no `gcc`. The GCC that comes with Go and Rust does not search `[nixos] packages`. The build stops with an error such as `fatal error: zlib.h: No such file or directory` or `cannot find -lz`.
-
-Fix: add `gcc` to `[toolchains]` and the library to `[nixos] packages`, then run `limanix update --config limanix.toml`. See [Native libraries](/inside/languages#native-libraries).
-
-## limanix create fails for a guest of the other architecture
+### Another architecture
 
 An `amd64` guest on Apple Silicon, or an `arm64` guest on Intel, runs with QEMU on Lima's shared network. It needs QEMU and the network helper on the Mac; `create` and `update` stop with one of these messages when something is missing.
 
@@ -110,36 +72,53 @@ limanix network setup
 
 See [Set up QEMU](/vms/resources#set-up-qemu).
 
-## The VM does not start
+## The build
 
-`limanix start dev-box` fails, or `limanix list` shows a `STATUS` other than `Running` or `Stopped`, such as `Broken`.
+### The build fails
 
-Cause: Lima could not boot the VM. Its host agent writes the reason to log files.
+The build runs in the VM after the checks. When it fails, the VM is not restarted and keeps the system it runs. The reason is in the output of the command; inside the VM, `sudo lmx logs apply` shows the build again.
 
-Fix:
+| Cause                                                                                         | Fix                                                                                                                                                                                                                  |
+| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A name in `[nixos] packages` is not a package                                                 | Correct it. Names are attribute paths in the guest's nixpkgs: search them at [search.nixos.org](https://search.nixos.org/packages) in the channel of the guest's NixOS release, or `unstable` for `unstable:` names. |
+| Two packages provide the same command                                                         | The error names both. Keep one of them.                                                                                                                                                                              |
+| A package's license is refused although you listed it                                         | Naming a package allows it by the last part of its name. When the package's own name differs, the nixpkgs error names it, and a NixOS module of yours can allow it with `nixpkgs.config.allowUnfreePackages`.        |
+| A module of your own does not build                                                           | Fix its files, then import them again: `limanix modules remove NAME`, `limanix modules add NAME DIRECTORY`.                                                                                                          |
+| `No space left on device`, or `guest disk is full; raise resources.disk or remove guest data` | See [The disk is full](#the-disk-is-full).                                                                                                                                                                           |
 
-1. Run `limanix doctor dev-box`. Its `vm` check shows what Lima reports.
-1. Find the name of the Lima instance: `lima_name` in `limanix list --json`.
-1. Read `ha.stderr.log` and `ha.stdout.log` in the directory of that instance under `~/.lima`, or under `LIMA_HOME` when you set it; see [Paths and ports](/reference/paths).
+A failed operation does not undo the steps before it: the VM may be stopped, its Lima settings may have changed, or new environment files may be installed. `limanix list` shows the VM with the state `error` and the saved error under its row.
+
+After you fix the cause, run `limanix update` with a file of the same VM name. This also applies after a failed `create`: a second `create` for a name with saved state is rejected.
 
 ::: code-group
 
 ```sh [Mac]
-limanix doctor dev-box
-limanix list --json | jq -r '.[] | "\(.name) \(.lima_name)"'
+limanix update --config limanix.toml
 ```
 
 :::
 
-## A command waits for another network operation
+`limanix start` is not a retry. It boots the saved VM without your corrected file and keeps the error.
 
-The command prints `Waiting for another Limanix network lifecycle operation` and pauses.
+### A library will not import
 
-Cause: starts, stops and deletions that share a Lima directory take turns with their network changes.
+A program in the VM cannot import a library that `[nixos] packages` lists, such as `python3Packages.requests`.
 
-Fix: wait. The command continues when the other operation is done, or stops when you press Ctrl-C.
+Cause: `[nixos] packages` installs commands, and C libraries for the compilers of `gcc`. A language library such as `python3Packages.requests` installs, but a program cannot import it.
 
-## limanix update is rejected
+Fix: install the library in the project's environment, such as a Python venv, or use a module. See [Modules and packages](/config/modules).
+
+### A header is missing
+
+A build in the VM stops with an error such as `fatal error: zlib.h: No such file or directory` or `cannot find -lz`.
+
+Cause: the library is not in `[nixos] packages`, or `[toolchains]` has no `gcc`. The GCC that comes with Go and Rust does not search `[nixos] packages`.
+
+Fix: add `gcc` to `[toolchains]` and the library to `[nixos] packages`, then run `limanix update --config limanix.toml`. See [Native libraries](/inside/languages#native-libraries).
+
+## Updates
+
+### Update is rejected
 
 | Message                                                                                                    | Cause and fix                                                                                                                                                                                                                                                                           |
 | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -150,7 +129,7 @@ Fix: wait. The command continues when the other operation is done, or stops when
 
 See [Changing a VM](/vms/update).
 
-## limanix update reports that the generation is booted but unhealthy
+### Booted but unhealthy
 
 The update ends with `Generation … is booted but unhealthy` and a reason, or the tmux status line or the prompt shows `degraded`.
 
@@ -177,7 +156,7 @@ sudo lmx logs health
 
 When the reason names a unit, `systemctl status UNIT` in the VM shows more.
 
-## limanix update warns that finalizing failed
+### Finalizing failed
 
 The update ends with `VM 'dev-box' is ready, but lmx reported: Finalizing generation … failed`, or the tmux status line or the prompt shows `finalize`.
 
@@ -193,7 +172,7 @@ sudo lmx logs finalize
 
 :::
 
-## An update was interrupted
+### Update interrupted
 
 Ctrl-C during `limanix update` cancels the build in the VM, starts the guest's own `lmxd` again and exits with status `130`. The VM keeps the system it ran before.
 
@@ -213,7 +192,38 @@ The next `limanix update` does both too.
 
 `limanix list` shows `interrupted` when a create, update or delete ended without finishing and no process is working on it. After an interrupted create or update, fix the cause from the original output and run `limanix update`. After an interrupted delete, check whether it had `--remove-home` before you run it again.
 
-## limanix list shows error, Missing or corrupt
+## Starting and status
+
+### The VM does not start
+
+`limanix start dev-box` fails, or `limanix list` shows a `STATUS` other than `Running` or `Stopped`, such as `Broken`.
+
+Cause: Lima could not boot the VM. Its host agent writes the reason to log files.
+
+Fix:
+
+1. Run `limanix doctor dev-box`. Its `vm` check shows what Lima reports.
+1. Find the name of the Lima instance: `lima_name` in `limanix list --json`.
+1. Read `ha.stderr.log` and `ha.stdout.log` in the directory of that instance under `~/.lima`, or under `LIMA_HOME` when you set it; see [Paths and ports](/reference/paths).
+
+::: code-group
+
+```sh [Mac]
+limanix doctor dev-box
+limanix list --json | jq -r '.[] | "\(.name) \(.lima_name)"'
+```
+
+:::
+
+### Waiting for network
+
+The command prints `Waiting for another Limanix network lifecycle operation` and pauses.
+
+Cause: starts, stops and deletions that share a Lima directory take turns with their network changes.
+
+Fix: wait. The command continues when the other operation is done, or stops when you press Ctrl-C.
+
+### List shows an error
 
 | `limanix list` shows | Cause                                                                                                                     | Fix                                                                                                                                                                                        |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -223,7 +233,9 @@ The next `limanix update` does both too.
 
 Do not edit or delete the records in the state directory to get around an error. LimaNix uses them to know which Lima instance and which home belong to a VM.
 
-## limanix shell says the VM is not running
+## Shell
+
+### The VM is not running
 
 The message is `VM 'dev-box' is not running; use limanix start dev-box`.
 
@@ -238,7 +250,9 @@ limanix shell dev-box
 
 :::
 
-## The VM shows Running, but limanix shell fails
+### Running, shell fails
+
+`limanix list` shows the VM as `Running`, but `limanix shell` fails.
 
 Cause: `Running` is Lima's power state. It does not mean that a build finished or that the development account is ready.
 
@@ -251,7 +265,7 @@ Fix:
 
 Keep the SSH or guest error when the shell still fails.
 
-## limanix shell --session says no session provider is configured
+### No session provider
 
 The VM prints `No session provider is configured in this VM.` and the setting that adds one; the command exits with status `127`.
 
@@ -288,7 +302,7 @@ Other messages about sessions:
 
 See [Shell and sessions](/vms/shell).
 
-## A command run with limanix shell uses values from the Mac
+### Mac values in commands
 
 `limanix shell dev-box -- echo $HOME` prints your home on the Mac, or `cd` and pipes do not work.
 
@@ -305,7 +319,11 @@ limanix shell dev-box -- bash -lc 'printf "%s\n" "$HOME"'
 
 :::
 
-## lmx status shows Owner unknown, or the prompt shows lmxd?
+## Inside the VM
+
+### lmxd does not answer
+
+`lmx status` shows `Owner unknown`, or the prompt shows `lmxd?`.
 
 Cause: `lmxd` does not answer. Your shell, files and services keep working; updates and the cleanup of the Nix store wait until it is back.
 
@@ -323,13 +341,17 @@ journalctl -u lmx
 
 `limanix update` on the Mac starts `lmxd` again as part of the update. When `owner` warns that `lmxd` and `lmx` have different versions, restart the VM: both then come from the booted generation.
 
-## Every shell starts with "lmx: the dotfiles at /mnt/dotfiles are not mounted"
+### Dotfiles not mounted
+
+Every shell starts with `lmx: the dotfiles at /mnt/dotfiles are not mounted`.
 
 Cause: the VM no longer sees the folder that `dotfiles` in `[shell]` names. Its mount failed, or the folder was moved or deleted on the Mac; then the message is `cannot read the dotfiles at /mnt/dotfiles`. Your links stay until the folder is back.
 
 Fix: correct the path in `limanix.toml` if the folder moved, then run `limanix update` on the Mac; the update mounts the folder again. `lmx doctor` shows the same problem as a failed `dotfiles` check.
 
-## A dotfile from the Mac has no effect in the VM
+### A dotfile has no effect
+
+A file from your dotfiles folder does not show up, or does not apply, in the VM.
 
 Run `lmx dotfiles` in the VM.
 
@@ -341,67 +363,7 @@ Run `lmx dotfiles` in the VM.
 
 See [Dotfiles](/config/dotfiles).
 
-## A port in the VM is unreachable from the Mac
-
-Check the port from the Mac. Add `--udp` for a UDP port.
-
-::: code-group
-
-```sh [Mac]
-limanix network check dev-box 8080
-```
-
-:::
-
-The command runs its checks in order and prints a hint under a failed one:
-
-| Failed check | Cause                                                                 | Fix                                                                                                                                                      |
-| ------------ | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vm`         | The VM is stopped, or its last create or update did not complete.     | Run `limanix start dev-box`, or fix the problem and run `limanix update`.                                                                                |
-| `address`    | The guest reported no IPv4 address on the shared network.             | See [limanix list shows - as the address](#limanix-list-shows-as-the-address).                                                                           |
-| `firewall`   | The guest firewall does not open the port for its protocol.           | Add the port to `[network.ports]` and run `limanix update`. An HTTP server needs its TCP port; the same number under `udp` is another rule.              |
-| `listener`   | Nothing listens on the port, or only on `127.0.0.1`.                  | Start the service and make it listen on `0.0.0.0` or on the guest address.                                                                               |
-| `connect`    | The guest checks passed, but the Mac cannot connect within 3 seconds. | The connection stops on the Mac: check a VPN, a firewall, and the Local Network permission of your terminal app in System Settings › Privacy & Security. |
-
-::: code-group
-
-```toml [limanix.toml]
-[network.ports]
-tcp = [8080]
-```
-
-:::
-
-- Docker opens the ports it publishes with its own firewall rules. `network.ports` has no say over them, and removing a port from it does not close a port that Docker publishes. `lmx net check` warns when Docker's proxy holds the socket.
-- An authentication or permission error comes from the service's own access rules. Opening another firewall port does not change it.
-- After an update, start a service you run by hand again: the update restarts the VM.
-
-See [Network](/vms/network).
-
-## localhost on the Mac does not reach a service in the VM
-
-Cause: LimaNix turns off Lima's automatic port forwarding. `localhost:8080` on the Mac is not the port `8080` of the VM.
-
-Fix: connect to the address of the VM, which `limanix list` shows in `ADDRESS`, such as `http://ADDRESS:8080`. The address is not fixed; check it again when you reconnect.
-
-## limanix list shows - as the address
-
-Cause: `ADDRESS` comes from `lmx status`, which `list` runs in each running VM with a 10-second limit. `-` means that the VM is stopped, did not answer in time, or has no IPv4 address on the shared network. The notice `the guest has no lmx yet; run limanix update` under the row means that an older client created the VM.
-
-Fix: check access first, then the VM.
-
-::: code-group
-
-```sh [Mac]
-limanix shell dev-box -- true
-limanix doctor dev-box
-```
-
-:::
-
-For the notice, run `limanix update --config limanix.toml` with the file of that VM: the update installs `lmx`.
-
-## The guest disk is full
+### The disk is full
 
 Builds fail with `No space left on device`, `create` or `update` stops with `guest disk is full; raise resources.disk or remove guest data`, the `DISK` column of `limanix list` is high, or the welcome and the prompt warn `disk low` or `disk-low`.
 
@@ -436,7 +398,7 @@ limanix update --config limanix.toml
 
 See [Files and storage](/vms/storage).
 
-## pbcopy or pbpaste does not reach the Mac clipboard
+### Clipboard does not work
 
 `pbcopy` and `pbpaste` in the VM talk to the terminal on your Mac with OSC 52 escape sequences, or through tmux inside tmux. The terminal must allow it.
 
@@ -447,6 +409,72 @@ See [Files and storage](/vms/storage).
 | `pbcopy needs the terminal of a limanix shell session.`, or the same for `pbpaste`                                       | The command has no terminal to talk to.                             | Run it in an interactive shell opened with `limanix shell dev-box`.                                                        |
 
 See [Clipboard](/inside/clipboard) for the settings of common terminals.
+
+## Network
+
+### A port is unreachable
+
+A service in the VM does not answer from the Mac.
+
+Check the port from the Mac. Add `--udp` for a UDP port.
+
+::: code-group
+
+```sh [Mac]
+limanix network check dev-box 8080
+```
+
+:::
+
+The command runs its checks in order and prints a hint under a failed one:
+
+| Failed check | Cause                                                                 | Fix                                                                                                                                                      |
+| ------------ | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vm`         | The VM is stopped, or its last create or update did not complete.     | Run `limanix start dev-box`, or fix the problem and run `limanix update`.                                                                                |
+| `address`    | The guest reported no IPv4 address on the shared network.             | See [No address in the list](#no-address-in-the-list).                                                                                                   |
+| `firewall`   | The guest firewall does not open the port for its protocol.           | Add the port to `[network.ports]` and run `limanix update`. An HTTP server needs its TCP port; the same number under `udp` is another rule.              |
+| `listener`   | Nothing listens on the port, or only on `127.0.0.1`.                  | Start the service and make it listen on `0.0.0.0` or on the guest address.                                                                               |
+| `connect`    | The guest checks passed, but the Mac cannot connect within 3 seconds. | The connection stops on the Mac: check a VPN, a firewall, and the Local Network permission of your terminal app in System Settings › Privacy & Security. |
+
+::: code-group
+
+```toml [limanix.toml]
+[network.ports]
+tcp = [8080]
+```
+
+:::
+
+- Docker opens the ports it publishes with its own firewall rules. `network.ports` has no say over them, and removing a port from it does not close a port that Docker publishes. `lmx net check` warns when Docker's proxy holds the socket.
+- An authentication or permission error comes from the service's own access rules. Opening another firewall port does not change it.
+- After an update, start a service you run by hand again: the update restarts the VM.
+
+See [Network](/vms/network).
+
+### localhost does not work
+
+`localhost:PORT` on the Mac does not reach a service in the VM.
+
+Cause: LimaNix turns off Lima's automatic port forwarding. `localhost:8080` on the Mac is not the port `8080` of the VM.
+
+Fix: connect to the address of the VM, which `limanix list` shows in `ADDRESS`, such as `http://ADDRESS:8080`. The address is not fixed; check it again when you reconnect.
+
+### No address in the list
+
+`limanix list` shows `-` in `ADDRESS`.
+
+Cause: `ADDRESS` comes from `lmx status`, which `list` runs in each running VM with a 10-second limit. `-` means that the VM is stopped, did not answer in time, or has no IPv4 address on the shared network.
+
+Fix: check access first, then the VM.
+
+::: code-group
+
+```sh [Mac]
+limanix shell dev-box -- true
+limanix doctor dev-box
+```
+
+:::
 
 ## Collect diagnostics
 

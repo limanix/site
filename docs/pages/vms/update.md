@@ -41,7 +41,7 @@ Each update gives the VM a new generation: the complete system that your `limani
 
 A successful update leaves the VM running, even when it was stopped before. Before the build, the VM
 makes room in its Nix store; a nearly full disk causes a warning, not a failure. See
-[Files and storage](/vms/storage#keep-the-guest-disk-from-filling-up).
+[Files and storage](/vms/storage#keep-the-disk-free).
 
 ## What can change
 

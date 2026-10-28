@@ -4,21 +4,36 @@ description: Where the files of a VM live, what deleting it removes and how its 
 
 # Files and storage
 
-A VM keeps files in three places: on its own disk, in a home folder on your Mac, and in the project
-folders you share. This page shows which is which, what each command keeps, and how the guest disk
-keeps free space.
+A VM keeps files on its own disk, in a home folder on your Mac, and in the folders you share with
+it: your projects and your dotfiles. This page shows which is which, what each command keeps, and
+how the guest disk keeps free space.
+
+<LimanixOverview variant="storage" />
 
 ## Where your files live
 
-| Place         | Where the files are                                                                | After `limanix delete`                      |
-| ------------- | ---------------------------------------------------------------------------------- | ------------------------------------------- |
-| Guest disk    | Inside the VM, outside shared folders; holds NixOS and data written outside mounts | Removed                                     |
-| Managed home  | On the Mac beneath `~/.limanix`; appears at `/home/dev` inside the VM              | Kept by default; `--remove-home` removes it |
-| Project mount | A Mac folder that appears in the VM, such as at `/workspace`                       | Kept on the Mac                             |
+| Place                                                      | Where the files are                                                                                                                                  | After `limanix delete`                                      |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [Guest disk](#the-guest-disk)                              | A disk image in `~/.lima`, seen only in the VM: NixOS and data written outside mounts                                                                | Removed                                                     |
+| [Managed home](#the-managed-home)                          | On the Mac beneath `~/.limanix`; appears read-write at `user.home` inside the VM                                                                     | Kept by default; `--remove-home` removes it                 |
+| [Project folders](/config/mounts)                          | Folders of your Mac, such as your project at `/workspace`: as many as you list in `[[mounts]]`, each read-write (`rw`) or read-only (`ro`) in the VM | Kept on the Mac                                             |
+| [Dotfiles](/config/dotfiles)                               | Your dotfiles folder on the Mac, read-write at `/mnt/dotfiles` in the VM; each new shell links its entries into your home                            | Kept on the Mac                                             |
+| [LimaNix state](/reference/paths#the-limanix-state-folder) | The record of each VM in `~/Library/Application Support/Limanix`; none of your files                                                                 | The VM's record is removed; the record of a kept home stays |
 
-The managed home and read-write project mounts share their files with the Mac: an edit or a deletion
-on either side changes the same file. A mount is not a backup. To share a project folder, see
-[Shared folders](/config/mounts).
+<div class="parts">
+
+- [Your files](/config/mounts#changes-in-the-vm-change-the-mac)\
+  Shared with the VM: an edit or a deletion on either side changes the same file. A mount is not a
+  backup.
+  - the managed home
+  - the dotfiles folder
+  - project folders with `mode = "rw"`
+- [LimaNix files](/reference/paths)\
+  `limanix` keeps them in step with your VMs: do not change them by hand.
+  - `~/.lima`: guest disks and Lima settings
+  - `~/Library/Application Support/Limanix`: the record of each VM
+
+</div>
 
 ## The guest disk
 
@@ -45,23 +60,40 @@ root = "~/.limanix"
 
 :::
 
-The suffix is generated: `limanix create` prints the actual path, and the `home` field of
-`limanix list --json` shows it. The home holds your files, the dotfiles you keep in it and caches
-that live in the home. A relative `root` is resolved from the folder of `limanix.toml`, and `~` is
+The suffix is generated: `limanix create` prints the actual path, and `limanix list --json` shows
+it in `home`:
+
+::: code-group
+
+```sh [Mac]
+limanix list --json | jq -r '.[] | select(.name == "dev-box").home'
+```
+
+:::
+
+The home holds your files and caches. With `dotfiles` in `[shell]`, it
+also holds links to the files of your dotfiles folder, which stay on the Mac; see
+[Dotfiles](/config/dotfiles). A relative `root` is resolved from the folder of `limanix.toml`, and `~` is
 the home of your Mac account. `home.root` and `user.home` cannot change after the VM is created.
 
 ## What each command keeps
 
-| Command                             | Guest disk            | Managed home               | Project folders                 |
+| Command                             | Guest disk            | Managed home               | Shared folders                  |
 | ----------------------------------- | --------------------- | -------------------------- | ------------------------------- |
 | `stop`, `start`                     | Kept                  | Kept                       | Kept                            |
 | `update`                            | Kept and reconfigured | Kept                       | Kept; mount settings can change |
 | `delete`, with or without `--force` | Removed               | Kept                       | Kept                            |
 | `delete --remove-home`              | Removed               | Removed with all its files | Kept                            |
 
-LimaNix has no snapshot or backup command. Before you delete a VM, keep `limanix.toml` and your
-module folders, back up the home and project folders you need, and export data that lives only on
-the guest disk, such as databases or Docker volumes. The TOML recreates the system, not your data.
+::: warning
+LimaNix has no snapshot or backup command. Before you delete a VM:
+
+- keep `limanix.toml` and your module folders;
+- back up the home and project folders you need;
+- export data that lives only on the guest disk, such as databases or Docker volumes.
+
+The file recreates the system, not your data.
+:::
 
 ## Recreate a VM
 
@@ -72,7 +104,7 @@ attach it again. Copy the files you need into the new home or a project folder.
 Once the VM is deleted, `limanix delete --remove-home` can no longer remove its old home. Keep the
 printed path and remove that folder yourself when you no longer need it.
 
-## Keep the guest disk from filling up
+## Keep the disk free
 
 The VM cleans its Nix store by itself:
 
@@ -120,10 +152,3 @@ usage before and after. `sudo nix-store --gc` collects whatever the free space.
 If that is not enough, raise `disk` in `[resources]` and run `limanix update` on the Mac. Tools you
 removed from your own `nix profile` stay on disk until `nix profile wipe-history`; see
 [Packages on the fly](/inside/packages).
-
-## On the Mac
-
-Lima keeps the guest disk under `~/.lima`, or `LIMA_HOME` when set. LimaNix keeps its records of
-each VM in `~/Library/Application Support/Limanix`, or `LIMANIX_HOME` when set. Leave both to the
-`limanix` commands, and read [Troubleshooting](/troubleshooting) before you change anything there.
-[Paths and ports](/reference/paths) lists what each folder holds.

@@ -1,33 +1,105 @@
 <script setup lang="ts">
-const rows = [
-  {
-    mac: '<code>limanix.toml</code>',
-    link: 'describes',
-    vm: 'NixOS with your shell, toolchains, services and packages',
+import { computed } from 'vue'
+
+const props = defineProps<{ variant?: 'overview' | 'editors' | 'storage' | 'dotfiles' }>()
+
+const diagrams = {
+  overview: {
+    rows: [
+      {
+        mac: '<code>limanix.toml</code>',
+        link: 'describes',
+        vm: 'NixOS with your shell, toolchains, services and packages',
+      },
+      { mac: 'Project folder', link: 'shared', vm: '<code>/workspace</code>', both: true },
+      {
+        mac: 'VM home in <code>~/.limanix</code>',
+        link: 'shared',
+        vm: '<code>/home/dev</code>',
+        both: true,
+      },
+      {
+        mac: 'Terminal and editors',
+        link: 'SSH',
+        vm: 'Shell, language servers and <a href="/inside/lmx"><code>lmx</code></a>',
+      },
+    ],
+    caption:
+      'Your tools run in the VM, and your files and editor stay on the Mac. Lima, built into <code>limanix</code>, runs the VM on Apple Virtualization.',
   },
-  { mac: 'Project folder', link: 'shared', vm: '<code>/workspace</code>', both: true },
-  {
-    mac: 'VM home in <code>~/.limanix</code>',
-    link: 'shared',
-    vm: '<code>/home/dev</code>',
-    both: true,
+  editors: {
+    rows: [
+      {
+        mac: 'Editor window and settings',
+        link: 'SSH',
+        vm: 'Editor server, extensions and language servers',
+      },
+      { mac: 'Terminal panel', link: 'SSH', vm: 'Shell, toolchains and builds' },
+      { mac: 'Project folder', link: 'shared', vm: '<code>/workspace</code>', both: true },
+    ],
+    caption: 'The editor connects to the VM as the SSH host <code>NAME.limanix</code>.',
   },
-  {
-    mac: 'Terminal and editors',
-    link: 'SSH',
-    vm: 'Shell, language servers and <a href="/inside/lmx"><code>lmx</code></a>',
+  storage: {
+    rows: [
+      { mac: 'Project folder', link: 'shared', vm: '<code>/workspace</code>', both: true },
+      {
+        mac: 'Managed home in <code>~/.limanix</code>',
+        link: 'shared',
+        vm: 'Your home, <code>user.home</code>',
+        both: true,
+      },
+      {
+        mac: 'Dotfiles folder, such as <code>~/dotfiles</code>',
+        link: 'shared',
+        vm: '<code>/mnt/dotfiles</code>, linked into your home',
+        both: true,
+      },
+      {
+        mac: 'Guest disk in <code>~/.lima</code>',
+        link: 'holds',
+        vm: 'NixOS, the Nix store and data in <code>/var</code>',
+      },
+    ],
+    caption:
+      'Shared folders are the same files on both sides. The guest disk is seen only in the VM, and <code>limanix delete</code> removes it.',
   },
-]
+  dotfiles: {
+    rows: [
+      {
+        mac: 'Dotfiles folder, such as <code>~/dotfiles</code>',
+        link: 'shared',
+        vm: '<code>/mnt/dotfiles</code>',
+        both: true,
+      },
+      {
+        mac: '<code>.zshrc</code> in the folder',
+        link: 'linked',
+        vm: '<code>~/.zshrc</code>',
+        both: true,
+      },
+      {
+        mac: '<code>.config/nvim</code> in the folder',
+        link: 'linked',
+        vm: '<code>~/.config/nvim</code>',
+        both: true,
+      },
+    ],
+    caption:
+      'Every VM sees the same folder at <code>/mnt/dotfiles</code>, and each new shell links its entries into your home.',
+  },
+}
+
+const diagram = computed(() => diagrams[props.variant ?? 'overview'])
 </script>
 
 <template>
   <figure class="overview">
-    <div class="overview__grid" :style="{ '--rows': rows.length }">
+    <div class="overview__grid" :style="{ '--rows': diagram.rows.length }">
       <div class="overview__panel overview__panel--mac" aria-hidden="true" />
       <div class="overview__panel overview__panel--vm" aria-hidden="true" />
       <p class="overview__title overview__side--mac">Your Mac</p>
       <p class="overview__title overview__side--vm">Linux VM</p>
-      <template v-for="(row, index) in rows" :key="row.link + index">
+      <template v-for="(row, index) in diagram.rows" :key="row.link + index">
         <p
           class="overview__item overview__side--mac"
           :style="{ gridRow: index + 2 }"
@@ -48,10 +120,7 @@ const rows = [
         />
       </template>
     </div>
-    <figcaption class="overview__caption">
-      Your tools run in the VM, and your files and editor stay on the Mac. Lima, built into
-      <code>limanix</code>, runs the VM on Apple Virtualization.
-    </figcaption>
+    <figcaption class="overview__caption" v-html="diagram.caption" />
   </figure>
 </template>
 

@@ -9,6 +9,8 @@ VS Code, Zed, and JetBrains IDEs. The window stays on the Mac. The editor's serv
 and the language servers run in the VM, next to your toolchains and the project's Linux
 dependencies.
 
+<LimanixOverview variant="editors" />
+
 ## Set up SSH once
 
 1. Add this line at the top of `~/.ssh/config`, before any `Host` block:
@@ -88,16 +90,7 @@ Zed uses the language servers of your toolchains and downloads others into the V
 
 The IDE downloads its backend into your home in the VM and opens a client window on the Mac.
 
-## What runs where
-
-<div class="parts">
-
-- **On the Mac**\
-  The editor window, its settings and the client.
-- **In the VM**\
-  The editor's server, extensions, language servers, terminals, toolchains and builds.
-
-</div>
+## The editor's server
 
 The editor's server and caches live in your home in the VM, which is the managed home on the Mac:
 they survive `limanix update`. Projects you share with the VM appear at their target, such as

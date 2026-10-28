@@ -4,7 +4,19 @@ description: Link your dotfiles from a folder on the Mac into the home of every 
 
 # Dotfiles
 
-Keep your shell, editor and Git settings in one folder on your Mac. Name the folder in `[shell]`, and each VM links its files into your home.
+Dotfiles are the settings files in your home whose names start with a dot, such as `.zshrc` for Zsh, `.gitconfig` for Git and `.tmux.conf` for tmux, and the settings folders in `.config`, such as `.config/nvim` for Neovim. They hold your aliases, your Git name and email, and your editor setup. LimaNix links them into every VM from one folder on your Mac.
+
+<LimanixOverview variant="dotfiles" />
+
+## Why a dotfiles folder
+
+Each VM has a home of its own, and a new VM starts with an empty one: settings that you make inside a VM stay in that VM. A dotfiles folder on the Mac keeps them in one place:
+
+- one folder serves every VM, and a new VM has your settings from its first shell;
+- the VMs link your files instead of copying them, and an edit reaches every VM at once;
+- the folder can be a Git repository that you also use on other machines.
+
+Dotfiles are optional. The [shell preset](/config/shell) already sets up the shell, the prompt, the editor and the tools; your dotfiles add your own settings on top.
 
 ## Name your dotfiles folder
 
@@ -17,7 +29,7 @@ dotfiles = "~/dotfiles"
 
 :::
 
-The folder is shaped like a home: `.zshrc`, `.tmux.conf`, `.gitconfig`, `.config/nvim` and so on. One folder can serve every VM.
+`dotfiles` names one folder, shaped like a home: `.zshrc`, `.tmux.conf`, `.gitconfig`, `.config/nvim` and so on. Use a folder of its own, such as a clone of your dotfiles repository. Your Mac home does not fit: every entry in it that starts with a dot, such as `.ssh` or `.Trash`, would be linked into the VM.
 
 The folder must exist when you create or update the VM. A relative path resolves from the folder that holds `limanix.toml`. Without `dotfiles`, the VM gets no dotfiles. Apply a change with `limanix update --config limanix.toml`; see [Changing a VM](/vms/update).
 
@@ -36,9 +48,11 @@ The VM mounts the folder read-write at `/mnt/dotfiles`. Every new shell you open
 
 Your startup files, such as `.zshrc`, load after the catalog's shell configuration. A `.config/nvim` with an `init.lua` replaces the bundled AstroNvim setup; see [Shell](/config/shell#choose-an-editor).
 
-## Edit on the Mac
+## Edit on either side
 
-An edit on the Mac is live in every VM at once: the links point to your files, and there is nothing to copy. The next shell links a new entry and removes the link of an entry you deleted. For settings that differ between VMs, test the hostname in your startup files, such as `$HOST` in Zsh.
+The folder is always mounted read-write: unlike [shared folders](/config/mounts), it has no `ro` mode. The links point to your files, and there is nothing to copy. An edit on the Mac is live in every VM at once, and an edit in a VM changes your file on the Mac. A tool that saves its own settings, such as `git config --global`, changes the file in your folder too.
+
+The next shell links a new entry and removes the link of an entry you deleted. For settings that differ between VMs, test the hostname in your startup files, such as `$HOST` in Zsh. If your Mac reads the same files, test `$OSTYPE`: it starts with `darwin` on the Mac and with `linux` in a VM.
 
 ## Files in the way
 

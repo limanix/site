@@ -126,7 +126,7 @@ Fix:
 
 ```sh [Mac]
 limanix doctor dev-box
-limanix list --json | jq -r '.[] | select(.name == "dev-box") | .lima_name'
+limanix list --json | jq -r '.[] | "\(.name) \(.lima_name)"'
 ```
 
 :::

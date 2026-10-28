@@ -100,7 +100,9 @@ VM:
 
    :::
 
-2. The network helper and Lima's sudoers rules. Run this as your regular Mac user, in an
+2. The network helper and Lima's sudoers rules. macOS lets only root create the network that a QEMU
+   guest uses: the helper, `socket_vmnet`, runs as root, and the sudoers rules let Lima start and
+   stop it with each VM without asking for your password. Run this as your regular Mac user, in an
    interactive terminal:
 
    ::: code-group

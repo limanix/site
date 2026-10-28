@@ -72,22 +72,7 @@ These paths and everything below them belong to the VM's system: `/etc`, `/boot`
 
 ## Remove all mounts
 
-Without a `mounts` setting, the VM gets two example mounts: `~/projects/my-project` at `/workspace` and `~/.ssh/limanix` at `/mnt/git-keys`. To have no mounts, put `mounts = []` before the first table and remove every `[[mounts]]` block:
-
-::: code-group
-
-```toml [limanix.toml]
-schema_version = 1
-name = "dev-box"
-mounts = []
-
-[shell]
-preset = "minimal"
-```
-
-:::
-
-Your home folder in the VM stays shared. With the defaults, it lives on the Mac under `~/.limanix` and appears at `/home/dev`; [Files and storage](/vms/storage) explains it.
+Remove every `[[mounts]]` block: a file without them shares no folders. Your home folder in the VM stays shared. With the defaults, it lives on the Mac under `~/.limanix` and appears at `/home/dev`; [Files and storage](/vms/storage) explains it.
 
 ## Changes in the VM change the Mac
 

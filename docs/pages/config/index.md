@@ -47,14 +47,14 @@ The [limanix.toml reference](/reference/config) lists every key with its type an
 
 The file uses TOML. In the [project example](#example-files) below:
 
-| In the file                | Meaning                                                                   |
-| -------------------------- | ------------------------------------------------------------------------- |
-| `schema_version = 1`       | A top-level setting; top-level settings come before the first table       |
-| `[resources]`              | A table; it holds the settings below it, up to the next table header      |
-| `[network.ports]`          | A table inside `network`                                                  |
-| `[[mounts]]`               | One entry in the list of shared folders; repeat the block for each folder |
-| `tcp = [8080]`, `udp = []` | Lists in square brackets; an empty list selects nothing                   |
-| `# Save this file…`        | A comment                                                                 |
+| In the file         | Meaning                                                                   |
+| ------------------- | ------------------------------------------------------------------------- |
+| `name = "dev-box"`  | A top-level setting; top-level settings come before the first table       |
+| `[resources]`       | A table; it holds the settings below it, up to the next table header      |
+| `[network.ports]`   | A table inside `network`                                                  |
+| `[[mounts]]`        | One entry in the list of shared folders; repeat the block for each folder |
+| `tcp = [8080]`      | A list in square brackets                                                 |
+| `# Save this file…` | A comment                                                                 |
 
 Values have types: `cpu = 4` is an integer, `sudo = true` a boolean and `mem = "8GiB"` a string. LimaNix rejects unknown keys and wrong types, and the error names the key. This catches typos such as `cpus` for `cpu` in `[resources]`.
 
@@ -69,38 +69,30 @@ name = "dev-box"
 
 :::
 
-`schema_version` is the version of the file format, not of the client. Keep it at `1`, the only version.
+`schema_version` is the version of the file format, not of the client. `1` is the only version, and a file without it is read as version 1.
 
 `name` is the VM's name: 1 to 63 lowercase letters, digits or hyphens, starting and ending with a letter or digit. Without it, the VM is called `example-box`. Changing the name in the file selects a different VM; it does not rename the existing one.
 
 ## Settings you leave out
 
-A setting you leave out keeps its default. Some defaults are examples, such as the mounts and the environment variables: write an empty list or table to remove them.
+A setting you leave out keeps its default. The defaults add nothing you did not ask for: no shared folders, environment variables or open ports.
 
-| Your file                             | What the VM gets                                                                                    |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| No `mounts` setting                   | Two example mounts: `~/projects/my-project` at `/workspace` and `~/.ssh/limanix` at `/mnt/git-keys` |
-| `mounts = []`                         | No shared folders besides your home folder                                                          |
-| One or more `[[mounts]]`              | Those mounts instead of the examples                                                                |
-| No `[env]` table                      | `APP_ENV = "development"` and `APP_LOG_LEVEL = "debug"`                                             |
-| An empty `[env]` table, or `env = {}` | No variables                                                                                        |
-| An `[env]` table with entries         | Exactly those variables                                                                             |
-| No `tcp` in `[network.ports]`         | TCP port 8080 open                                                                                  |
-| `tcp = []`                            | No TCP ports from this setting; modules can still open their own                                    |
-| No `[shell]` table                    | The `terminal` preset with Pure, AstroNvim and tmux                                                 |
-| `preset = "minimal"` alone            | Bash and the CLI tools; `prompt`, `editor` and `multiplexer` become `none`                          |
-| No `[toolchains]` table               | No toolchains                                                                                       |
-| No `dotfiles`                         | No dotfiles                                                                                         |
-| No `modules`, or `modules = []`       | No optional modules; the shell and toolchains still apply                                           |
-| No `packages`                         | No packages besides the GitHub CLI of the `terminal` preset                                         |
-| `[resources]` with only `cpu = 2`     | Two CPUs; the architecture, memory and disk keep their defaults                                     |
-| No `[theme]` table                    | The `system` flavor: your terminal's own colors                                                     |
+| Your file                         | What the VM gets                                                           |
+| --------------------------------- | -------------------------------------------------------------------------- |
+| No `arch` in `[resources]`        | Your Mac's architecture: `arm64` on Apple Silicon, `amd64` on Intel        |
+| No `[[mounts]]`                   | No shared folders besides your home folder                                 |
+| No `[env]` table                  | No environment variables                                                   |
+| No `tcp` in `[network.ports]`     | No TCP ports from this setting; modules can still open their own           |
+| No `[shell]` table                | The `terminal` preset with Pure, AstroNvim and tmux                        |
+| `preset = "minimal"` alone        | Bash and the CLI tools; `prompt`, `editor` and `multiplexer` become `none` |
+| No `[toolchains]` table           | No toolchains                                                              |
+| No `dotfiles`                     | No dotfiles                                                                |
+| No `modules`                      | No optional modules; the shell and toolchains still apply                  |
+| No `packages`                     | No packages besides the GitHub CLI of the `terminal` preset                |
+| `[resources]` with only `cpu = 2` | Two CPUs; the architecture, memory and disk keep their defaults            |
+| No `[theme]` table                | The `system` flavor: your terminal's own colors                            |
 
 An empty string is a value, not a default: `source = ""` is an error, and `APP_ENV = ""` sets an empty variable.
-
-::: warning
-The example mounts need both folders on your Mac, and `limanix create` fails without them. Write `mounts = []` before the first table, or list your own `[[mounts]]`.
-:::
 
 ## Example files
 
@@ -116,36 +108,18 @@ The project example, saved as `limanix.toml` in your project folder:
 
 ```toml [limanix.toml]
 # Save this file in your project directory as limanix.toml.
-# Apple Silicon: arm64. Intel Mac: change resources.arch to amd64.
-schema_version = 1
 name = "dev-box"
 
 [resources]
-arch = "arm64"
 cpu = 4
 mem = "8GiB"
 disk = "10GiB"
 
-[user]
-name = "dev"
-home = "/home/dev"
-sudo = true
-
-[home]
-root = "~/.limanix"
-
 [shell]
 preset = "terminal"
 
-[nixos]
-modules = []
-
-[network]
-mode = "shared"
-
 [network.ports]
 tcp = [8080]
-udp = []
 
 [env]
 APP_ENV = "development"
@@ -158,6 +132,6 @@ mode = "rw"
 
 :::
 
-It targets Apple Silicon; on an Intel Mac, set `arch = "amd64"`. Opening port 8080 does not start an application, and `modules = []` adds no modules.
+Opening port 8080 does not start an application.
 
-To start from the client's own example instead, run `limanix first-config` in your project folder. It writes `limanix.toml` with the defaults and the example mounts, and it overwrites an existing `limanix.toml`.
+To see every setting instead, run `limanix first-config` in your project folder. It writes `limanix.toml` with each setting at its default and a comment for each, and it overwrites an existing `limanix.toml`.

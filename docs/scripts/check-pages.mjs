@@ -110,8 +110,8 @@ for (const [path, page] of pages) {
       if (line.trim().startsWith(fence) && !line.trim().replace(/[`~]/g, '')) fence = null
       return
     }
-    if (/^:::\s*code-group/.test(line)) group = true
-    else if (/^:::\s*$/.test(line)) group = false
+    if (/^\s*:::\s*code-group/.test(line)) group = true
+    else if (/^\s*:::\s*$/.test(line)) group = false
 
     const prose = line.replace(/`[^`]*`/g, '')
     // Catalog prose is checked in its own repository; keep checking its links here.

@@ -122,6 +122,26 @@
   text-decoration: underline;
 }
 
+.vp-doc .parts p {
+  margin: 0;
+  line-height: inherit;
+}
+
+.vp-doc .parts :not(pre) > code {
+  white-space: nowrap;
+}
+
+.vp-doc .parts .vp-code-group {
+  margin: 12px 0;
+}
+
+@media (min-width: 641px) {
+  .vp-doc .parts div[class*='language-'] code {
+    padding: 0 16px;
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 640px) {
   .vp-doc .parts ul {
     grid-template-columns: minmax(0, 1fr);

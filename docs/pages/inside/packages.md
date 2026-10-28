@@ -6,7 +6,7 @@ description: Install a package for your user without changing limanix.toml.
 
 When no module or toolchain gives you a tool, take it straight from Nixpkgs, the package collection of NixOS. You run these commands inside the VM, for your own account, and none of them needs `sudo`.
 
-## Try a tool without installing it
+## Try a tool once
 
 ::: code-group
 
@@ -30,7 +30,7 @@ nix profile add nixpkgs#ripgrep
 
 The package goes into your profile and stays there until you remove it. `nixpkgs` here is the VM's own NixOS release: the same package set that the system and the modules use. A tool you add shares their libraries, and nothing is downloaded twice.
 
-## List and remove packages
+## Manage your profile
 
 | Task                                    | Command                      |
 | --------------------------------------- | ---------------------------- |
@@ -42,7 +42,17 @@ Older versions of your profile keep removed packages on disk until you run `nix 
 
 ## Find a package name
 
-Search [search.nixos.org](https://search.nixos.org/packages) in the channel of your VM's NixOS release. `nixos-version` shows it, such as 26.05.
+Search [search.nixos.org](https://search.nixos.org/packages) in the channel of your VM's NixOS release. `nixos-version` shows it, such as 26.05. Or search in the VM, in the same package set that `nixpkgs#` names:
+
+::: code-group
+
+```sh [VM]
+nix search nixpkgs ripgrep
+```
+
+:::
+
+The first search reads the whole package set and takes a while.
 
 ## Profile or limanix.toml
 

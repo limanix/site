@@ -408,7 +408,7 @@ See [Files and storage](/vms/storage).
 | `pbpaste` prints `The terminal did not share its clipboard. Allow clipboard reads in its settings, or paste with Cmd+V.` | The terminal refused the read, or did not answer within 10 seconds. | Allow clipboard reads in the terminal's settings. Reads usually need one more permission than writes. Or paste with Cmd+V. |
 | `pbcopy needs the terminal of a limanix shell session.`, or the same for `pbpaste`                                       | The command has no terminal to talk to.                             | Run it in an interactive shell opened with `limanix shell dev-box`.                                                        |
 
-See [Clipboard](/inside/clipboard) for the settings of common terminals.
+See [Clipboard](/inside/clipboard#allow-it-in-your-terminal) for the settings of common terminals.
 
 ## Network
 

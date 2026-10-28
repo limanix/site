@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 const props = defineProps<{
-  variant?: 'overview' | 'editors' | 'storage' | 'dotfiles' | 'parts' | 'connections'
+  variant?: 'overview' | 'editors' | 'storage' | 'dotfiles' | 'parts' | 'connections' | 'mounts'
 }>()
 
 const diagrams = {
@@ -125,6 +125,23 @@ const diagrams = {
     ],
     caption:
       'Lima and the catalog are built into <code>limanix</code>. Your terminal and editors reach the VM over SSH too.',
+  },
+  mounts: {
+    rows: [
+      {
+        mac: 'Project folder',
+        link: 'rw',
+        vm: '<code>/workspace</code>',
+        both: true,
+      },
+      {
+        mac: 'Fixtures folder',
+        link: 'ro',
+        vm: '<code>/mnt/fixtures</code>, read-only',
+      },
+    ],
+    caption:
+      'A read-write folder is the same files on both sides. A read-only folder only goes into the VM: programs there read it, and only the Mac changes it.',
   },
   connections: {
     rows: [

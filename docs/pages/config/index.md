@@ -8,20 +8,19 @@ A `limanix.toml` file describes one VM: its resources, your account, the shell, 
 
 ## Where the file lives
 
-Keep `limanix.toml` in your project folder and create the VM from there:
+Keep `limanix.toml` in your project folder: it can travel with the project in Git, and `"."` in it is the project folder. Pass its path to `create` and `update`:
 
 ::: code-group
 
 ```sh [Mac]
-cd ~/projects/my-project
-limanix create --config limanix.toml
+limanix create --config ~/projects/my-project/limanix.toml
 ```
 
 :::
 
 `limanix create` and `limanix update` need `--config` and read the VM name from the file. The other commands take the name directly, such as `limanix shell dev-box`.
 
-Relative paths in the file resolve from the folder that holds `limanix.toml`, wherever you run the command. A mount source of `"."` is the project folder itself.
+Relative paths in the file resolve from the folder that holds `limanix.toml`, wherever you run the command.
 
 Editing the file changes nothing by itself. Apply it with `limanix update --config limanix.toml`, which restarts the VM; see [Changing a VM](/vms/update). `limanix start` boots the VM as it was, without reading the file.
 
@@ -71,7 +70,13 @@ name = "dev-box"
 
 `schema_version` is the version of the file format, not of the client. `1` is the only version, and a file without it is read as version 1.
 
-`name` is the VM's name: 1 to 63 lowercase letters, digits or hyphens, starting and ending with a letter or digit. Without it, the VM is called `example-box`. Changing the name in the file selects a different VM; it does not rename the existing one.
+`name` is the VM's name; without it, the VM is called `example-box`.
+
+> A name has 1 to 63 lowercase letters, digits and hyphens, and starts and ends with a letter or digit.
+
+::: warning
+Changing `name` in the file points the file at a different VM; it does not rename the existing one.
+:::
 
 ## Settings you leave out
 
@@ -88,7 +93,7 @@ A setting you leave out keeps its default. The defaults add nothing you did not 
 | No `[toolchains]` table           | No toolchains                                                              |
 | No `dotfiles`                     | No dotfiles                                                                |
 | No `modules`                      | No optional modules; the shell and toolchains still apply                  |
-| No `packages`                     | No packages besides the GitHub CLI of the `terminal` preset                |
+| No `packages`                     | No extra packages; the shell preset still brings Git and its CLI tools     |
 | `[resources]` with only `cpu = 2` | Two CPUs; the architecture, memory and disk keep their defaults            |
 | No `[theme]` table                | The `system` flavor: your terminal's own colors                            |
 
@@ -96,17 +101,17 @@ An empty string is a value, not a default: `source = ""` is an error, and `APP_E
 
 ## Example files
 
-| Example   | What it sets up                                                                                                                                       |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Minimal   | Bash and the CLI tools on 2 CPUs, 4 GiB of memory and a 16 GiB disk, with no shared project folder, environment variables, modules or open ports      |
-| Project   | The `terminal` shell, your project folder at `/workspace`, TCP port 8080 open and `APP_ENV` set, on 4 CPUs, 8 GiB of memory and a 10 GiB disk         |
-| Workbench | The `terminal` shell with Go, Python and Node.js, Docker, Posting, Harlequin, `kubectl` and `k9s`, and your project at `/workspace`, on a 40 GiB disk |
+Three starting points. Save one as `limanix.toml` in your project folder and change what you need:
 
-The project example, saved as `limanix.toml` in your project folder:
+| Example   | What it sets up                                                                                                             |
+| --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Project   | Your project at `/workspace`, TCP port 8080 open and `APP_ENV` set, on 4 CPUs, 8 GiB of memory and a 10 GiB disk            |
+| Minimal   | Bash and the CLI tools on 2 CPUs, 4 GiB of memory and a 16 GiB disk, with no shared folder, modules or open ports           |
+| Workbench | Go, Python and Node.js, Docker, Posting, Harlequin, `kubectl` and `k9s`, and your project at `/workspace`, on a 40 GiB disk |
 
 ::: code-group
 
-```toml [limanix.toml]
+```toml [Project]
 # Save this file in your project directory as limanix.toml.
 name = "dev-box"
 
@@ -130,8 +135,50 @@ target = "/workspace"
 mode = "rw"
 ```
 
+```toml [Minimal]
+name = "dev-box"
+
+[resources]
+cpu = 2
+mem = "4GiB"
+disk = "16GiB"
+
+[shell]
+preset = "minimal"
+```
+
+```toml [Workbench]
+name = "dev-box"
+
+[resources]
+disk = "40GiB"
+
+[toolchains]
+go = "1.27"
+python = "3.15"
+nodejs = "26"
+
+[nixos]
+modules = ["lmx:docker", "lmx:posting", "lmx:harlequin"]
+packages = ["kubectl", "k9s"]
+
+[[mounts]]
+source = "."
+target = "/workspace"
+```
+
 :::
 
-Opening port 8080 does not start an application.
+`limanix first-config` writes a `limanix.toml` with every setting at its default and a comment for each, in the folder you name or the current one:
 
-To see every setting instead, run `limanix first-config` in your project folder. It writes `limanix.toml` with each setting at its default and a comment for each, and it overwrites an existing `limanix.toml`.
+::: code-group
+
+```sh [Mac]
+limanix first-config ~/projects/my-project
+```
+
+:::
+
+::: warning
+`first-config` overwrites a `limanix.toml` that is already in the folder.
+:::

@@ -4,7 +4,9 @@ description: Share folders of your Mac with a VM.
 
 # Shared folders
 
-Each `[[mounts]]` entry shares a folder of your Mac with the VM. Both sides see the same files: you edit them on the Mac and run your tools in the VM.
+Each `[[mounts]]` entry shares a folder of your Mac with the VM. Both sides see the same files: you edit them on the Mac and run your tools in the VM. Share as many folders as you need, each read-write or read-only.
+
+<LimanixOverview variant="mounts" />
 
 ## Share your project
 
@@ -14,7 +16,7 @@ Each `[[mounts]]` entry shares a folder of your Mac with the VM. Both sides see 
 [[mounts]]
 source = "."
 target = "/workspace"
-mode = "rw"
+mode   = "rw"
 ```
 
 :::
@@ -37,17 +39,19 @@ Repeat the block for each folder:
 [[mounts]]
 source = "."
 target = "/workspace"
-mode = "rw"
+mode   = "rw"
 
 [[mounts]]
 source = "../fixtures"
 target = "/mnt/fixtures"
-mode = "ro"
+mode   = "ro"
 ```
 
 :::
 
 Each source must be a folder that exists when you create or update the VM: create `../fixtures` on the Mac first. With `ro`, programs in the VM can read `/mnt/fixtures` but not change it.
+
+A guest of your Mac's architecture shares folders with virtiofs. A guest of the other architecture uses 9p, which is slower for builds that touch many small files; see [Guest architecture](/vms/resources#guest-architecture).
 
 ## Paths on the Mac
 
@@ -74,7 +78,7 @@ These paths and everything below them belong to the VM's system: `/etc`, `/boot`
 
 Remove every `[[mounts]]` block: a file without them shares no folders. Your home folder in the VM stays shared. With the defaults, it lives on the Mac under `~/.limanix` and appears at `/home/dev`; [Files and storage](/vms/storage) explains it.
 
-## Changes in the VM change the Mac
+## Edits reach the Mac {#changes-in-the-vm-change-the-mac}
 
 A read-write mount is the Mac folder itself, and so is your home folder in the VM. Editing, creating or deleting a file in the VM changes it on the Mac. `limanix delete` leaves shared folders on the Mac, and it keeps your home folder unless you add `--remove-home`.
 

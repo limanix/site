@@ -147,3 +147,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.vp-doc .settings-path {
+  font-weight: 600;
+  color: var(--vp-c-warning-1);
+}

@@ -119,14 +119,14 @@ Cause: Lima could not boot the VM. Its host agent writes the reason to log files
 Fix:
 
 1. Run `limanix doctor dev-box`. Its `vm` check shows what Lima reports.
-1. Find the name of the Lima instance in `lima_name` of `limanix list --json`.
+1. Find the name of the Lima instance: `lima_name` in `limanix list --json`.
 1. Read `ha.stderr.log` and `ha.stdout.log` in the directory of that instance under `~/.lima`, or under `LIMA_HOME` when you set it.
 
 ::: code-group
 
 ```sh [Mac]
 limanix doctor dev-box
-limanix list --json
+limanix list --json | jq -r '.[] | select(.name == "dev-box") | .lima_name'
 ```
 
 :::

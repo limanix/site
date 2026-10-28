@@ -23,7 +23,7 @@ limanix COMMAND [ARGUMENTS] [FLAGS]
 | `-h`, `--help`    | boolean | `false` | Print the help of `limanix` or of the command it follows.        |
 | `-v`, `--version` | boolean | `false` | Print the version of the client. Only `limanix` itself takes it. |
 
-Errors go to standard error as `limanix: MESSAGE`.
+Results go to standard output. Errors, as `limanix: MESSAGE`, and the build output of `create` and `update` go to standard error. For scripts, `list` and `modules list` take `-q` to print only names, and every command with a result takes `--json`; see [Use LimaNix in scripts](/vms/#use-limanix-in-scripts).
 
 ### Exit status
 
@@ -31,7 +31,7 @@ Errors go to standard error as `limanix: MESSAGE`.
 | ------ | --------------------------------------------------------------------------------------------------------------------------------- |
 | `0`    | Success.                                                                                                                          |
 | `1`    | The command failed. `limanix doctor` and `limanix network check` also exit with `1`, after printing every check, when one failed. |
-| `2`    | Usage error, such as an unknown command, a missing argument or a missing `--config`.                                              |
+| `2`    | Usage error, such as an unknown command, a missing argument, a missing `--config`, or `-q` with `--json`.                         |
 | `130`  | The command was interrupted, for example with Ctrl-C.                                                                             |
 | Other  | `limanix shell` exits with the status of the guest command or shell.                                                              |
 
@@ -51,16 +51,17 @@ Create a VM from a configuration file.
 ::: code-group
 
 ```sh [Mac]
-limanix create --config FILE
+limanix create --config FILE [--json]
 ```
 
 :::
 
-| Flag       | Type   | Default  | Description                        |
-| ---------- | ------ | -------- | ---------------------------------- |
-| `--config` | string | required | Path to the VM configuration file. |
+| Flag       | Type    | Default  | Description                                                  |
+| ---------- | ------- | -------- | ------------------------------------------------------------ |
+| `--config` | string  | required | Path to the VM configuration file.                           |
+| `--json`   | boolean | `false`  | Print the VM as JSON, as an object of `limanix list --json`. |
 
-`create` reads the VM name from the file, allocates the VM and its managed home, builds the NixOS system, restarts the VM into it and checks the development account. It prints the build output, then `Created NAME. Managed home: PATH`. It downloads the base image when needed; the first run needs network access for the image and the Nix dependencies.
+`create` reads the VM name from the file, allocates the VM and its managed home, builds the NixOS system, restarts the VM into it and checks the development account. It prints the build output to standard error, then `Created NAME. Managed home: PATH`, or the VM as JSON with `--json`. It downloads the base image when needed; the first run needs network access for the image and the Nix dependencies.
 
 A name that already has saved state is rejected with `VM 'NAME' already has state; use update or delete`. When `create` fails after the VM exists, `limanix list` shows it with the state `error`: fix the problem and run `limanix update` with the same file.
 
@@ -73,16 +74,17 @@ Apply a configuration to an existing VM and restart it.
 ::: code-group
 
 ```sh [Mac]
-limanix update --config FILE
+limanix update --config FILE [--json]
 ```
 
 :::
 
-| Flag       | Type   | Default  | Description                        |
-| ---------- | ------ | -------- | ---------------------------------- |
-| `--config` | string | required | Path to the VM configuration file. |
+| Flag       | Type    | Default  | Description                                                  |
+| ---------- | ------- | -------- | ------------------------------------------------------------ |
+| `--config` | string  | required | Path to the VM configuration file.                           |
+| `--json`   | boolean | `false`  | Print the VM as JSON, as an object of `limanix list --json`. |
 
-`update` selects the VM by the `name` in the file, keeps its disk and managed home, builds the new system in the VM and restarts it. It prints the build output, then `Updated NAME.` The VM is running afterwards, even if it was stopped before.
+`update` selects the VM by the `name` in the file, keeps its disk and managed home, builds the new system in the VM and restarts it. It prints the build output to standard error, then `Updated NAME.`, or the VM as JSON with `--json`. The VM is running afterwards, even if it was stopped before.
 
 - A failed build does not restart the VM, which keeps its current system. Steps before the failure are not undone: the VM may be stopped, its Lima settings may have changed, or new environment files may be installed.
 - Ctrl-C during the build cancels it in the VM, starts the guest's own `lmxd` again and exits with status `130`.
@@ -97,16 +99,17 @@ Start an existing VM.
 ::: code-group
 
 ```sh [Mac]
-limanix start NAME
+limanix start NAME [--json]
 ```
 
 :::
 
-| Argument | Type   | Default  | Description |
-| -------- | ------ | -------- | ----------- |
-| `NAME`   | string | required | VM name.    |
+| Argument or flag | Type    | Default  | Description                                                  |
+| ---------------- | ------- | -------- | ------------------------------------------------------------ |
+| `NAME`           | string  | required | VM name.                                                     |
+| `--json`         | boolean | `false`  | Print the VM as JSON, as an object of `limanix list --json`. |
 
-`start` boots the saved VM and prints `Started NAME.` It does not read `limanix.toml`, rebuild the system or reset an earlier operation error: `limanix update` does that.
+`start` boots the saved VM and prints `Started NAME.`, or the VM as JSON with `--json`. It does not read `limanix.toml`, rebuild the system or reset an earlier operation error: `limanix update` does that.
 
 Guide: [Using virtual machines](/vms/).
 
@@ -117,16 +120,17 @@ Stop a VM and keep its disk and home.
 ::: code-group
 
 ```sh [Mac]
-limanix stop NAME
+limanix stop NAME [--json]
 ```
 
 :::
 
-| Argument | Type   | Default  | Description |
-| -------- | ------ | -------- | ----------- |
-| `NAME`   | string | required | VM name.    |
+| Argument or flag | Type    | Default  | Description                                                  |
+| ---------------- | ------- | -------- | ------------------------------------------------------------ |
+| `NAME`           | string  | required | VM name.                                                     |
+| `--json`         | boolean | `false`  | Print the VM as JSON, as an object of `limanix list --json`. |
 
-`stop` shuts the VM down and prints `Stopped NAME.` Running processes in the VM end.
+`stop` shuts the VM down and prints `Stopped NAME.`, or the VM as JSON with `--json`. Running processes in the VM end.
 
 Guide: [Using virtual machines](/vms/).
 
@@ -174,14 +178,15 @@ List the VMs that LimaNix manages.
 ::: code-group
 
 ```sh [Mac]
-limanix list [--json]
+limanix list [-q | --json]
 ```
 
 :::
 
-| Flag     | Type    | Default | Description                  |
-| -------- | ------- | ------- | ---------------------------- |
-| `--json` | boolean | `false` | Print machine-readable JSON. |
+| Flag            | Type    | Default | Description                            |
+| --------------- | ------- | ------- | -------------------------------------- |
+| `-q`, `--quiet` | boolean | `false` | Print only the VM names, one per line. |
+| `--json`        | boolean | `false` | Print machine-readable JSON.           |
 
 | Column    | Content                                                                                                                                                                 |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -192,6 +197,8 @@ limanix list [--json]
 | `DISK`    | Used share of the guest disk, by bytes or, when they are scarcer, by inodes, such as `97% inodes`. `-` when the VM is stopped or did not answer.                        |
 
 Under a row, `list` prints the saved error of the last operation and a notice that says what to do, such as `the guest has no lmx yet; run limanix update`. `ADDRESS` and `DISK` come from `lmx status`, which `list` runs in each running VM with a 10-second limit. Without VMs, it prints `No VMs managed by Limanix.`
+
+`-q` prints only the names, one per line, and nothing without VMs, for loops such as `for vm in $(limanix list -q)`. It cannot be combined with `--json`.
 
 `--json` prints an array with one object per VM:
 
@@ -249,7 +256,7 @@ Delete a VM, and keep its managed home on the Mac unless you ask otherwise.
 ::: code-group
 
 ```sh [Mac]
-limanix delete NAME [--force] [--remove-home]
+limanix delete NAME [--force] [--remove-home] [--json]
 ```
 
 :::
@@ -259,8 +266,9 @@ limanix delete NAME [--force] [--remove-home]
 | `NAME`           | string  | required | VM name.                                                        |
 | `--force`        | boolean | `false`  | Force Lima to stop and delete the VM.                           |
 | `--remove-home`  | boolean | `false`  | Also remove this VM's managed home on the Mac and its contents. |
+| `--json`         | boolean | `false`  | Print the result as JSON.                                       |
 
-`delete` stops a running VM, then removes its guest disk, its Lima instance and its saved record. It prints `Deleted NAME.` and, without `--remove-home`, `Preserved managed home: PATH`. It also removes the record of a VM whose Lima instance is already missing.
+`delete` stops a running VM, then removes its guest disk, its Lima instance and its saved record. It prints `Deleted NAME.` and, without `--remove-home`, `Preserved managed home: PATH`. With `--json`, it prints an object with `name` and `home`, the path of the preserved home, or `null` with `--remove-home`. It also removes the record of a VM whose Lima instance is already missing.
 
 - There is no confirmation prompt.
 - Your `limanix.toml` and the folders shared with `[[mounts]]` stay on the Mac.
@@ -343,14 +351,15 @@ List the modules you can select.
 ::: code-group
 
 ```sh [Mac]
-limanix modules list [--json]
+limanix modules list [-q | --json]
 ```
 
 :::
 
-| Flag     | Type    | Default | Description                  |
-| -------- | ------- | ------- | ---------------------------- |
-| `--json` | boolean | `false` | Print machine-readable JSON. |
+| Flag            | Type    | Default | Description                             |
+| --------------- | ------- | ------- | --------------------------------------- |
+| `-q`, `--quiet` | boolean | `false` | Print only the selectors, one per line. |
+| `--json`        | boolean | `false` | Print machine-readable JSON.            |
 
 Each row shows a selector, its kind and its description, or the error of an imported module that fails the registry checks: modules first, then toolchains, then shell components. The kind says where `limanix.toml` chooses the entry:
 

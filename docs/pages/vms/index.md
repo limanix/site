@@ -92,8 +92,9 @@ limanix list
 | `DISK`    | How much of the guest disk is used; see [Files and storage](/vms/storage)                                                                          |
 
 A `-` in `ADDRESS` or `DISK` means the VM is stopped, did not answer within 10 seconds, or has no
-address on the shared network. A line under a row names an error or a notice. `limanix list --json`
-prints the same values for scripts.
+address on the shared network. A line under a row names an error or a notice. For scripts,
+`limanix list -q` prints only the names and `limanix list --json` the same values as JSON; see
+[Use LimaNix in scripts](#use-limanix-in-scripts).
 
 `STATE` is a saved result, not a live check: `Stopped` with `ready` means the last create or update
 succeeded and the VM was stopped afterwards. Starting or stopping a VM does not reset an `error`.
@@ -151,3 +152,42 @@ limanix delete dev-box --remove-home
 When deletion fails because Lima cannot stop the VM, add `--force`. `--force` does not remove the
 home; add `--remove-home` only when you want the home gone too. To create the VM again from the same
 file, see [Recreate a VM](/vms/storage#recreate-a-vm).
+
+## Use LimaNix in scripts
+
+Standard output carries only results: errors and the build output of `create` and `update` go to
+standard error. `limanix list -q` prints only the VM names, one per line, and
+`limanix modules list -q` only the selectors. Stop every VM:
+
+::: code-group
+
+```sh [Mac]
+for vm in $(limanix list -q); do
+  limanix stop "$vm"
+done
+```
+
+:::
+
+With `--json`, a command prints its result as JSON:
+
+| Command                             | `--json` prints                                                        |
+| ----------------------------------- | ---------------------------------------------------------------------- |
+| `list`                              | An array of VMs                                                        |
+| `create`, `update`, `start`, `stop` | The VM, as an object of `list --json`                                  |
+| `delete`                            | `name`, and `home`: the preserved home, or `null` with `--remove-home` |
+| `doctor`, `network check`           | The checks                                                             |
+| `modules list`                      | An array of modules                                                    |
+
+Start a VM and read its address with `jq`, which comes with macOS:
+
+::: code-group
+
+```sh [Mac]
+limanix start dev-box --json | jq -r .address
+```
+
+:::
+
+A failed command prints no JSON and exits with a status other than `0`. `-q` and `--json` cannot be
+combined. [limanix command](/reference/cli) lists the fields of each command.

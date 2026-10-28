@@ -4,27 +4,23 @@ description: Reach services in a VM from the Mac, open firewall ports and check 
 
 # Network
 
-Your Mac reaches a VM at the VM's own IP address. To reach a service in the VM, the service must
-listen on a reachable address, and the guest firewall must open its port.
+Each VM has its own IP address on a private network between your Mac and its VMs. You reach a
+service in a VM at that address: LimaNix forwards no ports to the Mac's `localhost`.
 
 ## The shared network
 
-::: code-group
+`[network] mode` has one value, `shared`, which is the default: a NAT network on which the VM
+reaches the internet through the Mac, and the Mac reaches the VM at its own address. Other computers
+on your network do not reach the VM.
 
-```toml [limanix.toml]
-[network]
-mode = "shared"
-```
+| Guest                   | Network                                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Your Mac's architecture | The native NAT of Apple Virtualization                                                                       |
+| The other architecture  | Lima's shared network, which `limanix network setup` prepares; see [Set up QEMU](/vms/resources#set-up-qemu) |
 
-:::
-
-`shared` is the only mode: a NAT network on which the Mac reaches the guest by its own IP address. A
-guest of the Mac's architecture uses the native NAT of the Apple Virtualization framework; a QEMU
-guest uses Lima's shared network, which `limanix network setup` prepares. See
-[Set up QEMU](/vms/resources#set-up-qemu).
-
-LimaNix turns off Lima's automatic port forwarding: `localhost:8080` on the Mac is not the VM's port
-`8080`. Connect to the VM's address instead.
+Without port forwarding, `localhost:8080` on the Mac is not the VM's port `8080`. In return, two VMs
+can serve the same port, and a service in a VM never takes a port on the Mac. Only SSH goes through
+a port on the Mac's `127.0.0.1`; see [SSH ports](/reference/paths#ssh-ports).
 
 ## Find the address
 
@@ -56,7 +52,7 @@ means all IPv4 interfaces of the guest; it does not limit access to the Mac. Whe
 rules for client addresses, use the Mac's address as that service sees it, not the guest's
 `ADDRESS`.
 
-For an HTTP service on port 8080, open `http://<guest-ip>:8080` on the Mac, with the address from
+For an HTTP service on port 8080, open `http://ADDRESS:8080` on the Mac, with the `ADDRESS` from
 `limanix list`. [PostgreSQL](/modules/postgres) shows the listener and access rules of a database.
 
 ## Open ports
@@ -66,7 +62,6 @@ For an HTTP service on port 8080, open `http://<guest-ip>:8080` on the Mac, with
 ```toml [limanix.toml]
 [network.ports]
 tcp = [8080]
-udp = []
 ```
 
 :::
@@ -76,45 +71,45 @@ udp = []
 `limanix update --config limanix.toml`; the update restarts the VM. Afterwards, start again any
 service that you run by hand. A list you leave out opens no ports.
 
-The lists only open the firewall: they do not start services, map Mac ports to guest ports or
-restrict who connects. The base system and modules can open ports of their own, even with empty
-lists; TCP 22 is always open for SSH. Docker opens the ports it publishes with its own rules, and
-removing a port from `[network.ports]` does not close them; see [Docker](/modules/docker).
+The lists only open the guest firewall:
+
+- they do not start services, map Mac ports to guest ports or restrict who connects;
+- the base system and modules can open ports of their own, even with empty lists: TCP 22 is always
+  open for SSH;
+- Docker opens the ports it publishes with its own rules, and removing a port from
+  `[network.ports]` does not close them; see [Docker](/modules/docker).
 
 ## Try a connection
 
-To test the path without your own service, add Python and the port to `limanix.toml`, then run
-`limanix update --config limanix.toml`. `limanix modules list` shows whether your client has
-`lmx:python-3.14`.
+Test the path with a small web server before you set up your own service:
 
-::: code-group
+1. Open port 8080 and apply the file with `limanix update --config limanix.toml`. Add the port to
+   the `tcp` list you already have rather than a second copy of the table:
 
-```toml [limanix.toml]
-[toolchains]
-python = "3.14"
+   ::: code-group
 
-[network.ports]
-tcp = [8080]
-```
+   ```toml [limanix.toml]
+   [network.ports]
+   tcp = [8080]
+   ```
 
-:::
+   :::
 
-Add these entries to the tables you already have rather than a second copy of a table. In the VM,
-serve a page:
+2. In the VM, serve a page on all addresses. `nix shell` fetches Python for this one command:
 
-::: code-group
+   ::: code-group
 
-```sh [VM]
-mkdir -p /tmp/limanix-http-demo
-printf 'Hello from Limanix\n' > /tmp/limanix-http-demo/index.html
-cd /tmp/limanix-http-demo
-python -m http.server --bind 0.0.0.0 8080
-```
+   ```sh [VM]
+   mkdir -p /tmp/demo && cd /tmp/demo
+   printf 'Hello from LimaNix\n' > index.html
+   nix shell nixpkgs#python3 --command \
+     python3 -m http.server --bind 0.0.0.0 8080
+   ```
 
-:::
+   :::
 
-On the Mac, open `http://<guest-ip>:8080/` with the `ADDRESS` from `limanix list`. The page shows
-`Hello from Limanix`. Press Ctrl-C in the VM to stop the server.
+3. On the Mac, open `http://ADDRESS:8080/` with the `ADDRESS` from `limanix list`. The page shows
+   `Hello from LimaNix`. Press Ctrl-C in the VM to stop the server.
 
 ## Check a port
 
@@ -140,10 +135,11 @@ The command runs these checks in order and prints a hint under a check that need
 Add `--udp` for a UDP port; it has no `connect` check, because UDP has no connection to try.
 `--json` prints the same checks for scripts. The command exits with status 1 when a check failed.
 
-When the checks in the VM pass but `connect` fails, the connection stops on the Mac: check a VPN, a
-firewall on the Mac, and the Local Network permission of your terminal app in System Settings ›
-Privacy & Security. When every check passes and your client still fails, check the service's access
-rules and your credentials. Opening another port does not fix an access denial.
+| Result                                          | Next step                                                                                                                                                           |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A check in the VM fails                         | Follow the hint under it.                                                                                                                                           |
+| Only `connect` fails                            | The connection stops on the Mac: check a VPN, a firewall on the Mac, and the Local Network permission of your terminal app in System Settings › Privacy & Security. |
+| Every check passes, and your client still fails | Check the service's access rules and your credentials. Opening another port does not fix an access denial.                                                          |
 
 ### Check from inside the VM
 

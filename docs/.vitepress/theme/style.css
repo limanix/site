@@ -95,3 +95,35 @@
 .vp-doc td code.nowrap {
   white-space: nowrap;
 }
+
+.vp-doc .parts ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.vp-doc .parts li {
+  margin: 0;
+  padding: 12px 0 16px;
+  border-top: 1px solid var(--vp-c-divider);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc .parts a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.vp-doc .parts a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .vp-doc .parts ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

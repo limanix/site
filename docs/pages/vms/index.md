@@ -4,30 +4,42 @@ description: Create, start, stop, list, check and delete LimaNix VMs from your M
 
 # Using virtual machines
 
-You manage each VM from your Mac with the `limanix` command. This page follows a VM from `create`
-to `delete`.
+You manage each VM from your Mac with the `limanix` command, as your normal Mac user, without
+`sudo`. This page follows a VM from `create` to `delete`.
 
 ## Commands
 
-| Command                                | What it does                                                                   |
-| -------------------------------------- | ------------------------------------------------------------------------------ |
-| `limanix create --config limanix.toml` | Creates a VM and its managed home, builds its NixOS system and starts it       |
-| `limanix start dev-box`                | Starts a stopped VM with the system it already has                             |
-| `limanix stop dev-box`                 | Shuts the VM down and keeps its disk and managed home                          |
-| `limanix shell dev-box`                | Opens a shell in the VM; see [Shell and sessions](/vms/shell)                  |
-| `ssh dev-box.limanix`                  | Connects with SSH, as editors do; see [Connect an editor](/vms/editors)        |
-| `limanix update --config limanix.toml` | Applies your edited `limanix.toml` to the VM; see [Changing a VM](/vms/update) |
-| `limanix list`                         | Lists your VMs with their state, address and disk usage                        |
-| `limanix doctor dev-box`               | Checks the VM and tells you what to fix                                        |
-| `limanix network check dev-box 8080`   | Checks why the Mac cannot reach a port in the VM; see [Network](/vms/network)  |
-| `limanix delete dev-box`               | Deletes the VM and keeps its managed home                                      |
+<div class="parts">
 
-Run them as your normal Mac user, without `sudo`.
+- [`limanix create`](#create-a-vm)\
+  Creates a VM from `limanix.toml`, builds its NixOS system and starts it.
+- [`limanix update`](/vms/update)\
+  Applies your edited `limanix.toml` and restarts the VM.
+- [`limanix start`](#start-and-stop)\
+  Boots a stopped VM with the system it already has.
+- [`limanix stop`](#start-and-stop)\
+  Shuts the VM down and keeps its disk and home.
+- [`limanix shell`](/vms/shell)\
+  Opens a shell in the VM, or runs one command there.
+- [`ssh dev-box.limanix`](/vms/editors)\
+  Connects over SSH, as editors do.
+- [`limanix list`](#list-your-vms)\
+  Lists your VMs with their state, address and disk usage.
+- [`limanix doctor`](#check-a-vm)\
+  Checks a VM and tells you what to fix.
+- [`limanix network check`](/vms/network)\
+  Checks why the Mac cannot reach a port in the VM.
+- [`limanix delete`](#delete-a-vm)\
+  Deletes a VM and keeps its home on the Mac.
+
+</div>
+
+[limanix command](/reference/cli) lists every argument and flag.
 
 ## How names work
 
-`create` and `update` take the VM name from `name` in `limanix.toml`. All other commands take the
-name as an argument, such as `dev-box`.
+`create` and `update` take the VM name from `name` in `limanix.toml`. The other commands take the
+name as an argument, such as `limanix start dev-box`.
 
 ::: code-group
 
@@ -37,27 +49,33 @@ name = "dev-box"
 
 :::
 
-A name has 1 to 63 lowercase letters, digits and hyphens, and starts and ends with a letter or
-digit. Changing `name` in the file points the file at a different VM; it does not rename the
-existing one.
+> A name has 1 to 63 lowercase letters, digits and hyphens, and starts and ends with a letter or
+> digit.
+
+::: warning
+Changing `name` in the file points the file at a different VM; it does not rename the existing one.
+:::
 
 ## Create a VM
 
 ::: code-group
 
 ```sh [Mac]
-limanix create --config limanix.toml
+limanix create --config ~/projects/my-project/limanix.toml
 ```
 
 :::
 
-`--config` is required. Creation downloads the base image when needed, boots the VM, builds its
-NixOS system from the file and restarts it into that system. At the end, it prints the VM name and
-the path of the VM's managed home on the Mac. The first run needs network access for the image and
-the packages.
+`--config` is required. `create` then:
 
-`create` refuses a name that already has a VM; change that VM with `limanix update` instead. To
-write the file, start with [The limanix.toml file](/config/).
+1. downloads the base image when needed;
+2. boots the VM and builds its NixOS system from the file;
+3. restarts the VM into that system;
+4. prints the VM name and the path of its managed home on the Mac.
+
+The first run needs network access for the image and the packages. `create` refuses a name that
+already has a VM; change that VM with `limanix update` instead. To write the file, start with
+[The limanix.toml file](/config/).
 
 ## Start and stop
 
@@ -110,48 +128,42 @@ limanix doctor dev-box
 
 :::
 
-`doctor` prints one row per check, with a hint under each row that needs attention. It checks the VM
-in Lima and its saved record (`vm`), the VM's address (`address`), then the guest itself: its
-configuration, the `lmxd` daemon, the NixOS generations and, when space runs low, the disk. A
-stopped VM, or one that another command is changing, shows only the `vm` row. When the guest does
-not answer, a `guest` row replaces its checks.
+`doctor` prints one row per check: its status, `ok`, `warning`, `failed` or `unknown`, its name and
+a message, with a hint under each row that needs attention.
 
-Each check is `ok`, `warning`, `failed` or `unknown`. The command exits with status 1 when a check
-failed, and `--json` prints the same checks. `doctor` repairs nothing and does not restart the VM.
-Inside the VM, `lmx doctor` runs the guest's checks; see [The lmx command](/inside/lmx).
+| Check                                                | What it looks at                                                                               |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `vm`                                                 | The VM in Lima and its saved record                                                            |
+| `address`                                            | The VM's address on the shared network                                                         |
+| `config`, `owner`, `generations`, `disk`, `dotfiles` | The guest: its configuration, `lmxd`, the NixOS generations, a low disk and the dotfiles links |
+| `guest`                                              | Replaces the guest checks when the guest does not answer                                       |
+
+A stopped VM, or one that another command is changing, shows only `vm`. The command exits with
+status 1 when a check failed. `doctor` repairs nothing and does not restart the VM. Inside the VM,
+`lmx doctor` runs the guest's checks; see [The lmx command](/inside/lmx).
 
 ## Delete a VM
 
 ::: code-group
 
 ```sh [Mac]
-limanix delete dev-box
+limanix delete dev-box                # keeps the home
+limanix delete dev-box --remove-home  # removes it too
 ```
 
 :::
 
-`delete` stops the VM if it runs, then removes its disk and its saved record. The managed home
-stays on the Mac, and the command prints its path. Your `limanix.toml` and shared project folders
-stay too. `delete` also cleans up a VM that Lima no longer has.
+`delete` stops the VM if it runs, then removes its disk and its saved record. The managed home stays
+on the Mac unless you add `--remove-home`, and the command prints its path. Your `limanix.toml` and
+shared project folders stay too. `delete` also cleans up a VM that Lima no longer has.
 
 ::: warning
 `delete` does not ask for confirmation. Save what you need from the guest disk first; see
 [Files and storage](/vms/storage).
 :::
 
-To remove the managed home and all its files as well:
-
-::: code-group
-
-```sh [Mac]
-limanix delete dev-box --remove-home
-```
-
-:::
-
-When deletion fails because Lima cannot stop the VM, add `--force`. `--force` does not remove the
-home; add `--remove-home` only when you want the home gone too. To create the VM again from the same
-file, see [Recreate a VM](/vms/storage#recreate-a-vm).
+When deletion fails because Lima cannot stop the VM, add `--force`; it does not remove the home. To
+create the VM again from the same file, see [Recreate a VM](/vms/storage#recreate-a-vm).
 
 ## Use LimaNix in scripts
 

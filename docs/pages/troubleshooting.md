@@ -120,7 +120,7 @@ Fix:
 
 1. Run `limanix doctor dev-box`. Its `vm` check shows what Lima reports.
 1. Find the name of the Lima instance: `lima_name` in `limanix list --json`.
-1. Read `ha.stderr.log` and `ha.stdout.log` in the directory of that instance under `~/.lima`, or under `LIMA_HOME` when you set it.
+1. Read `ha.stderr.log` and `ha.stdout.log` in the directory of that instance under `~/.lima`, or under `LIMA_HOME` when you set it; see [Paths and ports](/reference/paths).
 
 ::: code-group
 

@@ -18,7 +18,7 @@ No. `limanix.toml` covers the shell, toolchains, modules and packages. When you 
 
 ## Do I install Lima or Nix?
 
-No. Lima is built into `limanix`, and Nix runs inside the VM. Only a guest of the other architecture, such as an Intel guest on Apple Silicon, needs QEMU on the Mac; see [Resources and architecture](/vms/resources).
+No. Lima is built into `limanix`, and Nix runs inside the VM. Only a guest of the other architecture, such as an Intel guest on Apple Silicon, needs QEMU on the Mac; see [Set up QEMU](/vms/resources#set-up-qemu).
 
 ## How is it different from Lima?
 

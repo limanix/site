@@ -21,7 +21,7 @@ mode = "shared"
 `shared` is the only mode: a NAT network on which the Mac reaches the guest by its own IP address. A
 guest of the Mac's architecture uses the native NAT of the Apple Virtualization framework; a QEMU
 guest uses Lima's shared network, which `limanix network setup` prepares. See
-[Resources and architecture](/vms/resources).
+[Set up QEMU](/vms/resources#set-up-qemu).
 
 LimaNix turns off Lima's automatic port forwarding: `localhost:8080` on the Mac is not the VM's port
 `8080`. Connect to the VM's address instead.

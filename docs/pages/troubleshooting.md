@@ -108,7 +108,7 @@ limanix network setup
 
 :::
 
-See [Resources and architecture](/vms/resources).
+See [Set up QEMU](/vms/resources#set-up-qemu).
 
 ## The VM does not start
 

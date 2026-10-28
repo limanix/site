@@ -9,19 +9,22 @@ Editing `limanix.toml` does not change a VM, and neither does installing a new `
 
 ## Apply a change
 
-Save your work in the VM first: the update restarts the VM, which ends its sessions and services.
-Then edit `limanix.toml` and apply it:
+::: warning
+The update restarts the VM and ends its sessions and services. Save your work in the VM first.
+:::
+
+Edit `limanix.toml` and apply it:
 
 ::: code-group
 
 ```sh [Mac]
-limanix update --config limanix.toml
+limanix update --config ~/projects/my-project/limanix.toml
 ```
 
 :::
 
-`update` finds the VM by `name` in the file. When it succeeds, open a shell and check the tool or
-service you changed. Start again any service that you run by hand.
+`update` finds the VM by `name` in the file. When it succeeds, check the tool or service you
+changed, and start again any service that you run by hand.
 
 ## What an update does
 
@@ -40,22 +43,26 @@ A successful update leaves the VM running, even when it was stopped before. Befo
 makes room in its Nix store; a nearly full disk causes a warning, not a failure. See
 [Files and storage](/vms/storage#keep-the-guest-disk-from-filling-up).
 
-## What stays and what can change
+## What can change
 
-An update keeps the VM itself: its guest disk, its managed home and your shared folders. You can
-change CPU and memory, grow the disk, and change the shell, toolchains, modules, packages, dotfiles,
-theme, environment, ports, mounts and `user.sudo`.
+An update keeps the VM itself: its guest disk, its managed home and your shared folders.
 
-These settings are fixed when the VM is created:
+<div class="parts">
 
-| Setting          | Holds                                             |
-| ---------------- | ------------------------------------------------- |
-| `resources.arch` | The guest architecture                            |
-| `user.name`      | The username in the VM                            |
-| `user.home`      | The home path in the VM                           |
-| `home.root`      | The folder on the Mac that holds the managed home |
+- **Can change**
+  - CPU and memory, and a larger disk
+  - The shell, toolchains, modules and packages
+  - Dotfiles, theme and environment
+  - Ports and mounts
+  - `user.sudo`
+- **Fixed at creation**
+  - `resources.arch`: the guest architecture
+  - `user.name` and `user.home`: your account in the VM
+  - `home.root`: the folder on the Mac that holds the managed home
 
-An update that changes one of them fails with
+</div>
+
+An update that changes a fixed setting fails with
 `an update cannot change architecture, username, or managed-home paths`. Revert the change, or
 create a new VM and copy the files you need.
 
@@ -66,8 +73,12 @@ which an earlier failed update may already have grown. See
 ## When an update fails
 
 A build error, such as a package name that does not exist, stops the update before the restart. The
-VM keeps its current system, and the reason is in the output. Fix the file and run `limanix update`
-again.
+VM keeps its current system, and the reason is in the output. To read it again:
+
+- `limanix list` shows the saved error under the VM's row;
+- `sudo lmx logs apply` in the VM shows the whole build output.
+
+Fix the file and run `limanix update` again.
 
 An update does not undo the steps it finished before it failed: the VM may already be stopped, have
 its new CPU, memory and disk settings, or have new environment files. `limanix list` shows `error`

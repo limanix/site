@@ -12,13 +12,13 @@ how the guest disk keeps free space.
 
 ## Where your files live
 
-| Place                                                      | Where the files are                                                                                                                                  | After `limanix delete`                                      |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [Guest disk](#the-guest-disk)                              | A disk image in `~/.lima`, seen only in the VM: NixOS and data written outside mounts                                                                | Removed                                                     |
-| [Managed home](#the-managed-home)                          | On the Mac beneath `~/.limanix`; appears read-write at `user.home` inside the VM                                                                     | Kept by default; `--remove-home` removes it                 |
-| [Project folders](/config/mounts)                          | Folders of your Mac, such as your project at `/workspace`: as many as you list in `[[mounts]]`, each read-write (`rw`) or read-only (`ro`) in the VM | Kept on the Mac                                             |
-| [Dotfiles](/config/dotfiles)                               | Your dotfiles folder on the Mac, read-write at `/mnt/dotfiles` in the VM; each new shell links its entries into your home                            | Kept on the Mac                                             |
-| [LimaNix state](/reference/paths#the-limanix-state-folder) | The record of each VM in `~/Library/Application Support/Limanix`; none of your files                                                                 | The VM's record is removed; the record of a kept home stays |
+| Place                                                      | Where the files are                                                                                                                                                      | After `limanix delete`                                      |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| [Guest disk](#the-guest-disk)                              | A disk image in `~/.lima`, seen only in the VM: NixOS and data written outside mounts                                                                                    | Removed                                                     |
+| [Managed home](#the-managed-home)                          | On the Mac beneath `~/.limanix`; appears read-write at `user.home` inside the VM                                                                                         | Kept by default; `--remove-home` removes it                 |
+| [Project folders](/config/mounts)                          | Folders of your Mac, such as your project at `/workspace`: as many as you list in `[[mounts]]`, each read-write (`rw`) or read-only (`ro`) in the VM                     | Kept on the Mac                                             |
+| [Dotfiles](/config/dotfiles)                               | Your dotfiles folder on the Mac, read-write at `/mnt/dotfiles` in the VM; each interactive Bash or Zsh shell of the development account links its entries into your home | Kept on the Mac                                             |
+| [LimaNix state](/reference/paths#the-limanix-state-folder) | The record of each VM in `~/Library/Application Support/Limanix`; none of your files                                                                                     | The VM's record is removed; the record of a kept home stays |
 
 <div class="parts">
 
@@ -149,6 +149,7 @@ sudo lmx store reserve
 The command collects right away when less than 20% is free, waits for the collection and prints the
 usage before and after. `sudo nix-store --gc` collects whatever the free space.
 
-If that is not enough, raise `disk` in `[resources]` and run `limanix update` on the Mac. Tools you
-removed from your own `nix profile` stay on disk until `nix profile wipe-history`; see
-[Packages on the fly](/inside/packages).
+If that is not enough, raise `disk` in `[resources]` and run `limanix update` on the Mac.
+Other versions of your `nix profile` can keep removed tools in the Nix store.
+`nix profile wipe-history` deletes those profile versions; garbage collection can then remove store paths that nothing else uses.
+See [Packages on the fly](/inside/packages).

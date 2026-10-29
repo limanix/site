@@ -39,7 +39,7 @@ LimaNix is one program on your Mac, `limanix`, and a NixOS system in each VM tha
 
 <LimanixFlow />
 
-Step 5 runs the `lmxd` of the new generation: a new VM, a VM made by an older client and a current VM take the same steps. A successful update leaves the VM running, even if it was stopped before. Editing `limanix.toml` alone changes nothing, and `limanix start` boots the saved system without reading the file.
+Step 4 runs the `lmxd` of the new generation: a new VM and an existing one take the same steps. A running VM stays usable during the build and restarts once, at step 6. A stopped VM, or one whose disk or memory grows, gets its new Lima settings at step 3, before the build. A successful update leaves the VM running, even if it was stopped before. Editing `limanix.toml` alone changes nothing, and `limanix start` boots the saved system without reading the file.
 
 ## Generations
 
@@ -61,19 +61,19 @@ instances/dev-box/generations/35b2edf4547e/
 
 :::
 
-The VM sees the folder read-only at `/mnt/limanix` and builds its system from it. The guest disk keeps only the applied system. After a successful run, `limanix` removes the inputs of older generations; a failed run keeps its inputs for diagnosis.
+The VM sees the `generations` folder read-only at `/mnt/limanix` and builds each generation from its own folder, such as `/mnt/limanix/35b2edf4547e`. After a successful build, `limanix` points the link `generations/current` at it, and `lmx status` in the VM reports that generation. The guest disk keeps only the applied system. After a successful run, `limanix` removes the inputs of older generations; a failed run keeps its inputs for diagnosis.
 
 ## When a step fails
 
-| What fails                                  | What happens                                                                                                                                     |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| The check or the preparation, steps 1 and 2 | The VM keeps its system and its settings, and `create` makes no VM. Fix the file or the Mac and run the command again.                           |
-| The build, steps 5 and 6                    | The VM does not restart and keeps its current system, and its own `lmxd` takes over again. The error is in the output on your Mac.               |
-| The build, canceled with Ctrl-C             | `limanix` cancels the build and brings back the VM's own `lmxd`. The VM keeps the system it ran, and the command ends with status 130.           |
-| A check after the restart, step 8           | The new system runs, but the command fails with `Generation … is booted but unhealthy` and the reason. `limanix doctor dev-box` shows the check. |
-| Only the cleanup, step 8                    | The VM is ready with a warning, and `lmxd` tries again later.                                                                                    |
+| What fails                                  | What happens                                                                                                                                                                                                             |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The check or the preparation, steps 1 and 2 | The VM keeps its system and its settings, and `create` makes no VM. Fix the file or the Mac and run the command again.                                                                                                   |
+| The build, steps 4 and 5                    | The VM does not restart and keeps its current system and environment files, and its own `lmxd` takes over again. The error is in the output on your Mac.                                                                 |
+| The build, canceled with Ctrl-C             | `limanix` cancels the build and brings back the VM's own `lmxd`. The VM keeps the system it ran, and the command ends with status 130. A build that had already finished stays, and the VM boots it at its next restart. |
+| A check after the restart, step 7           | The new system runs, but the command fails with `Generation … is booted but unhealthy` and the reason. `limanix doctor dev-box` shows the check.                                                                         |
+| Only the cleanup, step 7                    | The VM is ready with a warning, and `lmxd` tries again later.                                                                                                                                                            |
 
-An update is not a transaction: completed steps are not undone. The VM may already be stopped, its Lima settings may have changed, or new environment files may be installed. Fix the cause and run `limanix update` again; [Troubleshooting](/troubleshooting) covers each case.
+An update is not a transaction: completed steps are not undone. Lima settings applied at step 3 stay after a failed build, and a failure at step 6 can leave the VM stopped. Fix the cause and run `limanix update` again; it also applies the file to a VM that no longer starts with its old settings. [Troubleshooting](/troubleshooting) covers each case.
 
 ## Where state lives
 

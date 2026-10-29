@@ -32,13 +32,16 @@ The package goes into your profile and stays there until you remove it. `nixpkgs
 
 ## Manage your profile
 
-| Task                                    | Command                      |
-| --------------------------------------- | ---------------------------- |
-| List what you installed                 | `nix profile list`           |
-| Remove a package                        | `nix profile remove ripgrep` |
-| Free the disk space of removed packages | `nix profile wipe-history`   |
+| Task                                       | Command                      |
+| ------------------------------------------ | ---------------------------- |
+| List what you installed                    | `nix profile list`           |
+| Remove a package                           | `nix profile remove ripgrep` |
+| Delete all but the current profile version | `nix profile wipe-history`   |
 
-Older versions of your profile keep removed packages on disk until you run `nix profile wipe-history`. `lmx` never deletes them when it cleans up the disk; see [Make room on the disk](/inside/lmx#make-room-on-the-disk).
+Other versions of your profile can keep removed packages in the Nix store.
+`nix profile wipe-history` deletes every profile version except the current one, but does not delete the packages themselves.
+Garbage collection removes store paths once no profile or other garbage-collector root refers to them.
+`lmxd` leaves your profile history alone; see [The disk is full](/troubleshooting#the-disk-is-full) for collection commands.
 
 ## Find a package name
 

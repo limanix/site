@@ -29,14 +29,14 @@ Colors follow `[theme]` in `limanix.toml`. Output that does not go to a terminal
 
 ### Privileges
 
-| Command                                              | Needs                                                                                                  |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `lmx store reserve`, `lmx apply`, `lmx apply cancel` | Root, with `sudo`, and a running `lmxd`.                                                               |
-| `lmx status --wait`                                  | A running `lmxd`.                                                                                      |
-| `lmx logs`                                           | Root, or membership in the `wheel` or `systemd-journal` group, which may read the journal of `lmxd`.   |
-| `lmx dotfiles link`                                  | The development account. It refuses any other user, root included.                                     |
-| `lmx status`, `lmx doctor`, `lmx net check`          | Nothing. With `sudo` they read more: the generation the Mac mounted, and the processes of other users. |
-| Every other command                                  | Nothing.                                                                                               |
+| Command                                              | Needs                                                                                                   |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `lmx store reserve`, `lmx apply`, `lmx apply cancel` | Root, with `sudo`, and a running `lmxd`.                                                                |
+| `lmx status --wait`                                  | A running `lmxd`.                                                                                       |
+| `lmx logs`                                           | Root, or membership in the `wheel` or `systemd-journal` group, which may read the journal of `lmxd`.    |
+| `lmx dotfiles link`                                  | The development account. It refuses any other user, root included.                                      |
+| `lmx status`, `lmx doctor`, `lmx net check`          | Nothing. With `sudo` they read more: the generation the Mac selected, and the processes of other users. |
+| Every other command                                  | Nothing.                                                                                                |
 
 ### Exit status
 
@@ -117,17 +117,17 @@ lmx status --wait converged --generation GENERATION [--timeout DURATION] [--json
 | `--timeout`          | duration    | `10m`   | Longest wait, such as `90s`, `10m` or `1h`. A number alone is seconds. Requires `--wait`.                                                         |
 | `--json`             | boolean     | `false` | Answer with the JSON host contract instead of text.                                                                                               |
 
-| Line           | Shows                                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `Generation`   | The generation the Mac mounted (`desired`), the one built for the next boot (`built`) and the one running now (`booted`). |
-| `Disk`         | Free space on the disk that holds the Nix store. On a file system with an inode table, free inodes too.                   |
-| `Network`      | The guest's interfaces and addresses.                                                                                     |
-| `Failed units` | systemd units that failed.                                                                                                |
-| `Owner`        | The version of `lmxd` and what it is doing.                                                                               |
-| `Condition`    | What needs attention and why, when something does.                                                                        |
-| `Problem`      | Why a fact could not be read. That fact shows `unknown`; the other lines still show.                                      |
+| Line           | Shows                                                                                                                      |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `Generation`   | The generation the Mac selected (`desired`), the one built for the next boot (`built`) and the one running now (`booted`). |
+| `Disk`         | Free space on the disk that holds the Nix store. On a file system with an inode table, free inodes too.                    |
+| `Network`      | The guest's interfaces and addresses.                                                                                      |
+| `Failed units` | systemd units that failed.                                                                                                 |
+| `Owner`        | The version of `lmxd` and what it is doing.                                                                                |
+| `Condition`    | What needs attention and why, when something does.                                                                         |
+| `Problem`      | Why a fact could not be read. That fact shows `unknown`; the other lines still show.                                       |
 
-Without `sudo`, the generation the Mac mounted may show as `unknown`: that mount is readable only by root.
+Without `sudo`, the generation the Mac selected may show as `unknown`: its mount is readable only by root.
 
 `--short` prints one word per thing that needs attention, and nothing while all is well. It never waits more than 200 ms for `lmxd` and exits with status `0`.
 
@@ -138,7 +138,7 @@ Without `sudo`, the generation the Mac mounted may show as `unknown`: that mount
 | `disk-low` | Less than 10% of the store disk is free.                 |
 | `restart`  | A new generation is built and waits for a restart.       |
 | `applying` | An update is being built now.                            |
-| `apply`    | The Mac mounted a generation that is not built yet.      |
+| `apply`    | The Mac selected a generation that is not built yet.     |
 | `lmxd?`    | `lmxd` did not answer within 200 ms.                     |
 
 `--wait` asks `lmxd` every two seconds until the generation is converged, then answers as `lmx status` does. A failed finalize of that generation ends the wait at once. At the timeout, the command fails. `limanix update` runs it after it restarts the VM.
@@ -223,13 +223,16 @@ sudo lmx logs KIND [--previous]
 
 | Kind       | Tasks                                               |
 | ---------- | --------------------------------------------------- |
-| `apply`    | Builds of a mounted generation.                     |
+| `apply`    | Builds of a generation for the next boot.           |
 | `health`   | Health checks of the booted generation.             |
 | `finalize` | Removals of older generations after a healthy boot. |
 | `collect`  | Collections of unreferenced store paths.            |
 | `roots`    | Reports of the garbage-collector roots.             |
 
-`lmx logs` prints the task, its generation and its start time in UTC, then its lines. It fails when no task of that kind ran in the boot. An update builds in one boot and restarts into the next: its build output is in `sudo lmx logs apply --previous`.
+`lmx logs` prints the task, its generation and its start time in UTC, then its lines.
+It fails when no task of that kind ran in the selected boot.
+Use `sudo lmx logs apply` when a build failed and the VM has not restarted since.
+Use `sudo lmx logs apply --previous` when the build ran in the boot immediately before the current one, such as after the update restarted the VM.
 
 ## `lmx version`
 
@@ -265,11 +268,11 @@ sudo lmx store reserve [--json]
 | -------- | ------- | ------- | --------------------------------------------------- |
 | `--json` | boolean | `false` | Answer with the JSON host contract instead of text. |
 
-When less than 20% of the store disk is free, `lmxd` collects the store paths that nothing uses, and the command waits for the collection. It then prints how much it freed, or `Nothing was collected.`, and the free space of the guest disk. A collection that already runs is shared, and interrupting the command does not stop it. The command fails when less than 10% is still free afterwards. `limanix update` runs it before it stops the VM.
+When less than 20% of the store disk is free, `lmxd` collects the store paths that nothing uses, and the command waits for the collection. It then prints how much it freed, or `Nothing was collected.`, and the free space of the guest disk. A collection that already runs is shared, and interrupting the command does not stop it. The command fails when less than 10% is still free afterwards. `limanix update` runs it before the build.
 
 ## `lmx apply`
 
-Build the generation the Mac mounted for the next boot. The work runs in `lmxd`.
+Build a generation that the Mac prepared for the next boot. The work runs in `lmxd`.
 
 ::: code-group
 
@@ -281,11 +284,11 @@ sudo lmx apply --generation GENERATION [--follow] [--json]
 
 | Option               | Type    | Default  | Description                                                                                                        |
 | -------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
-| `-g`, `--generation` | string  | required | Generation to apply. It must be the one the Mac mounted at `/mnt/limanix`.                                         |
+| `-g`, `--generation` | string  | required | Generation to apply. Its inputs are at `/mnt/limanix/GENERATION`, and their marker must name it.                   |
 | `--follow`           | boolean | `false`  | Follow the apply until it ends, with the build's output.                                                           |
 | `--json`             | boolean | `false`  | Answer with the JSON host contract instead of text. With `--follow`, one JSON line per event, and the answer last. |
 
-`limanix update` runs it for you. `lmxd` installs the environment files of the generation into `/etc/limanix`, makes room in the store as `lmx store reserve` does, and builds the generation with `nixos-rebuild boot`. Interrupting the command does not stop the apply, and running it again attaches to the running apply. An apply of another generation is cancelled and replaced. After a successful apply, the generation waits for a restart. A cancelled apply exits with status `130`.
+`limanix update` runs it for you. `lmxd` makes room in the store as `lmx store reserve` does, builds the generation with `nixos-rebuild boot`, then installs its environment files into `/etc/limanix`. A failed or cancelled build leaves the installed files as they were. Interrupting the command does not stop the apply, and running it again attaches to the running apply. An apply of another generation is cancelled and replaced. After a successful apply, the generation waits for a restart. A cancelled apply exits with status `130`.
 
 ## `lmx apply cancel`
 
@@ -304,7 +307,7 @@ sudo lmx apply cancel --generation GENERATION [--json]
 | `-g`, `--generation` | string  | required | Generation whose apply to cancel.                   |
 | `--json`             | boolean | `false`  | Answer with the JSON host contract instead of text. |
 
-`limanix update` runs it when you press Ctrl-C. The build is killed; a boot loader update that `nixos-rebuild` already started finishes in its own unit.
+`limanix update` runs it when you press Ctrl-C. The build is killed; a boot loader update that `nixos-rebuild` already started finishes in its own unit. A build that had already finished installs its environment files and reports success.
 
 ## `lmx clipboard copy`
 
@@ -376,7 +379,8 @@ Guide: [Dotfiles](/config/dotfiles).
 
 ## `lmx dotfiles link`
 
-Link the dotfiles into your home. Every shell of the development account does it as it starts.
+Link the dotfiles into your home.
+Each interactive Bash or Zsh shell of the development account does it as it starts.
 
 ::: code-group
 
@@ -392,7 +396,7 @@ lmx dotfiles link [--quiet]
 
 - It links each top-level entry of the dotfiles that starts with `.` into the home, and each entry of their `.config` into `~/.config`, and prints each change. `.git`, `.github`, `.gitignore`, `.gitmodules` and `.DS_Store` are never linked.
 - It changes only links that point into the dotfiles. A file, a directory or a link to anywhere else stays and is a conflict; a conflict does not fail the command.
-- A link to an entry that is gone from the dotfiles is removed.
+- When an entry is gone from the dotfiles, its link is removed. A link you made to another path in the dotfiles stays.
 - While the dotfiles directory is not mounted, it links and removes nothing.
 - It runs only as the development account: with `sudo`, the links in the home would belong to root.
 

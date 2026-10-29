@@ -86,7 +86,7 @@ The build runs in the VM after the checks. When it fails, the VM is not restarte
 | A module of your own does not build                                                           | Fix its files, then import them again: `limanix modules remove NAME`, `limanix modules add NAME DIRECTORY`.                                                                                                          |
 | `No space left on device`, or `guest disk is full; raise resources.disk or remove guest data` | See [The disk is full](#the-disk-is-full).                                                                                                                                                                           |
 
-A failed operation does not undo the steps before it: the VM may be stopped, its Lima settings may have changed, or new environment files may be installed. `limanix list` shows the VM with the state `error` and the saved error under its row.
+A failed build changes neither the system nor the environment files of the VM, and a running VM keeps its Lima settings too. A VM that was stopped, or whose disk or memory grows, gets its new Lima settings before the build, and they stay. `limanix list` shows the VM with the state `error` and the saved error under its row.
 
 After you fix the cause, run `limanix update` with a file of the same VM name. This also applies after a failed `create`: a second `create` for a name with saved state is rejected.
 
@@ -343,7 +343,7 @@ journalctl -u lmx
 
 ### Dotfiles not mounted
 
-Every shell starts with `lmx: the dotfiles at /mnt/dotfiles are not mounted`.
+Each interactive Bash or Zsh shell of the development account starts with `lmx: the dotfiles at /mnt/dotfiles are not mounted`.
 
 Cause: the VM no longer sees the folder that `dotfiles` in `[shell]` names. Its mount failed, or the folder was moved or deleted on the Mac; then the message is `cannot read the dotfiles at /mnt/dotfiles`. Your links stay until the folder is back.
 
@@ -357,8 +357,8 @@ Run `lmx dotfiles` in the VM.
 
 | Line       | Cause                                                                            | Fix                                                                                                                                                         |
 | ---------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `conflict` | A file, a folder or a link of your own is in the way. LimaNix never replaces it. | Move it aside, for example with `mv ~/.zshrc ~/.zshrc.guest`, and open a new shell.                                                                         |
-| `missing`  | The link is not made yet.                                                        | Open a new shell, or run `lmx dotfiles link`.                                                                                                               |
+| `conflict` | A file, a folder or a link of your own is in the way. LimaNix never replaces it. | Move it aside, for example with `mv ~/.zshrc ~/.zshrc.guest`, and open a new interactive Bash or Zsh shell.                                                 |
+| `missing`  | The link is not made yet.                                                        | Open a new interactive Bash or Zsh shell, or run `lmx dotfiles link`.                                                                                       |
 | No line    | The entry is not linked at all.                                                  | Only top-level names that start with `.` and the entries of `.config` are linked. `.git`, `.github`, `.gitignore`, `.gitmodules` and `.DS_Store` never are. |
 
 See [Dotfiles](/config/dotfiles).
@@ -428,13 +428,13 @@ limanix network check dev-box 8080
 
 The command runs its checks in order and prints a hint under a failed one:
 
-| Failed check | Cause                                                                 | Fix                                                                                                                                                      |
-| ------------ | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vm`         | The VM is stopped, or its last create or update did not complete.     | Run `limanix start dev-box`, or fix the problem and run `limanix update`.                                                                                |
-| `address`    | The guest reported no IPv4 address on the shared network.             | See [No address in the list](#no-address-in-the-list).                                                                                                   |
-| `firewall`   | The guest firewall does not open the port for its protocol.           | Add the port to `[network.ports]` and run `limanix update`. An HTTP server needs its TCP port; the same number under `udp` is another rule.              |
-| `listener`   | Nothing listens on the port, or only on `127.0.0.1`.                  | Start the service and make it listen on `0.0.0.0` or on the guest address.                                                                               |
-| `connect`    | The guest checks passed, but the Mac cannot connect within 3 seconds. | The connection stops on the Mac: check a VPN, a firewall, and the Local Network permission of your terminal app in System Settings › Privacy & Security. |
+| Failed check | Cause                                                                 | Fix                                                                                                                                                                      |
+| ------------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `vm`         | The VM is stopped, or its last create or update did not complete.     | Run `limanix start dev-box`, or fix the problem and run `limanix update`.                                                                                                |
+| `address`    | The guest reported no IPv4 address on the shared network.             | See [No address in the list](#no-address-in-the-list).                                                                                                                   |
+| `firewall`   | The guest firewall does not open the port for its protocol.           | Add the port to `[network.ports]` and run `limanix update`. An HTTP server needs its TCP port; the same number under `udp` is another rule.                              |
+| `listener`   | Nothing listens on the port, or only on `127.0.0.1`.                  | Start the service and make it listen on `0.0.0.0` or on the guest address.                                                                                               |
+| `connect`    | The guest checks passed, but the Mac cannot connect within 3 seconds. | The checks do not locate the failure. Check a VPN, a firewall on the Mac, and the Local Network permission of your terminal app in System Settings › Privacy & Security. |
 
 ::: code-group
 
@@ -504,7 +504,7 @@ In the VM:
 lmx version
 sudo lmx doctor
 sudo lmx status
-sudo lmx logs apply --previous
+sudo lmx logs apply
 sudo journalctl -u lmx
 ```
 
@@ -518,6 +518,7 @@ sudo journalctl -u lmx
 | `sudo lmx logs collect`  | The last cleanup of the Nix store.         |
 | `sudo lmx logs roots`    | The last report of what still holds space. |
 
-Add `--previous` to read the boot before the current one. An update builds in one boot and restarts into the next: its build output is in `sudo lmx logs apply --previous`.
+Without `--previous`, the command reads the current boot: use `sudo lmx logs apply` when a build failed and the VM has not restarted since.
+Use `sudo lmx logs apply --previous` when the build ran in the boot immediately before the current one, such as after the update restarted the VM.
 
 When you report a problem, include the client version and the exact command, the error with the output around it, the JSON listing of the VM, the relevant parts of `limanix.toml`, the architecture of your Mac, and whether the failure happened during `create`, `update`, `start` or `shell`. Read logs and configuration before you share them: environment values, paths and guest output can contain private data.

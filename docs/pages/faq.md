@@ -118,9 +118,13 @@ limanix update --config ~/projects/my-project/limanix.toml
 
 ## What if an update fails?
 
-The VM keeps its current system and does not restart into the new one. The build error appears on your Mac: fix the file and run `limanix update` again.
+If the build fails, the VM keeps its current system and does not restart into the new one.
+The build error appears on your Mac: fix the file and run `limanix update` again.
 
-Earlier steps are not undone: the VM's Lima settings may have changed and new `[env]` values may be installed. See [Troubleshooting](/troubleshooting).
+If a health check fails after the restart, the VM is already running the new system, but `update` reports an error.
+Run `limanix doctor dev-box` to see which check failed.
+
+A running VM keeps its settings and `[env]` values until the build succeeds. A stopped VM, or one whose disk or memory grows, gets its new Lima settings before the build, and a failed build does not undo them. See [Troubleshooting](/troubleshooting).
 
 ## How do I reach a server?
 

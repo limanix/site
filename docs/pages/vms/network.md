@@ -135,11 +135,11 @@ The command runs these checks in order and prints a hint under a check that need
 Add `--udp` for a UDP port; it has no `connect` check, because UDP has no connection to try.
 `--json` prints the same checks for scripts. The command exits with status 1 when a check failed.
 
-| Result                                          | Next step                                                                                                                                                           |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A check in the VM fails                         | Follow the hint under it.                                                                                                                                           |
-| Only `connect` fails                            | The connection stops on the Mac: check a VPN, a firewall on the Mac, and the Local Network permission of your terminal app in System Settings › Privacy & Security. |
-| Every check passes, and your client still fails | Check the service's access rules and your credentials. Opening another port does not fix an access denial.                                                          |
+| Result                                          | Next step                                                                                                                                                                |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A check in the VM fails                         | Follow the hint under it.                                                                                                                                                |
+| Only `connect` fails                            | The checks do not locate the failure. Check a VPN, a firewall on the Mac, and the Local Network permission of your terminal app in System Settings › Privacy & Security. |
+| Every check passes, and your client still fails | Check the service's access rules and your credentials. Opening another port does not fix an access denial.                                                               |
 
 ### Check from inside the VM
 

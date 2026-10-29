@@ -86,8 +86,9 @@ limanix update --config FILE [--json]
 
 `update` selects the VM by the `name` in the file, keeps its disk and managed home, builds the new system in the VM and restarts it. It prints the build output to standard error, then `Updated NAME.`, or the VM as JSON with `--json`. The VM is running afterwards, even if it was stopped before.
 
-- A failed build does not restart the VM, which keeps its current system. Steps before the failure are not undone: the VM may be stopped, its Lima settings may have changed, or new environment files may be installed.
-- Ctrl-C during the build cancels it in the VM, starts the guest's own `lmxd` again and exits with status `130`.
+- A running VM keeps running during the build and restarts once, after it. A stopped VM, or one whose disk or memory grows, gets the new Lima settings before the build.
+- A failed build does not restart the VM, which keeps its current system and environment files. Steps before the failure are not undone: Lima settings applied before the build stay. A failure after the build can leave the VM stopped.
+- Ctrl-C during the build cancels it in the VM, starts the guest's own `lmxd` again and exits with status `130`. A build that had already finished stays, and the VM boots it at its next restart.
 - `resources.arch`, `user.name`, `user.home` and `home.root` are fixed when the VM is created. `resources.disk` can grow but not shrink.
 
 Guide: [Changing a VM](/vms/update).

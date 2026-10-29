@@ -4,7 +4,9 @@ description: Every command and option of lmx, the command inside each LimaNix VM
 
 # lmx command
 
-`lmx` is the command inside every LimaNix VM. It shows the state of the guest and what to do about a problem, and it carries out the updates that `limanix` starts on the Mac. The work that must outlive your terminal, such as a build or a Nix store cleanup, runs in `lmxd`, a root daemon under systemd. [The lmx command](/inside/lmx) shows how to use it day to day.
+<!-- @include: ../../.reference/lmx.md#lmx-about -->
+
+`lmx` shows the state of the guest and what to do about a problem, and it carries out the updates that `limanix` starts on the Mac. The work that must outlive your terminal, such as a build or a Nix store cleanup, runs in `lmxd`, a root daemon under systemd. [The lmx command](/inside/lmx) shows how to use it day to day.
 
 ## Usage
 
@@ -51,7 +53,7 @@ Colors follow `[theme]` in `limanix.toml`. Output that does not go to a terminal
 
 ## `lmx help`
 
-Show the workspace and its commands, or what a module gives you.
+<!-- @include: ../../.reference/lmx.md#lmx-help-about -->
 
 ::: code-group
 
@@ -67,7 +69,7 @@ Without a topic, `lmx help` prints the guest help page, whose `lmx help TOPIC` l
 
 ## `lmx info`
 
-Show the kernel, guest disk, shared folders and failed units.
+<!-- @include: ../../.reference/lmx.md#lmx-info-about -->
 
 ::: code-group
 
@@ -81,7 +83,7 @@ lmx info
 
 ## `lmx welcome`
 
-Show the workspace welcome again.
+<!-- @include: ../../.reference/lmx.md#lmx-welcome-about -->
 
 ::: code-group
 
@@ -95,7 +97,7 @@ The welcome appears once per session when the development account opens an inter
 
 ## `lmx status`
 
-Show generations, disk usage, network interfaces and failed units.
+<!-- @include: ../../.reference/lmx.md#lmx-status-about -->
 
 ::: code-group
 
@@ -139,7 +141,7 @@ Without `sudo`, the generation the Mac selected may show as `unknown`: its mount
 
 ## `lmx doctor`
 
-Diagnose the configuration, `lmxd` and the generations, with what to do next.
+<!-- @include: ../../.reference/lmx.md#lmx-doctor-about -->
 
 ::: code-group
 
@@ -164,9 +166,13 @@ Each line is one check: its status, its name and a message, with what to do on a
 
 `lmx doctor` works without `lmxd`. On the Mac, [`limanix doctor NAME`](/reference/cli#limanix-doctor) runs the same checks and adds the VM and its address.
 
-## `lmx net check`
+## `lmx net`
 
-Check why a port of this VM may be unreachable from the Mac: firewall, listener and process.
+<!-- @include: ../../.reference/lmx.md#lmx-net-about -->
+
+### `lmx net check`
+
+<!-- @include: ../../.reference/lmx.md#lmx-net-check-about -->
 
 ::: code-group
 
@@ -184,7 +190,7 @@ The command exits with status `1` when a check failed. Run it with `sudo` to see
 
 ## `lmx logs`
 
-Show the output of the latest `lmxd` task of a kind, from the journal.
+<!-- @include: ../../.reference/lmx.md#lmx-logs-about -->
 
 ::: code-group
 
@@ -205,7 +211,7 @@ Use `sudo lmx logs apply --previous` when the build ran in the boot immediately 
 
 ## `lmx version`
 
-Show the `lmx` version and the host contract it speaks.
+<!-- @include: ../../.reference/lmx.md#lmx-version-about -->
 
 ::: code-group
 
@@ -219,9 +225,13 @@ lmx version [--json]
 
 It prints `lmx VERSION (host contract N)`.
 
-## `lmx store reserve`
+## `lmx store`
 
-Collect unreferenced Nix store paths when free space is low. The work runs in `lmxd`.
+<!-- @include: ../../.reference/lmx.md#lmx-store-about -->
+
+### `lmx store reserve`
+
+<!-- @include: ../../.reference/lmx.md#lmx-store-reserve-about -->
 
 ::: code-group
 
@@ -237,7 +247,7 @@ When less than 20% of the store disk is free, `lmxd` collects the store paths th
 
 ## `lmx apply`
 
-Build a generation that the Mac prepared for the next boot. The work runs in `lmxd`.
+<!-- @include: ../../.reference/lmx.md#lmx-apply-about -->
 
 ::: code-group
 
@@ -251,9 +261,9 @@ sudo lmx apply --generation GENERATION [--follow] [--json]
 
 `limanix update` runs it for you. `lmxd` makes room in the store as `lmx store reserve` does, builds the generation with `nixos-rebuild boot`, then installs its environment files into `/etc/limanix`. A failed or cancelled build leaves the installed files as they were. Interrupting the command does not stop the apply, and running it again attaches to the running apply. An apply of another generation is cancelled and replaced. After a successful apply, the generation waits for a restart. A cancelled apply exits with status `130`.
 
-## `lmx apply cancel`
+### `lmx apply cancel`
 
-Cancel the apply of a generation and wait until it stops.
+<!-- @include: ../../.reference/lmx.md#lmx-apply-cancel-about -->
 
 ::: code-group
 
@@ -267,9 +277,13 @@ sudo lmx apply cancel --generation GENERATION [--json]
 
 `limanix update` runs it when you press Ctrl-C. The build is killed; a boot loader update that `nixos-rebuild` already started finishes in its own unit. A build that had already finished installs its environment files and reports success.
 
-## `lmx clipboard copy`
+## `lmx clipboard`
 
-Copy standard input to the Mac clipboard. Also installed as `pbcopy`.
+<!-- @include: ../../.reference/lmx.md#lmx-clipboard-about -->
+
+### `lmx clipboard copy`
+
+<!-- @include: ../../.reference/lmx.md#lmx-clipboard-copy-about -->
 
 ::: code-group
 
@@ -283,9 +297,9 @@ The input travels through your terminal as an OSC 52 sequence, or through tmux i
 
 Guide: [Clipboard](/inside/clipboard).
 
-## `lmx clipboard paste`
+### `lmx clipboard paste`
 
-Print the Mac clipboard, if the terminal allows reads. Also installed as `pbpaste`.
+<!-- @include: ../../.reference/lmx.md#lmx-clipboard-paste-about -->
 
 ::: code-group
 
@@ -301,7 +315,7 @@ Guide: [Clipboard](/inside/clipboard).
 
 ## `lmx session`
 
-Open a named session with the selected provider. Also installed as `limanix-session`.
+<!-- @include: ../../.reference/lmx.md#lmx-session-about -->
 
 ::: code-group
 
@@ -319,7 +333,11 @@ Guide: [Shell and sessions](/vms/shell).
 
 ## `lmx dotfiles`
 
-Show which of your dotfiles from the Mac are linked into your home, without changing anything.
+<!-- @include: ../../.reference/lmx.md#lmx-dotfiles-about -->
+
+### `lmx dotfiles status`
+
+<!-- @include: ../../.reference/lmx.md#lmx-dotfiles-status-about -->
 
 ::: code-group
 
@@ -333,10 +351,9 @@ lmx dotfiles [status]
 
 Guide: [Dotfiles](/config/dotfiles).
 
-## `lmx dotfiles link`
+### `lmx dotfiles link`
 
-Link the dotfiles into your home.
-Each interactive Bash or Zsh shell of the development account does it as it starts.
+<!-- @include: ../../.reference/lmx.md#lmx-dotfiles-link-about -->
 
 ::: code-group
 

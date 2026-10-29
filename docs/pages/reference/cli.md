@@ -4,6 +4,8 @@ description: Every command, argument and flag of the limanix command on the Mac,
 
 # limanix command
 
+<!-- @include: ../../.reference/cli.md#limanix-about -->
+
 `limanix` runs on your Mac. It creates, changes, starts and opens the VMs that your `limanix.toml` files describe. Run it as your regular Mac user, without `sudo`. [Using virtual machines](/vms/) shows the everyday workflow.
 
 ## Usage
@@ -46,13 +48,11 @@ Neither variable moves existing VMs or homes. Use the same values for every comm
 
 ## `limanix create`
 
-Create a VM from a configuration file.
+<!-- @include: ../../.reference/cli.md#limanix-create-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix create --config FILE [--json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-create-usage -->
 
 :::
 
@@ -66,13 +66,11 @@ Guide: [Using virtual machines](/vms/).
 
 ## `limanix update`
 
-Apply a configuration to an existing VM and restart it.
+<!-- @include: ../../.reference/cli.md#limanix-update-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix update --config FILE [--json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-update-usage -->
 
 :::
 
@@ -89,13 +87,11 @@ Guide: [Changing a VM](/vms/update).
 
 ## `limanix start`
 
-Start an existing VM.
+<!-- @include: ../../.reference/cli.md#limanix-start-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix start NAME [--json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-start-usage -->
 
 :::
 
@@ -111,13 +107,11 @@ Guide: [Using virtual machines](/vms/).
 
 ## `limanix stop`
 
-Stop a VM and keep its disk and home.
+<!-- @include: ../../.reference/cli.md#limanix-stop-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix stop NAME [--json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-stop-usage -->
 
 :::
 
@@ -133,13 +127,11 @@ Guide: [Using virtual machines](/vms/).
 
 ## `limanix shell`
 
-Open a shell in a VM as the development user, or run one command there.
+<!-- @include: ../../.reference/cli.md#limanix-shell-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix shell NAME [--session SESSION | -- COMMAND ...]
-```
+<!-- @include: ../../.reference/cli.md#limanix-shell-usage -->
 
 :::
 
@@ -153,7 +145,6 @@ limanix shell NAME [--session SESSION | -- COMMAND ...]
 - Without a command, `shell` opens the login shell of the development user in their home: Zsh with the `terminal` preset, Bash with `minimal`. `exit` returns to the Mac; the VM keeps running.
 - With `-- COMMAND`, the command starts in the user's home, and `limanix shell` exits with its status. For `cd`, pipes or variables, run a guest shell such as `bash -lc '...'`. Single quotes keep the Mac's shell from expanding them first.
 - `--session SESSION`, or `--session=SESSION`, goes before or after the VM name, at most once, with a nonempty name. It runs `limanix-session SESSION` in the VM, which creates the session or attaches to it with the provider: `multiplexer = "tmux"` in [`[shell]`](/config/shell) or a module. Without a provider, the VM names the setting to add and the command exits with status `127`. The tmux provider rejects names containing `.` or `:`.
-- `--session` cannot be combined with a guest command.
 - A stopped VM fails with `VM 'NAME' is not running; use limanix start NAME`.
 
 ::: code-group
@@ -171,13 +162,11 @@ Guide: [Shell and sessions](/vms/shell).
 
 ## `limanix list`
 
-List the VMs that LimaNix manages.
+<!-- @include: ../../.reference/cli.md#limanix-list-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix list [-q | --json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-list-usage -->
 
 :::
 
@@ -216,13 +205,11 @@ Guide: [Using virtual machines](/vms/).
 
 ## `limanix doctor`
 
-Check a VM, its address and the guest owner `lmx`.
+<!-- @include: ../../.reference/cli.md#limanix-doctor-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix doctor NAME [--json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-doctor-usage -->
 
 :::
 
@@ -232,23 +219,21 @@ limanix doctor NAME [--json]
 
 <!-- @include: ../../.reference/cli.md#limanix-doctor -->
 
-`doctor` prints one row per check: its status, its name and a message, with a hint below when there is something to do. A status is `ok`, `warning`, `failed` or `unknown`.
+`doctor` prints one row per check: its status, its name and a message, with the hint on a line below.
 
 <!-- @include: ../../.reference/cli.md#limanix-doctor-checks -->
 
-A VM that is stopped, or that another `limanix` command is changing, shows only `vm`. `doctor` does not repair or restart anything. It exits with status `1` when a check failed; a warning does not fail it. `--json` prints an object with `name` and `checks`, each check with `check`, `status`, `message` and, when there is one, `hint`.
+A VM that is stopped, or that another `limanix` command is changing, shows only `vm`. `doctor` does not repair or restart anything, and a warning does not fail it. `--json` prints an object with `name` and `checks`, each check with `check`, `status`, `message` and, when there is one, `hint`.
 
 Guide: [Using virtual machines](/vms/). Problems by symptom: [Troubleshooting](/troubleshooting).
 
 ## `limanix delete`
 
-Delete a VM, and keep its managed home on the Mac unless you ask otherwise.
+<!-- @include: ../../.reference/cli.md#limanix-delete-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix delete NAME [--force] [--remove-home] [--json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-delete-usage -->
 
 :::
 
@@ -267,15 +252,19 @@ limanix delete NAME [--force] [--remove-home] [--json]
 
 Guide: [Files and storage](/vms/storage).
 
-## `limanix network setup`
+## `limanix network`
 
-Install the bundled `socket_vmnet` helper and Lima's sudoers rules, with administrator approval.
+<!-- @include: ../../.reference/cli.md#limanix-network-about -->
+
+`limanix network` without a subcommand prints its help.
+
+### `limanix network setup`
+
+<!-- @include: ../../.reference/cli.md#limanix-network-setup-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix network setup
-```
+<!-- @include: ../../.reference/cli.md#limanix-network-setup-usage -->
 
 :::
 
@@ -288,19 +277,15 @@ Only a guest whose architecture differs from the Mac's needs it: that guest runs
 
 An existing helper must pass the checks; an existing sudoers file is backed up before it is replaced. `create` and `update` of a QEMU guest offer the same installation in an interactive terminal; without one they fail with `socket_vmnet setup is required; run limanix network setup in an interactive terminal`. Automatic setup supports only Lima's standard helper, runtime and sudoers paths.
 
-`limanix network` without a subcommand prints its help.
-
 Guide: [Resources and architecture](/vms/resources).
 
-## `limanix network check`
+### `limanix network check`
 
-Check why a port in the VM may be unreachable from the Mac.
+<!-- @include: ../../.reference/cli.md#limanix-network-check-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix network check NAME PORT [--udp] [--json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-network-check-usage -->
 
 :::
 
@@ -315,7 +300,7 @@ The checks run in this order:
 
 <!-- @include: ../../.reference/cli.md#limanix-network-check-checks -->
 
-The command exits with status `1` when a check failed. `--json` prints an object with `name`, `port`, `protocol` and `checks`, as in `limanix doctor`.
+`--json` prints an object with `name`, `port`, `protocol` and `checks`, as in `limanix doctor`.
 
 ::: code-group
 
@@ -327,15 +312,19 @@ limanix network check dev-box 8080
 
 Guide: [Network](/vms/network).
 
-## `limanix modules list`
+## `limanix modules`
 
-List the modules you can select.
+<!-- @include: ../../.reference/cli.md#limanix-modules-about -->
+
+`limanix modules` without a subcommand is a usage error.
+
+### `limanix modules list`
+
+<!-- @include: ../../.reference/cli.md#limanix-modules-list-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix modules list [-q | --json]
-```
+<!-- @include: ../../.reference/cli.md#limanix-modules-list-usage -->
 
 :::
 
@@ -359,19 +348,15 @@ The list comes from the catalog built into the client and from your imported mod
 | `description` | Catalog description, or `Locally imported NixOS module`.                       |
 | `error`       | `null`, or a diagnostic for an imported module that fails the registry checks. |
 
-`limanix modules` without a subcommand is a usage error.
-
 Guide: [The catalog](/modules/).
 
-## `limanix modules add`
+### `limanix modules add`
 
-Import a directory with a `default.nix` as a module of your own.
+<!-- @include: ../../.reference/cli.md#limanix-modules-add-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix modules add NAME DIRECTORY
-```
+<!-- @include: ../../.reference/cli.md#limanix-modules-add-usage -->
 
 :::
 
@@ -389,15 +374,13 @@ limanix modules add NAME DIRECTORY
 
 Guide: [Your own modules](/modules/custom).
 
-## `limanix modules remove`
+### `limanix modules remove`
 
-Remove an imported module from the registry.
+<!-- @include: ../../.reference/cli.md#limanix-modules-remove-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix modules remove NAME
-```
+<!-- @include: ../../.reference/cli.md#limanix-modules-remove-usage -->
 
 :::
 
@@ -411,13 +394,11 @@ Guide: [Your own modules](/modules/custom).
 
 ## `limanix first-config`
 
-Write an example `limanix.toml`.
+<!-- @include: ../../.reference/cli.md#limanix-first-config-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix first-config [PATH]
-```
+<!-- @include: ../../.reference/cli.md#limanix-first-config-usage -->
 
 :::
 
@@ -425,7 +406,7 @@ limanix first-config [PATH]
 | -------- | ------ | ----------------- | ------------------------------------------------ |
 | `PATH`   | string | current directory | Existing directory to write `limanix.toml` into. |
 
-`first-config` writes the [defaults](/reference/config#defaults) with a comment for each setting, then prints `Wrote` and the path of the file. It overwrites an existing `limanix.toml` in that directory, rejects one that is a symlink, and does not create missing directories.
+`first-config` writes the [defaults](/reference/config#defaults) with a comment for each setting, then prints `Wrote` and the path of the file. It does not create missing directories.
 
 Guide: [The limanix.toml file](/config/).
 

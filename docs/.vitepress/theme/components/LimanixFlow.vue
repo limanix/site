@@ -14,13 +14,8 @@ const steps: Step[] = [
   },
   {
     side: 'mac',
-    title: 'Configure',
-    text: '<code>create</code> makes the VM in Lima. <code>update</code> stops a running VM and applies the new CPU, memory, disk and mounts.',
-  },
-  {
-    side: 'mac',
     title: 'Start',
-    text: 'Starts the VM with the inputs at <code>/mnt/limanix</code>, read-only.',
+    text: '<code>create</code> makes the VM in Lima and starts it. <code>update</code> leaves a running VM as it is; a stopped VM, or one whose disk or memory grows, gets the new Lima settings and starts.',
   },
   {
     side: 'vm',
@@ -30,10 +25,14 @@ const steps: Step[] = [
   {
     side: 'vm',
     title: 'Build',
-    text: 'Installs your <code>[env]</code>, makes room in the Nix store and builds the next system. The output streams to the Mac.',
+    text: 'Makes room in the Nix store, builds the next system, then installs your <code>[env]</code>. The output streams to the Mac, and the VM stays usable.',
   },
   { divider: 'Until here, a failure leaves the VM on its current system' },
-  { side: 'mac', title: 'Restart', text: 'Restarts the VM into the new system.' },
+  {
+    side: 'mac',
+    title: 'Restart',
+    text: 'Selects the new generation and restarts the VM into it, with the new CPU, memory and mounts.',
+  },
   {
     side: 'vm',
     title: 'Check and clean up',

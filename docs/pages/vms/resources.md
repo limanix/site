@@ -43,8 +43,10 @@ disk space.
 
 ## Change resources
 
-Edit `[resources]` and run `limanix update --config limanix.toml`. The update stops a running VM,
-applies the new sizes and starts it again; see [Changing a VM](/vms/update).
+Edit `[resources]` and run `limanix update --config limanix.toml`. The new sizes apply when the
+update restarts the VM after the build. A larger `disk` or `mem` applies before the build instead,
+because the build may need it: a running VM restarts once more for it. See
+[Changing a VM](/vms/update).
 
 | Setting      | With `update`                                                          |
 | ------------ | ---------------------------------------------------------------------- |

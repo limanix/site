@@ -12,7 +12,7 @@ Dotfiles are the settings files in your home whose names start with a dot, such 
 
 Each VM has a home of its own, and a new VM starts with an empty one: settings that you make inside a VM stay in that VM. A dotfiles folder on the Mac keeps them in one place:
 
-- one folder serves every VM, and a new VM has your settings from its first shell;
+- one folder serves every VM, and a new VM has your settings from its first interactive Bash or Zsh shell;
 - the VMs link your files instead of copying them, and an edit reaches every VM at once;
 - the folder can be a Git repository that you also use on other machines.
 
@@ -35,7 +35,8 @@ The folder must exist when you create or update the VM. A relative path resolves
 
 ## What gets linked
 
-The VM mounts the folder read-write at `/mnt/dotfiles`. Every new shell you open links its entries into your home before it reads your startup files, such as `~/.zshenv` or `~/.bash_profile`:
+The VM mounts the folder read-write at `/mnt/dotfiles`.
+Each interactive Bash or Zsh shell of the development account links the entries into your home before it reads your startup files, such as `~/.zshenv` or `~/.bash_profile`:
 
 | In the folder                                                        | In your home in the VM                                                |
 | -------------------------------------------------------------------- | --------------------------------------------------------------------- |
@@ -52,11 +53,11 @@ Your startup files, such as `.zshrc`, load after the catalog's shell configurati
 
 The folder is always mounted read-write: unlike [shared folders](/config/mounts), it has no `ro` mode. The links point to your files, and there is nothing to copy. An edit on the Mac is live in every VM at once, and an edit in a VM changes your file on the Mac. A tool that saves its own settings, such as `git config --global`, changes the file in your folder too.
 
-The next shell links a new entry and removes the link of an entry you deleted. For settings that differ between VMs, test the hostname in your startup files, such as `$HOST` in Zsh. If your Mac reads the same files, test `$OSTYPE`: it starts with `darwin` on the Mac and with `linux` in a VM.
+The next interactive Bash or Zsh shell links a new entry and removes the link of an entry you deleted. For settings that differ between VMs, test the hostname in your startup files, such as `$HOST` in Zsh. If your Mac reads the same files, test `$OSTYPE`: it starts with `darwin` on the Mac and with `linux` in a VM.
 
 ## Files in the way
 
-A file or folder that already exists in your home is never replaced, and neither is a link that points outside the dotfiles folder. `lmx dotfiles` lists such a path as a conflict, and `lmx doctor` warns about it. Move it aside, then open a new shell:
+A file or folder that already exists in your home is never replaced, and neither is a link that points outside the dotfiles folder. `lmx dotfiles` lists such a path as a conflict, and `lmx doctor` warns about it. Move it aside, then open a new interactive Bash or Zsh shell:
 
 ::: code-group
 
@@ -92,4 +93,4 @@ Move the conflicting paths aside, then open a new shell.
 
 ## When the folder is missing
 
-While the VM does not see the folder, nothing is linked or removed, and each new shell says so. Your links stay until the folder is back. This happens when the mount fails, or when the folder moved or was deleted on the Mac. Fix the path in `limanix.toml` if it changed, then run `limanix update --config limanix.toml`; it mounts the folder again.
+While the VM does not see the folder, nothing is linked or removed, and each interactive Bash or Zsh shell says so. Your links stay until the folder is back. This happens when the mount fails, or when the folder moved or was deleted on the Mac. Fix the path in `limanix.toml` if it changed, then run `limanix update --config limanix.toml`; it mounts the folder again.

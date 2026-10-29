@@ -108,7 +108,8 @@ For one command, add `--help`, such as `lmx status --help`. `lmx info` shows the
 | `sudo lmx logs collect`  | The last cleanup of the Nix store         |
 | `sudo lmx logs roots`    | The last report of what still holds space |
 
-An update builds in one boot and restarts into the next. Read its build output with `sudo lmx logs apply --previous`.
+If a build failed and the VM has not restarted since, read its output with `sudo lmx logs apply`.
+Use `sudo lmx logs apply --previous` when the build ran in the boot immediately before the current one, such as after the update restarted the VM.
 
 ## Check a port
 
@@ -124,7 +125,7 @@ When the Mac cannot reach a service in the VM, this checks whether the VM's fire
 
 ## Check your dotfiles
 
-`lmx dotfiles` shows which entries of your [dotfiles](/config/dotfiles) are linked into your home, which links are missing and which of your own files are in the way. It changes nothing. `lmx dotfiles link` makes the links now; every new shell does it too.
+`lmx dotfiles` shows which entries of your [dotfiles](/config/dotfiles) are linked into your home, which links are missing and which of your own files are in the way. It changes nothing. `lmx dotfiles link` makes the links now; each interactive Bash or Zsh shell of the development account does it too.
 
 ## Make room on the disk
 

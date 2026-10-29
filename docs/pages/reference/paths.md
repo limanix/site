@@ -25,16 +25,16 @@ other values show other VMs.
 
 `limanix` creates it when it first needs it, readable only by your Mac account:
 
-| Path                           | What it holds                                                                    |
-| ------------------------------ | -------------------------------------------------------------------------------- |
-| `instances/NAME/identity.json` | What `create` fixes: the VM's name, ID, architecture, account and managed home   |
-| `instances/NAME/instance.json` | The result of the last operation, the current generation and its error           |
-| `instances/NAME/generations/`  | The prepared inputs of each build: the NixOS configuration and the Lima settings |
-| `modules/`                     | Modules imported with `limanix modules add`                                      |
-| `homes/`                       | Records of the managed homes that `limanix delete` kept                          |
-| `locks/`                       | Locks that keep two commands from changing the same VM at once                   |
-| `runtime/`                     | Lima's guest agent, unpacked from the `limanix` binary                           |
-| `ssh/config`                   | SSH settings for editors; see [SSH ports](#ssh-ports)                            |
+| Path                           | What it holds                                                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `instances/NAME/identity.json` | What `create` fixes: the VM's name, ID, architecture, account and managed home                                           |
+| `instances/NAME/instance.json` | The result of the last operation, the current generation and its error                                                   |
+| `instances/NAME/generations/`  | The prepared inputs of each build: the NixOS configuration and the Lima settings. `current` points to the last one built |
+| `modules/`                     | Modules imported with `limanix modules add`                                                                              |
+| `homes/`                       | Records of the managed homes that `limanix delete` kept                                                                  |
+| `locks/`                       | Locks that keep two commands from changing the same VM at once                                                           |
+| `runtime/`                     | Lima's guest agent, unpacked from the `limanix` binary                                                                   |
+| `ssh/config`                   | SSH settings for editors; see [SSH ports](#ssh-ports)                                                                    |
 
 `limanix delete` removes the VM's folder in `instances/` and records its managed home in `homes/`.
 With `--remove-home`, it removes the home and that record too. [Install](/install#remove-limanix)

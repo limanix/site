@@ -28,13 +28,13 @@ That is why your terminal decides: it must support OSC 52 and allow it. `pbpaste
 
 ## Allow it in your terminal
 
-| Terminal  | Copy                                                                | Paste with `pbpaste`                                                                                            |
-| --------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Ghostty   | Allowed by default: `clipboard-write = allow`                       | Asks each time by default; `clipboard-read = allow` stops asking                                                |
-| kitty     | Allowed by default: `write-clipboard` in `clipboard_control`        | Asks each time by default; `read-clipboard` in `clipboard_control` instead of `read-clipboard-ask` stops asking |
-| iTerm2    | General › Selection › Applications in terminal may access clipboard | Not documented: paste with Cmd+V                                                                                |
-| WezTerm   | Supported                                                           | Not supported: paste with Cmd+V                                                                                 |
-| Alacritty | Allowed by default: `osc52 = "OnlyCopy"` in `[terminal]`            | Set `osc52 = "CopyPaste"`                                                                                       |
+| Terminal                                                         | Copy                                                                | Paste with `pbpaste`                                                                                            |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Ghostty                                                          | Allowed by default: `clipboard-write = allow`                       | Asks each time by default; `clipboard-read = allow` stops asking                                                |
+| kitty                                                            | Allowed by default: `write-clipboard` in `clipboard_control`        | Asks each time by default; `read-clipboard` in `clipboard_control` instead of `read-clipboard-ask` stops asking |
+| [iTerm2](https://iterm2.com/3.4/documentation-escape-codes.html) | General › Selection › Applications in terminal may access clipboard | Supported since 3.5; requires permission                                                                        |
+| WezTerm                                                          | Supported                                                           | Not supported: paste with Cmd+V                                                                                 |
+| Alacritty                                                        | Allowed by default: `osc52 = "OnlyCopy"` in `[terminal]`            | Set `osc52 = "CopyPaste"`                                                                                       |
 
 ::: tip
 When the terminal does not let the VM read the clipboard, paste with Cmd+V, the terminal's own paste shortcut.

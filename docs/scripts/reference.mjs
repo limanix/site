@@ -114,7 +114,13 @@ export function lmxChecksTable(entry) {
 }
 
 function about(entry) {
-  return region(`${slug(entry.name)}-about`, sentence(entry.about))
+  const summary = sentence(entry.about)
+  const details = sentence(entry.details)
+  const body =
+    !details || details.startsWith(summary.replace(/\.$/, ''))
+      ? details || summary
+      : `${summary}\n\n${details}`
+  return region(`${slug(entry.name)}-about`, body)
 }
 
 export function renderCli(client, lmx) {
@@ -122,6 +128,7 @@ export function renderCli(client, lmx) {
     .map((entry) =>
       [
         about(entry),
+        region(`${slug(entry.name)}-usage`, `\`\`\`sh [Mac]\n${entry.usage}\n\`\`\``),
         entry.args.length > 0 ? region(slug(entry.name), flagsTable(entry)) : '',
         entry.checks.length > 0
           ? region(`${slug(entry.name)}-checks`, checksTable(entry, lmx))

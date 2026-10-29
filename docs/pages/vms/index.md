@@ -131,12 +131,7 @@ limanix doctor dev-box
 `doctor` prints one row per check: its status, `ok`, `warning`, `failed` or `unknown`, its name and
 a message, with a hint under each row that needs attention.
 
-| Check                                                | What it looks at                                                                               |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `vm`                                                 | The VM in Lima and its saved record                                                            |
-| `address`                                            | The VM's address on the shared network                                                         |
-| `config`, `owner`, `generations`, `disk`, `dotfiles` | The guest: its configuration, `lmxd`, the NixOS generations, a low disk and the dotfiles links |
-| `guest`                                              | Replaces the guest checks when the guest does not answer                                       |
+<!-- @include: ../../.reference/cli.md#limanix-doctor-checks -->
 
 A stopped VM, or one that another command is changing, shows only `vm`. The command exits with
 status 1 when a check failed. `doctor` repairs nothing and does not restart the VM. Inside the VM,

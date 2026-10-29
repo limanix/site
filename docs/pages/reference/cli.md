@@ -56,10 +56,7 @@ limanix create --config FILE [--json]
 
 :::
 
-| Flag       | Type    | Default  | Description                                                  |
-| ---------- | ------- | -------- | ------------------------------------------------------------ |
-| `--config` | string  | required | Path to the VM configuration file.                           |
-| `--json`   | boolean | `false`  | Print the VM as JSON, as an object of `limanix list --json`. |
+<!-- @include: ../../.reference/cli.md#limanix-create -->
 
 `create` reads the VM name from the file, allocates the VM and its managed home, builds the NixOS system, restarts the VM into it and checks the development account. It prints the build output to standard error, then `Created NAME. Managed home: PATH`, or the VM as JSON with `--json`. It downloads the base image when needed; the first run needs network access for the image and the Nix dependencies.
 
@@ -79,10 +76,7 @@ limanix update --config FILE [--json]
 
 :::
 
-| Flag       | Type    | Default  | Description                                                  |
-| ---------- | ------- | -------- | ------------------------------------------------------------ |
-| `--config` | string  | required | Path to the VM configuration file.                           |
-| `--json`   | boolean | `false`  | Print the VM as JSON, as an object of `limanix list --json`. |
+<!-- @include: ../../.reference/cli.md#limanix-update -->
 
 `update` selects the VM by the `name` in the file, keeps its disk and managed home, builds the new system in the VM and restarts it. It prints the build output to standard error, then `Updated NAME.`, or the VM as JSON with `--json`. The VM is running afterwards, even if it was stopped before.
 
@@ -105,10 +99,11 @@ limanix start NAME [--json]
 
 :::
 
-| Argument or flag | Type    | Default  | Description                                                  |
-| ---------------- | ------- | -------- | ------------------------------------------------------------ |
-| `NAME`           | string  | required | VM name.                                                     |
-| `--json`         | boolean | `false`  | Print the VM as JSON, as an object of `limanix list --json`. |
+| Argument | Type   | Default  | Description |
+| -------- | ------ | -------- | ----------- |
+| `NAME`   | string | required | VM name.    |
+
+<!-- @include: ../../.reference/cli.md#limanix-start -->
 
 `start` boots the saved VM and prints `Started NAME.`, or the VM as JSON with `--json`. It does not read `limanix.toml`, rebuild the system or reset an earlier operation error: `limanix update` does that.
 
@@ -126,10 +121,11 @@ limanix stop NAME [--json]
 
 :::
 
-| Argument or flag | Type    | Default  | Description                                                  |
-| ---------------- | ------- | -------- | ------------------------------------------------------------ |
-| `NAME`           | string  | required | VM name.                                                     |
-| `--json`         | boolean | `false`  | Print the VM as JSON, as an object of `limanix list --json`. |
+| Argument | Type   | Default  | Description |
+| -------- | ------ | -------- | ----------- |
+| `NAME`   | string | required | VM name.    |
+
+<!-- @include: ../../.reference/cli.md#limanix-stop -->
 
 `stop` shuts the VM down and prints `Stopped NAME.`, or the VM as JSON with `--json`. Running processes in the VM end.
 
@@ -147,11 +143,12 @@ limanix shell NAME [--session SESSION | -- COMMAND ...]
 
 :::
 
-| Argument or flag | Type    | Default  | Description                                                                                         |
-| ---------------- | ------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `NAME`           | string  | required | VM name.                                                                                            |
-| `COMMAND ...`    | strings | none     | Guest command and its arguments, after `--`. They reach the guest unchanged, without a guest shell. |
-| `--session`      | string  | none     | Create or attach to a named persistent session; requires a session provider in the VM.              |
+| Argument      | Type    | Default  | Description                                                                                         |
+| ------------- | ------- | -------- | --------------------------------------------------------------------------------------------------- |
+| `NAME`        | string  | required | VM name.                                                                                            |
+| `COMMAND ...` | strings | none     | Guest command and its arguments, after `--`. They reach the guest unchanged, without a guest shell. |
+
+<!-- @include: ../../.reference/cli.md#limanix-shell -->
 
 - Without a command, `shell` opens the login shell of the development user in their home: Zsh with the `terminal` preset, Bash with `minimal`. `exit` returns to the Mac; the VM keeps running.
 - With `-- COMMAND`, the command starts in the user's home, and `limanix shell` exits with its status. For `cd`, pipes or variables, run a guest shell such as `bash -lc '...'`. Single quotes keep the Mac's shell from expanding them first.
@@ -184,10 +181,7 @@ limanix list [-q | --json]
 
 :::
 
-| Flag            | Type    | Default | Description                            |
-| --------------- | ------- | ------- | -------------------------------------- |
-| `-q`, `--quiet` | boolean | `false` | Print only the VM names, one per line. |
-| `--json`        | boolean | `false` | Print machine-readable JSON.           |
+<!-- @include: ../../.reference/cli.md#limanix-list -->
 
 | Column    | Content                                                                                                                                                                 |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -232,19 +226,15 @@ limanix doctor NAME [--json]
 
 :::
 
-| Argument or flag | Type    | Default  | Description                  |
-| ---------------- | ------- | -------- | ---------------------------- |
-| `NAME`           | string  | required | VM name.                     |
-| `--json`         | boolean | `false`  | Print machine-readable JSON. |
+| Argument | Type   | Default  | Description |
+| -------- | ------ | -------- | ----------- |
+| `NAME`   | string | required | VM name.    |
+
+<!-- @include: ../../.reference/cli.md#limanix-doctor -->
 
 `doctor` prints one row per check: its status, its name and a message, with a hint below when there is something to do. A status is `ok`, `warning`, `failed` or `unknown`.
 
-| Check                                                | What it checks                                                                                                                                                                        |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vm`                                                 | The saved record and Lima: the VM runs, and its last create or update completed.                                                                                                      |
-| `address`                                            | The guest has an IPv4 address on the shared network.                                                                                                                                  |
-| `config`, `owner`, `generations`, `disk`, `dotfiles` | The checks of [`lmx doctor`](/reference/lmx#lmx-doctor) in the VM: its configuration, `lmxd`, the NixOS generations, a low disk, and the dotfiles links when `shell.dotfiles` is set. |
-| `guest`                                              | Takes the place of the guest checks when the guest gives no answer.                                                                                                                   |
+<!-- @include: ../../.reference/cli.md#limanix-doctor-checks -->
 
 A VM that is stopped, or that another `limanix` command is changing, shows only `vm`. `doctor` does not repair or restart anything. It exits with status `1` when a check failed; a warning does not fail it. `--json` prints an object with `name` and `checks`, each check with `check`, `status`, `message` and, when there is one, `hint`.
 
@@ -262,12 +252,11 @@ limanix delete NAME [--force] [--remove-home] [--json]
 
 :::
 
-| Argument or flag | Type    | Default  | Description                                                     |
-| ---------------- | ------- | -------- | --------------------------------------------------------------- |
-| `NAME`           | string  | required | VM name.                                                        |
-| `--force`        | boolean | `false`  | Force Lima to stop and delete the VM.                           |
-| `--remove-home`  | boolean | `false`  | Also remove this VM's managed home on the Mac and its contents. |
-| `--json`         | boolean | `false`  | Print the result as JSON.                                       |
+| Argument | Type   | Default  | Description |
+| -------- | ------ | -------- | ----------- |
+| `NAME`   | string | required | VM name.    |
+
+<!-- @include: ../../.reference/cli.md#limanix-delete -->
 
 `delete` stops a running VM, then removes its guest disk, its Lima instance and its saved record. It prints `Deleted NAME.` and, without `--remove-home`, `Preserved managed home: PATH`. With `--json`, it prints an object with `name` and `home`, the path of the preserved home, or `null` with `--remove-home`. It also removes the record of a VM whose Lima instance is already missing.
 
@@ -315,23 +304,16 @@ limanix network check NAME PORT [--udp] [--json]
 
 :::
 
-| Argument or flag | Type    | Default  | Description                            |
-| ---------------- | ------- | -------- | -------------------------------------- |
-| `NAME`           | string  | required | VM name.                               |
-| `PORT`           | integer | required | Port number from 1 to 65535.           |
-| `--udp`          | boolean | `false`  | Check a UDP port instead of a TCP one. |
-| `--json`         | boolean | `false`  | Print machine-readable JSON.           |
+| Argument | Type    | Default  | Description                  |
+| -------- | ------- | -------- | ---------------------------- |
+| `NAME`   | string  | required | VM name.                     |
+| `PORT`   | integer | required | Port number from 1 to 65535. |
+
+<!-- @include: ../../.reference/cli.md#limanix-network-check -->
 
 The checks run in this order:
 
-| Check      | What it checks                                                                  |
-| ---------- | ------------------------------------------------------------------------------- |
-| `vm`       | The VM runs, and its last create or update completed.                           |
-| `address`  | The guest has an IPv4 address on the shared network.                            |
-| `firewall` | The guest firewall opens the port for its protocol.                             |
-| `listener` | Something listens on the port on an address other than loopback.                |
-| `process`  | Which process and user hold the socket, when something listens.                 |
-| `connect`  | The Mac connects to the address and port within 3 seconds. Only for a TCP port. |
+<!-- @include: ../../.reference/cli.md#limanix-network-check-checks -->
 
 The command exits with status `1` when a check failed. `--json` prints an object with `name`, `port`, `protocol` and `checks`, as in `limanix doctor`.
 
@@ -357,10 +339,7 @@ limanix modules list [-q | --json]
 
 :::
 
-| Flag            | Type    | Default | Description                             |
-| --------------- | ------- | ------- | --------------------------------------- |
-| `-q`, `--quiet` | boolean | `false` | Print only the selectors, one per line. |
-| `--json`        | boolean | `false` | Print machine-readable JSON.            |
+<!-- @include: ../../.reference/cli.md#limanix-modules-list -->
 
 Each row shows a selector, its kind and its description, or the error of an imported module that fails the registry checks: modules first, then toolchains, then shell components. The kind says where `limanix.toml` chooses the entry:
 

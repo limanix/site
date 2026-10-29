@@ -123,14 +123,7 @@ limanix network check dev-box 8080
 
 The command runs these checks in order and prints a hint under a check that needs attention:
 
-| Check      | What it checks                                                  |
-| ---------- | --------------------------------------------------------------- |
-| `vm`       | The VM runs, and its last create or update completed            |
-| `address`  | The guest has an IPv4 address on the shared network             |
-| `firewall` | The guest firewall opens the port for its protocol              |
-| `listener` | Something listens on the port on an address other than loopback |
-| `process`  | Which process and user hold the socket, when something listens  |
-| `connect`  | The Mac connects to the address and port within 3 seconds       |
+<!-- @include: ../../.reference/cli.md#limanix-network-check-checks -->
 
 Add `--udp` for a UDP port; it has no `connect` check, because UDP has no connection to try.
 `--json` prints the same checks for scripts. The command exits with status 1 when a check failed.

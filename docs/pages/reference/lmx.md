@@ -61,9 +61,7 @@ lmx help [TOPIC]
 
 :::
 
-| Argument | Type   | Default | Description                                                              |
-| -------- | ------ | ------- | ------------------------------------------------------------------------ |
-| `TOPIC`  | string | none    | Module to explain, such as `python`, `python-3.12` or `lmx:python-3.12`. |
+<!-- @include: ../../.reference/lmx.md#lmx-help -->
 
 Without a topic, `lmx help` prints the guest help page, whose `lmx help TOPIC` line lists the topics. With a topic, it prints the module's help card: what the module installed in this VM, its commands, common tasks and a link to its guide. A topic without a card fails and lists the topics that have one. Your own modules can add a card with the NixOS option `limanix.help.<topic>`.
 
@@ -109,13 +107,9 @@ lmx status --wait converged --generation GENERATION [--timeout DURATION] [--json
 
 :::
 
-| Option               | Type        | Default | Description                                                                                                                                       |
-| -------------------- | ----------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--short`            | boolean     | `false` | Print only what needs attention, such as `restart`, for tmux and the prompt. Cannot be combined with `--wait` or `--json`.                        |
-| `--wait`             | `converged` | none    | Wait until the guest reaches this state, then answer. `converged` means the generation is booted, healthy and finalized. Requires `--generation`. |
-| `-g`, `--generation` | string      | none    | Generation the wait is for. Requires `--wait`.                                                                                                    |
-| `--timeout`          | duration    | `10m`   | Longest wait, such as `90s`, `10m` or `1h`. A number alone is seconds. Requires `--wait`.                                                         |
-| `--json`             | boolean     | `false` | Answer with the JSON host contract instead of text.                                                                                               |
+<!-- @include: ../../.reference/lmx.md#lmx-status -->
+
+<!-- @include: ../../.reference/lmx.md#lmx-status-values -->
 
 | Line           | Shows                                                                                                                      |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -155,19 +149,11 @@ lmx doctor [--json]
 
 :::
 
-| Option   | Type    | Default | Description                                         |
-| -------- | ------- | ------- | --------------------------------------------------- |
-| `--json` | boolean | `false` | Answer with the JSON host contract instead of text. |
+<!-- @include: ../../.reference/lmx.md#lmx-doctor -->
 
 Each line is one check: its status, its name and a message, with what to do on an indented line below.
 
-| Check         | Checks                                                                                                                                                                                   |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config`      | `/etc/lmx/config.json` is readable and valid.                                                                                                                                            |
-| `owner`       | `lmxd` answers, with the same version as `lmx`.                                                                                                                                          |
-| `generations` | The state of the generations, from `lmxd` or, without it, from the generation markers.                                                                                                   |
-| `disk`        | Shown when `lmxd` reports that the disk is low.                                                                                                                                          |
-| `dotfiles`    | Shown when `limanix.toml` names dotfiles: their entries are linked into the home. A `warning` names the paths in the way; `failed` means the directory is not mounted or cannot be read. |
+<!-- @include: ../../.reference/lmx.md#lmx-doctor-checks -->
 
 | Status    | Meaning                                                               |
 | --------- | --------------------------------------------------------------------- |
@@ -190,17 +176,9 @@ lmx net check PORT [--udp] [--json]
 
 :::
 
-| Argument or option | Type    | Default  | Description                                         |
-| ------------------ | ------- | -------- | --------------------------------------------------- |
-| `PORT`             | integer | required | Port to check, from 1 to 65535.                     |
-| `--udp`            | boolean | `false`  | Check a UDP port instead of a TCP one.              |
-| `--json`           | boolean | `false`  | Answer with the JSON host contract instead of text. |
+<!-- @include: ../../.reference/lmx.md#lmx-net-check -->
 
-| Check      | Checks                                                                                                                                                                            |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `firewall` | The guest firewall opens the port for its protocol. TCP port 22 is always open for SSH.                                                                                           |
-| `listener` | Something listens on the port, and not only on a loopback address.                                                                                                                |
-| `process`  | Which process holds the socket, and which user created it. Only when something listens. Docker's proxy is a warning: `network.ports` does not control the ports Docker publishes. |
+<!-- @include: ../../.reference/lmx.md#lmx-net-check-checks -->
 
 The command exits with status `1` when a check failed. Run it with `sudo` to see the processes of other users. On the Mac, [`limanix network check NAME PORT`](/reference/cli#limanix-network-check) runs the same checks, then connects from the Mac.
 
@@ -216,18 +194,9 @@ sudo lmx logs KIND [--previous]
 
 :::
 
-| Argument or option | Type    | Default  | Description                                                                              |
-| ------------------ | ------- | -------- | ---------------------------------------------------------------------------------------- |
-| `KIND`             | string  | required | Kind of `lmxd` task: `apply`, `health`, `finalize`, `collect` or `roots`.                |
-| `--previous`       | boolean | `false`  | Read the boot before the running one, such as the one that built the running generation. |
+<!-- @include: ../../.reference/lmx.md#lmx-logs -->
 
-| Kind       | Tasks                                               |
-| ---------- | --------------------------------------------------- |
-| `apply`    | Builds of a generation for the next boot.           |
-| `health`   | Health checks of the booted generation.             |
-| `finalize` | Removals of older generations after a healthy boot. |
-| `collect`  | Collections of unreferenced store paths.            |
-| `roots`    | Reports of the garbage-collector roots.             |
+<!-- @include: ../../.reference/lmx.md#lmx-logs-values -->
 
 `lmx logs` prints the task, its generation and its start time in UTC, then its lines.
 It fails when no task of that kind ran in the selected boot.
@@ -246,9 +215,7 @@ lmx version [--json]
 
 :::
 
-| Option   | Type    | Default | Description                                         |
-| -------- | ------- | ------- | --------------------------------------------------- |
-| `--json` | boolean | `false` | Answer with the JSON host contract instead of text. |
+<!-- @include: ../../.reference/lmx.md#lmx-version -->
 
 It prints `lmx VERSION (host contract N)`.
 
@@ -264,9 +231,7 @@ sudo lmx store reserve [--json]
 
 :::
 
-| Option   | Type    | Default | Description                                         |
-| -------- | ------- | ------- | --------------------------------------------------- |
-| `--json` | boolean | `false` | Answer with the JSON host contract instead of text. |
+<!-- @include: ../../.reference/lmx.md#lmx-store-reserve -->
 
 When less than 20% of the store disk is free, `lmxd` collects the store paths that nothing uses, and the command waits for the collection. It then prints how much it freed, or `Nothing was collected.`, and the free space of the guest disk. A collection that already runs is shared, and interrupting the command does not stop it. The command fails when less than 10% is still free afterwards. `limanix update` runs it before the build.
 
@@ -282,11 +247,7 @@ sudo lmx apply --generation GENERATION [--follow] [--json]
 
 :::
 
-| Option               | Type    | Default  | Description                                                                                                        |
-| -------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
-| `-g`, `--generation` | string  | required | Generation to apply. Its inputs are at `/mnt/limanix/GENERATION`, and their marker must name it.                   |
-| `--follow`           | boolean | `false`  | Follow the apply until it ends, with the build's output.                                                           |
-| `--json`             | boolean | `false`  | Answer with the JSON host contract instead of text. With `--follow`, one JSON line per event, and the answer last. |
+<!-- @include: ../../.reference/lmx.md#lmx-apply -->
 
 `limanix update` runs it for you. `lmxd` makes room in the store as `lmx store reserve` does, builds the generation with `nixos-rebuild boot`, then installs its environment files into `/etc/limanix`. A failed or cancelled build leaves the installed files as they were. Interrupting the command does not stop the apply, and running it again attaches to the running apply. An apply of another generation is cancelled and replaced. After a successful apply, the generation waits for a restart. A cancelled apply exits with status `130`.
 
@@ -302,10 +263,7 @@ sudo lmx apply cancel --generation GENERATION [--json]
 
 :::
 
-| Option               | Type    | Default  | Description                                         |
-| -------------------- | ------- | -------- | --------------------------------------------------- |
-| `-g`, `--generation` | string  | required | Generation whose apply to cancel.                   |
-| `--json`             | boolean | `false`  | Answer with the JSON host contract instead of text. |
+<!-- @include: ../../.reference/lmx.md#lmx-apply-cancel -->
 
 `limanix update` runs it when you press Ctrl-C. The build is killed; a boot loader update that `nixos-rebuild` already started finishes in its own unit. A build that had already finished installs its environment files and reports success.
 
@@ -353,9 +311,7 @@ lmx session NAME
 
 :::
 
-| Argument | Type   | Default  | Description                                                                                  |
-| -------- | ------ | -------- | -------------------------------------------------------------------------------------------- |
-| `NAME`   | string | required | Session name, passed to the provider unchanged. Put `--` before a name that starts with `-`. |
+<!-- @include: ../../.reference/lmx.md#lmx-session -->
 
 The command creates the session or attaches to it with the provider the VM's configuration selects, such as tmux; the provider then owns the terminal and the exit status. Without a provider, it says which setting of `limanix.toml` adds one and exits with status `127`. [`limanix shell NAME --session SESSION`](/reference/cli#limanix-shell) on the Mac runs `limanix-session SESSION`.
 
@@ -390,9 +346,7 @@ lmx dotfiles link [--quiet]
 
 :::
 
-| Option    | Type    | Default | Description                                            |
-| --------- | ------- | ------- | ------------------------------------------------------ |
-| `--quiet` | boolean | `false` | Print nothing but errors, as a starting shell runs it. |
+<!-- @include: ../../.reference/lmx.md#lmx-dotfiles-link -->
 
 - It links each top-level entry of the dotfiles that starts with `.` into the home, and each entry of their `.config` into `~/.config`, and prints each change. `.git`, `.github`, `.gitignore`, `.gitmodules` and `.DS_Store` are never linked.
 - It changes only links that point into the dotfiles. A file, a directory or a link to anywhere else stays and is a conflict; a conflict does not fail the command.

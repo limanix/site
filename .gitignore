@@ -22,6 +22,7 @@
 
 # Site
 /docs/.catalog/
+/docs/.reference/
 /app/.catalog/
 /app/node_modules/
 /app/dist/

@@ -25,12 +25,9 @@ name = "dev-box"
 
 :::
 
-| Key              | Type            | Default         | Description                                                                                                                                                                                                   |
-| ---------------- | --------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `schema_version` | integer         | `1`             | Version of the file format, independent of the LimaNix release. Only `1` is supported.                                                                                                                        |
-| `name`           | string          | `"example-box"` | VM name: 1 to 63 lowercase letters, digits and hyphens, starting and ending with a letter or digit. `create` and `update` select the VM by this name. Changing it selects another VM; it does not rename one. |
-| `mounts`         | array of tables | `[]`            | Shared folders, see [`[[mounts]]`](#mounts).                                                                                                                                                                  |
-| `env`            | table           | `{}`            | Guest environment, see [`[env]`](#env).                                                                                                                                                                       |
+<!-- @include: ../../.reference/config.md#config-top -->
+
+[`[env]`](#env) and [`[[mounts]]`](#mounts) have their own sections below.
 
 Guide: [The limanix.toml file](/config/).
 
@@ -49,11 +46,7 @@ sudo = true
 
 :::
 
-| Key    | Type    | Default       | Description                                                                                                                                                                                          |
-| ------ | ------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name` | string  | `"dev"`       | Username of the development account that `limanix shell` opens: a lowercase letter or `_`, then lowercase letters, digits, `_` or `-`, up to 32 characters. `root` and `limanix-admin` are reserved. |
-| `home` | string  | `"/home/dev"` | Home directory of that account, where the managed home is mounted. Follows the [guest path rules](#guest-paths).                                                                                     |
-| `sudo` | boolean | `true`        | Passwordless `sudo` inside the guest. It grants no rights on the Mac.                                                                                                                                |
+<!-- @include: ../../.reference/config.md#config-user -->
 
 `name` and `home` are [fixed at creation](#fixed-at-creation). The account uses the numeric UID of your Mac account for shared files; its name can differ from your Mac account's name.
 
@@ -74,12 +67,7 @@ disk = "10GiB"
 
 :::
 
-| Key    | Type                   | Default    | Description                                                                                                                                                                                                                                                          |
-| ------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `arch` | `"arm64"` or `"amd64"` | your Mac's | Guest architecture. Your Mac's own, `arm64` on Apple Silicon or `amd64` on Intel, runs with Apple's Virtualization framework. The other one runs with QEMU, which you install on the Mac, and needs [`limanix network setup`](/reference/cli#limanix-network-setup). |
-| `cpu`  | integer                | `4`        | Guest CPU count, a positive integer.                                                                                                                                                                                                                                 |
-| `mem`  | string                 | `"8GiB"`   | Guest memory size in whole GiB.                                                                                                                                                                                                                                      |
-| `disk` | string                 | `"10GiB"`  | Guest system disk size in whole GiB. Shared folders are not on this disk. `update` can grow it but not shrink it.                                                                                                                                                    |
+<!-- @include: ../../.reference/config.md#config-resources -->
 
 A size is a positive whole number followed by `GiB`, such as `"8GiB"`. `"8GB"`, `"1.5GiB"`, `"0GiB"` and `"08GiB"` are rejected. `arch` is [fixed at creation](#fixed-at-creation).
 
@@ -98,9 +86,7 @@ root = "~/.limanix"
 
 :::
 
-| Key    | Type   | Default        | Description                                                                                                                                                                                       |
-| ------ | ------ | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `root` | string | `"~/.limanix"` | Directory on the Mac under which LimaNix creates the VM's managed home, `<root>/<name>-<id>`, and mounts it read-write at `user.home`. Follows the [host path rules](#host-paths). Cannot be `/`. |
+<!-- @include: ../../.reference/config.md#config-home -->
 
 `root` is [fixed at creation](#fixed-at-creation). `limanix create` prints the path of the managed home, and `limanix list --json` shows it in `home`.
 
@@ -123,13 +109,7 @@ dotfiles = "~/dotfiles"
 
 :::
 
-| Key           | Type                                  | Default                                | Description                                                                                                                                                                                                                                                                                                                                                          |
-| ------------- | ------------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preset`      | `"terminal"` or `"minimal"`           | `"terminal"`                           | `terminal` is Zsh with Oh My Zsh, the CLI tools, Lazygit, Yazi and the GitHub CLI. `minimal` is Bash with the CLI tools.                                                                                                                                                                                                                                             |
-| `prompt`      | `"pure"`, `"starship"` or `"none"`    | `"pure"`; `"none"` with `minimal`      | Zsh prompt of the `terminal` preset. `none` leaves the prompt to your startup files. With `minimal` it must be `none`.                                                                                                                                                                                                                                               |
-| `editor`      | `"astronvim"`, `"neovim"` or `"none"` | `"astronvim"`; `"none"` with `minimal` | `astronvim` is Neovim configured with language servers for the chosen toolchains. `neovim` is plain Neovim.                                                                                                                                                                                                                                                          |
-| `multiplexer` | `"tmux"` or `"none"`                  | `"tmux"`; `"none"` with `minimal`      | Terminal multiplexer. It also provides the sessions of `limanix shell --session`.                                                                                                                                                                                                                                                                                    |
-| `dotfiles`    | string                                | `""`                                   | Directory of your dotfiles on the Mac, mounted read-write at `/mnt/dotfiles`. Each interactive Bash or Zsh shell of the development account links its top-level entries that start with `.`, and the entries of its `.config`, into the home, leaving existing files alone. Empty mounts none. Follows the [host path rules](#host-paths); the directory must exist. |
+<!-- @include: ../../.reference/config.md#config-shell -->
 
 `none` leaves a component out of the VM. With `preset = "minimal"`, the defaults of `prompt`, `editor` and `multiplexer` are `none`; name an editor or a multiplexer to add it.
 
@@ -153,17 +133,7 @@ gradle = "9"
 
 :::
 
-| Key      | Type   | Default | Description                                                                                                                                                                                      |
-| -------- | ------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `go`     | string | `""`    | Go line, with gopls, Delve and GCC.                                                                                                                                                              |
-| `rust`   | string | `""`    | Default toolchain of rustup, which installs it at the first start after a change: `stable`, `beta`, `nightly`, a dated channel such as `nightly-2026-10-01`, or a Rust version such as `1.90.0`. |
-| `python` | string | `""`    | Python line, with virtualenv and Pyright.                                                                                                                                                        |
-| `nodejs` | string | `""`    | Node.js line, with npm, npx and the TypeScript language server.                                                                                                                                  |
-| `java`   | string | `""`    | OpenJDK line, with the jdtls language server; `JAVA_HOME` points to it.                                                                                                                          |
-| `maven`  | string | `""`    | Apache Maven line, which runs on the `java` line and needs it.                                                                                                                                   |
-| `gradle` | string | `""`    | Gradle line, which runs on the `java` line and needs it; the build stops when the Gradle line does not support that Java.                                                                        |
-| `gcc`    | string | `""`    | GCC line for C and C++, with GDB, clangd, make, CMake, Ninja, Meson and pkg-config; the compilers find the headers and libraries of `[nixos] packages`.                                          |
-| `clang`  | string | `""`    | Clang line, with clangd, clang-format, clang-tidy and LLDB, next to GCC, which it brings; `cc` and `c++` stay GCC.                                                                               |
+<!-- @include: ../../.reference/config.md#config-toolchains -->
 
 A line is a version such as `1.27` and must exist in the catalog of your client: `limanix modules list` shows each line as a selector of kind `toolchains`, such as `lmx:go-1.27`. An unknown line fails with the lines the catalog has. `maven` or `gradle` without `java` fails with `toolchains.gradle: needs a JDK: add java to [toolchains], such as java = "21"`.
 
@@ -183,10 +153,7 @@ packages = ["jq", "unstable:kubernetes-helm"]
 
 :::
 
-| Key        | Type             | Default | Description                                                                                                                                                                                                                                                                                                                     |
-| ---------- | ---------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `modules`  | array of strings | `[]`    | Selected modules: `lmx:NAME` or `lmx:NAME-VERSION` from the catalog built into the client, or `third-party:NAME` imported with `limanix modules add`. Without a version, the module's default version is selected. Repeated selectors and several versions of a module are accepted. An empty list selects no optional modules. |
-| `packages` | array of strings | `[]`    | Commands from the guest's nixpkgs by attribute path, such as `jq` or `python3Packages.ipython`. `unstable:NAME` takes the package from the catalog's nixos-unstable revision. Naming a package allows its license. A command that another package of the guest also provides fails the build.                                   |
+<!-- @include: ../../.reference/config.md#config-nixos -->
 
 `[shell]` and `[toolchains]` choose the other catalog modules. A shell component or a toolchain in `modules` fails with the table that chooses it, such as `nixos.modules[0]: lmx:go is a toolchain; choose its version in [toolchains], such as go = "1.27"`. The `terminal` preset also installs the GitHub CLI, `gh`; a package of the same name in `packages` takes its place.
 
@@ -205,9 +172,7 @@ flavor = "system"
 
 :::
 
-| Key      | Type                                                          | Default    | Description                                                                                                                                                                                                                           |
-| -------- | ------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `flavor` | `"system"`, `"latte"`, `"frappe"`, `"macchiato"` or `"mocha"` | `"system"` | Colors of `lmx` and the catalog modules. `system` uses the terminal's own colors and background: the guest follows the theme of your terminal. `latte` is a light Catppuccin flavor; `frappe`, `macchiato` and `mocha` are dark ones. |
+<!-- @include: ../../.reference/config.md#config-theme -->
 
 Guide: [Environment and theme](/config/environment).
 
@@ -224,9 +189,7 @@ mode = "shared"
 
 :::
 
-| Key    | Type       | Default    | Description                                                                                                   |
-| ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
-| `mode` | `"shared"` | `"shared"` | Shared network with NAT. The Mac reaches the guest at the guest's own IP address, which `limanix list` shows. |
+<!-- @include: ../../.reference/config.md#config-network -->
 
 Guide: [Network](/vms/network).
 
@@ -244,10 +207,7 @@ udp = []
 
 :::
 
-| Key   | Type              | Default | Description                                                                                                                                |
-| ----- | ----------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `tcp` | array of integers | `[]`    | Inbound TCP ports in the guest firewall. Services listen on a guest network interface and are reached at `<guest-ip>:<port>` from the Mac. |
-| `udp` | array of integers | `[]`    | Inbound UDP ports in the guest firewall.                                                                                                   |
+<!-- @include: ../../.reference/config.md#config-network-ports -->
 
 A port is an integer from 1 to 65535. The lists only open the firewall: they do not start services or forward ports of the Mac, and `localhost` on the Mac does not reach them. Selected modules can open ports of their own, also when the lists are empty.
 
@@ -292,11 +252,7 @@ mode = "rw"
 
 :::
 
-| Key      | Type             | Default  | Description                                                                                                                                  |
-| -------- | ---------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `source` | string           | required | Directory on the Mac to mount inside the guest. Follows the [host path rules](#host-paths); it must exist when you run `create` or `update`. |
-| `target` | string           | required | Mount destination inside the guest. Follows the [guest path rules](#guest-paths).                                                            |
-| `mode`   | `"rw"` or `"ro"` | `"rw"`   | Mount access inside the guest: read-write or read-only.                                                                                      |
+<!-- @include: ../../.reference/config.md#config-mounts -->
 
 - Targets cannot overlap: `/workspace` and `/workspace/cache` cannot both be targets.
 - A target cannot be `user.home` or a directory above it. A target inside the home, such as `/home/dev/.config/nvim`, is allowed.
@@ -333,60 +289,11 @@ Every other key changes with `limanix update`, which restarts the VM.
 
 ## Defaults
 
-An empty `limanix.toml` is the same as this file. [`limanix first-config`](/reference/cli#limanix-first-config) writes the same defaults with a comment for each setting, and shows the empty `dotfiles` and toolchain keys as commented-out examples.
+[`limanix first-config`](/reference/cli#limanix-first-config) writes this file: every setting with its default and a comment, and the empty `dotfiles` and toolchain keys as commented-out examples. An empty `limanix.toml` gives the same settings. On an Intel Mac, `arch` is `"amd64"`.
 
 ::: code-group
 
-```toml [limanix.toml]
-schema_version = 1
-name = "example-box"
-
-[user]
-name = "dev"
-home = "/home/dev"
-sudo = true
-
-[resources]
-arch = "arm64" # amd64 on an Intel Mac
-cpu = 4
-mem = "8GiB"
-disk = "10GiB"
-
-[home]
-root = "~/.limanix"
-
-[shell]
-preset = "terminal"
-prompt = "pure"
-editor = "astronvim"
-multiplexer = "tmux"
-dotfiles = ""
-
-[toolchains]
-go = ""
-rust = ""
-python = ""
-nodejs = ""
-java = ""
-maven = ""
-gradle = ""
-gcc = ""
-clang = ""
-
-[nixos]
-modules = []
-packages = []
-
-[theme]
-flavor = "system"
-
-[network]
-mode = "shared"
-
-[network.ports]
-tcp = []
-udp = []
-```
+<!-- @include: ../../.reference/config.md#config-example -->
 
 :::
 

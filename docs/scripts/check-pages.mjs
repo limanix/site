@@ -35,11 +35,24 @@ const route = (file) =>
 
 const isFence = (line) => /^\s*(```|~~~)/.test(line)
 
+const included = (file, target) => {
+  const [path, name] = target.split('#')
+  const text = readFileSync(resolve(dirname(file), path), 'utf8')
+  if (!name) return text
+  const match = text.match(
+    new RegExp(`<!-- #region ${name} -->\\n([\\s\\S]*?)\\n<!-- #endregion ${name} -->`),
+  )
+  if (!match) throw new Error(`${relative(root, file)}: no region ${name} in ${path}`)
+  return path.includes('.reference/')
+    ? `<!-- generated -->\n${match[1]}\n<!-- /generated -->`
+    : match[1]
+}
+
 const pages = new Map()
 const inputs = files.map((file) => ({
   file,
-  text: readFileSync(file, 'utf8').replace(/<!-- @include: (.+?) -->/g, (_, path) =>
-    readFileSync(resolve(dirname(file), path), 'utf8'),
+  text: readFileSync(file, 'utf8').replace(/<!-- @include: (.+?) -->/g, (_, target) =>
+    included(file, target),
   ),
   catalog: false,
 }))
@@ -94,8 +107,13 @@ const report = (page, line, message) =>
 for (const [path, page] of pages) {
   let fence = null
   let group = false
+  let generated = false
   page.text.split('\n').forEach((line, index) => {
     const n = index + 1
+    if (line === '<!-- generated -->' || line === '<!-- /generated -->') {
+      generated = line === '<!-- generated -->'
+      return
+    }
     const open = line.match(/^\s*(```+|~~~+)(.*)$/)
     if (open && !fence) {
       fence = open[1]
@@ -115,7 +133,7 @@ for (const [path, page] of pages) {
 
     const prose = line.replace(/`[^`]*`/g, '')
     // Catalog prose is checked in its own repository; keep checking its links here.
-    for (const word of page.catalog ? [] : banned) {
+    for (const word of page.catalog || generated ? [] : banned) {
       const match = prose.match(word)
       if (match) report(page, n, `style: "${match[0]}"`)
     }

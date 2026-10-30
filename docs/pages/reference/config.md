@@ -33,7 +33,7 @@ Guide: [The limanix.toml file](/config/).
 
 ## `[user]`
 
-The regular account inside the guest and its sudo access.
+<!-- @include: ../../.reference/config.md#config-user-about -->
 
 ::: code-group
 
@@ -48,13 +48,13 @@ sudo = true
 
 <!-- @include: ../../.reference/config.md#config-user -->
 
-`name` and `home` are [fixed at creation](#fixed-at-creation). The account uses the numeric UID of your Mac account for shared files; its name can differ from your Mac account's name.
+The account uses the numeric UID of your Mac account for shared files; its name can differ from your Mac account's name.
 
 Guide: [Environment and theme](/config/environment).
 
 ## `[resources]`
 
-Guest architecture and compute resources.
+<!-- @include: ../../.reference/config.md#config-resources-about -->
 
 ::: code-group
 
@@ -69,13 +69,13 @@ disk = "10GiB"
 
 <!-- @include: ../../.reference/config.md#config-resources -->
 
-A size is a positive whole number followed by `GiB`, such as `"8GiB"`. `"8GB"`, `"1.5GiB"`, `"0GiB"` and `"08GiB"` are rejected. `arch` is [fixed at creation](#fixed-at-creation).
+Sizes such as `"8GB"`, `"1.5GiB"`, `"0GiB"` and `"08GiB"` are rejected.
 
 Guide: [Resources and architecture](/vms/resources).
 
 ## `[home]`
 
-Storage on the Mac for the home directory of the guest user.
+<!-- @include: ../../.reference/config.md#config-home-about -->
 
 ::: code-group
 
@@ -88,13 +88,13 @@ root = "~/.limanix"
 
 <!-- @include: ../../.reference/config.md#config-home -->
 
-`root` is [fixed at creation](#fixed-at-creation). `limanix create` prints the path of the managed home, and `limanix list --json` shows it in `home`.
+`limanix create` prints the path of the managed home, and `limanix list --json` shows it in `home`.
 
 Guide: [Files and storage](/vms/storage).
 
 ## `[shell]`
 
-Shell, prompt, editor and multiplexer of the development account.
+<!-- @include: ../../.reference/config.md#config-shell-about -->
 
 ::: code-group
 
@@ -117,7 +117,9 @@ Guides: [Shell](/config/shell), [Dotfiles](/config/dotfiles).
 
 ## `[toolchains]`
 
-Language toolchains, one version each. An empty or omitted key installs none.
+<!-- @include: ../../.reference/config.md#config-toolchains-about -->
+
+An empty or omitted key installs none.
 
 ::: code-group
 
@@ -141,7 +143,7 @@ Guide: [Toolchains](/config/toolchains).
 
 ## `[nixos]`
 
-Modules that configure the guest system, and packages to install.
+<!-- @include: ../../.reference/config.md#config-nixos-about -->
 
 ::: code-group
 
@@ -161,7 +163,7 @@ Guides: [Modules and packages](/config/modules), [The catalog](/modules/).
 
 ## `[theme]`
 
-Colors of the guest.
+<!-- @include: ../../.reference/config.md#config-theme-about -->
 
 ::: code-group
 
@@ -178,7 +180,7 @@ Guide: [Environment and theme](/config/environment).
 
 ## `[network]`
 
-Guest network.
+<!-- @include: ../../.reference/config.md#config-network-about -->
 
 ::: code-group
 
@@ -195,7 +197,7 @@ Guide: [Network](/vms/network).
 
 ## `[network.ports]`
 
-Inbound ports of the guest firewall.
+<!-- @include: ../../.reference/config.md#config-network-ports-about -->
 
 ::: code-group
 
@@ -215,7 +217,7 @@ Guide: [Network](/vms/network).
 
 ## `[env]`
 
-Guest-wide environment for login sessions and for system and user services.
+<!-- @include: ../../.reference/config.md#config-env-about -->
 
 ::: code-group
 
@@ -239,7 +241,9 @@ Guide: [Environment and theme](/config/environment).
 
 ## `[[mounts]]`
 
-Directories of the Mac mounted inside the guest. Each `[[mounts]]` block is one shared folder.
+<!-- @include: ../../.reference/config.md#config-mounts-about -->
+
+Each `[[mounts]]` block is one shared folder.
 
 ::: code-group
 
@@ -279,13 +283,9 @@ Guide: [Shared folders](/config/mounts).
 
 ## Fixed at creation
 
-| Key                                                     | Behavior                                                                |
-| ------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `resources.arch`, `user.name`, `user.home`, `home.root` | `update` rejects a change. Create a new VM and copy the files you need. |
-| `resources.disk`                                        | `update` can raise it. It cannot shrink.                                |
-| `name`                                                  | Another name selects another VM.                                        |
+<!-- @include: ../../.reference/config.md#config-update -->
 
-Every other key changes with `limanix update`, which restarts the VM.
+Another `name` selects another VM. Every other key changes with `limanix update`, which restarts the VM.
 
 ## Defaults
 

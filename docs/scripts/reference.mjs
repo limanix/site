@@ -6,6 +6,30 @@ export const referenceDir = fileURLToPath(new URL('../.reference/', import.meta.
 
 const guestChecks = { 'limanix doctor': 'lmx doctor', 'limanix network check': 'lmx net check' }
 const flagTypes = { string: 'string', strings: 'strings', int: 'integer', uint16: 'integer' }
+const updates = {
+  fixed: [
+    'Fixed at creation',
+    '`limanix update` rejects a change. Create a new VM and copy the files you need.',
+  ],
+  grow: ['Can grow, not shrink', '`limanix update` can raise it. It cannot shrink.'],
+}
+const known = {
+  client: {
+    '': 'commands exit_statuses environment config example',
+    'commands[]': 'name usage about details args checks output columns json',
+    'environment[]': 'id default what',
+    'config[]': 'key type required default choices doc example format update',
+  },
+  lmx: {
+    '': 'commands exit_statuses environment check_statuses status_lines short_words',
+    'commands[]': 'name usage about details args checks privileges',
+  },
+  both: {
+    'commands[].args[]': 'name short value required default values about details',
+    'commands[].args[].values[]': 'name about',
+    'exit_statuses[]': 'status what',
+  },
+}
 
 const cell = (text) =>
   (text ?? '')
@@ -38,6 +62,24 @@ function region(name, body) {
   return `<!-- #region ${name} -->\n${body}\n<!-- #endregion ${name} -->\n\n`
 }
 
+function optional(name, rows, render) {
+  return rows?.length > 0 ? region(name, render(rows)) : ''
+}
+
+function definitions(header, rows) {
+  return table(
+    header,
+    rows.map((row) => [code(row.id), sentence(row.what)]),
+  )
+}
+
+function exitTable(statuses) {
+  return table(
+    ['Status', 'Meaning'],
+    statuses.map(({ status, what }) => [status === null ? 'Other' : code(status), sentence(what)]),
+  )
+}
+
 function either(values) {
   const quoted = values.map(code)
   return quoted.length < 2
@@ -50,28 +92,42 @@ function argumentName(arg) {
 }
 
 const statedDefault = /\s*\[default: ([^\]]+)\]\.?$/
+const isFlag = (arg) => arg.name.startsWith('-')
 
 function argumentDefault(arg) {
   if (arg.required) return 'required'
   if (arg.default !== null) return code(arg.default)
   const stated = statedDefault.exec(arg.about ?? '')
   if (stated) return code(stated[1])
-  return arg.value === null && arg.name.startsWith('-') ? code('false') : 'none'
+  return arg.value === null && isFlag(arg) ? code('false') : 'none'
 }
 
 function argumentAbout(arg) {
-  return sentence((arg.about ?? '').replace(statedDefault, ''))
+  return [sentence((arg.about ?? '').replace(statedDefault, '')), sentence(arg.details)]
+    .filter(Boolean)
+    .join(' ')
+}
+
+function argumentRow(arg) {
+  return [
+    argumentName(arg),
+    arg.value === null ? 'boolean' : (flagTypes[arg.value] ?? arg.value),
+    argumentDefault(arg),
+    argumentAbout(arg),
+  ]
 }
 
 export function flagsTable(entry) {
   return table(
     ['Flag', 'Type', 'Default', 'Description'],
-    entry.args.map((arg) => [
-      argumentName(arg),
-      arg.value === null ? 'boolean' : (flagTypes[arg.value] ?? arg.value),
-      argumentDefault(arg),
-      argumentAbout(arg),
-    ]),
+    entry.args.filter(isFlag).map(argumentRow),
+  )
+}
+
+function positionalsTable(entry) {
+  return table(
+    ['Argument', 'Type', 'Default', 'Description'],
+    entry.args.filter((arg) => !isFlag(arg)).map(argumentRow),
   )
 }
 
@@ -124,37 +180,88 @@ function about(entry) {
 }
 
 export function renderCli(client, lmx) {
-  return client.commands
-    .map((entry) =>
-      [
+  return [
+    ...client.commands.map((entry) => {
+      const name = slug(entry.name)
+      return [
         about(entry),
-        region(`${slug(entry.name)}-usage`, `\`\`\`sh [Mac]\n${entry.usage}\n\`\`\``),
-        entry.args.length > 0 ? region(slug(entry.name), flagsTable(entry)) : '',
-        entry.checks.length > 0
-          ? region(`${slug(entry.name)}-checks`, checksTable(entry, lmx))
-          : '',
-      ].join(''),
-    )
-    .join('')
+        region(`${name}-usage`, `\`\`\`sh [Mac]\n${entry.usage}\n\`\`\``),
+        optional(
+          `${name}-arguments`,
+          entry.args.filter((arg) => !isFlag(arg)),
+          () => positionalsTable(entry),
+        ),
+        optional(name, entry.args.filter(isFlag), () => flagsTable(entry)),
+        optional(`${name}-values`, valuesTables(entry), (values) => values),
+        optional(`${name}-checks`, entry.checks, () => checksTable(entry, lmx)),
+        optional(
+          `${name}-output`,
+          entry.output,
+          (lines) => `\`\`\`text [Output]\n${lines.join('\n')}\n\`\`\``,
+        ),
+        optional(`${name}-columns`, entry.columns, (rows) =>
+          definitions(['Column', 'Content'], rows),
+        ),
+        optional(`${name}-json`, entry.json, (rows) => definitions(['Field', 'Value'], rows)),
+      ].join('')
+    }),
+    optional('limanix-exit-statuses', client.exit_statuses, exitTable),
+    optional('limanix-environment', client.environment, (rows) =>
+      table(
+        ['Variable', 'Default', 'Description'],
+        rows.map((row) => [code(row.id), code(row.default), sentence(row.what)]),
+      ),
+    ),
+  ].join('')
 }
 
 export function renderLmx(lmx) {
-  return lmx.commands
-    .map((entry) => {
-      const values = valuesTables(entry)
+  return [
+    ...lmx.commands.map((entry) => {
+      const name = slug(entry.name)
       return [
         about(entry),
-        entry.args.length > 0 ? region(slug(entry.name), argumentsTable(entry)) : '',
-        values ? region(`${slug(entry.name)}-values`, values) : '',
-        entry.checks.length > 0 ? region(`${slug(entry.name)}-checks`, lmxChecksTable(entry)) : '',
+        optional(`${name}-usage`, entry.usage, (usage) => `\`\`\`sh [VM]\n${usage}\n\`\`\``),
+        optional(name, entry.args, () => argumentsTable(entry)),
+        optional(`${name}-values`, valuesTables(entry), (values) => values),
+        optional(`${name}-checks`, entry.checks, () => lmxChecksTable(entry)),
       ].join('')
-    })
-    .join('')
+    }),
+    optional(
+      'lmx-privileges',
+      lmx.commands.filter((entry) => entry.privileges),
+      (rows) =>
+        table(
+          ['Command', 'Needs'],
+          rows.map((entry) => [code(entry.name), sentence(entry.privileges)]),
+        ),
+    ),
+    optional('lmx-exit-statuses', lmx.exit_statuses, exitTable),
+    optional('lmx-environment', lmx.environment, (rows) =>
+      definitions(['Variable', 'Description'], rows),
+    ),
+    optional('lmx-check-statuses', lmx.check_statuses, (rows) =>
+      definitions(['Status', 'Meaning'], rows),
+    ),
+    optional('lmx-status-lines', lmx.status_lines, (rows) => definitions(['Line', 'Shows'], rows)),
+    optional('lmx-short-words', lmx.short_words, (rows) => definitions(['Word', 'Meaning'], rows)),
+  ].join('')
 }
 
 function configDefault(field) {
   if (field.default !== null) return code(field.default)
   return field.required ? 'required' : '—'
+}
+
+function configAbout(field) {
+  const update = updates[field.update]
+  return [
+    sentence(field.doc),
+    sentence(field.format),
+    update ? `[${update[0]}](#fixed-at-creation).` : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 }
 
 export function configTable(fields, prefix) {
@@ -169,12 +276,14 @@ export function configTable(fields, prefix) {
       code(field.key.slice(field.key.lastIndexOf('.') + 1)),
       field.choices.length > 0 ? either(field.choices.map((choice) => `"${choice}"`)) : field.type,
       configDefault(field),
-      sentence(field.doc),
+      configAbout(field),
     ]),
   )
 }
 
 export function renderConfig(client) {
+  const unknown = client.config.find((field) => field.update && !updates[field.update])
+  if (unknown) throw new Error(`Unknown update rule of ${unknown.key}: ${unknown.update}`)
   const tables = [
     '',
     ...client.config
@@ -182,11 +291,43 @@ export function renderConfig(client) {
       .map((field) => (field.type === 'array of tables' ? `${field.key}[]` : field.key)),
   ]
   return [
+    ...client.config
+      .filter((field) => field.type.startsWith('table') || field.type === 'array of tables')
+      .map((field) => region(`config-${slug(field.key)}-about`, sentence(field.doc))),
     ...tables.map((prefix) =>
       region(`config-${slug(prefix) || 'top'}`, configTable(client.config, prefix)),
     ),
+    optional(
+      'config-update',
+      Object.entries(updates)
+        .map(([rule, [, behavior]]) => [
+          client.config
+            .filter((field) => field.update === rule)
+            .map((field) => code(field.key))
+            .join(', '),
+          behavior,
+        ])
+        .filter(([keys]) => keys),
+      (rows) => table(['Key', 'Behavior'], rows),
+    ),
     region('config-example', `\`\`\`toml [limanix.toml]\n${client.example.trimEnd()}\n\`\`\``),
   ].join('')
+}
+
+function checkFields(source, data, path = '') {
+  if (Array.isArray(data)) {
+    for (const item of data) checkFields(source, item, `${path}[]`)
+    return
+  }
+  if (data === null || typeof data !== 'object') return
+  const fields = (known[source][path] ?? known.both[path] ?? 'id what').split(' ')
+  for (const [key, value] of Object.entries(data)) {
+    const field = path ? `${path}.${key}` : key
+    if (!fields.includes(key)) {
+      throw new Error(`Unknown field ${field} in the ${source} reference.json`)
+    }
+    checkFields(source, value, field)
+  }
 }
 
 async function download(url) {
@@ -210,6 +351,7 @@ export async function loadSources(env = process.env) {
     throw new Error(`Invalid client release: ${clientRef}`)
   }
   const client = await readJSON(env.CLIENT_ROOT, 'limanix/client', clientRef, 'reference.json')
+  checkFields('client', client)
   const pin = await readJSON(
     env.CLIENT_ROOT,
     'limanix/client',
@@ -218,6 +360,7 @@ export async function loadSources(env = process.env) {
   )
   const lmxRef = env.LMX_ROOT ? 'local' : `v${pin.version}`
   const lmx = await readJSON(env.LMX_ROOT, 'limanix/lmx', lmxRef, 'reference.json')
+  checkFields('lmx', lmx)
   return { client: { ...client, ref: clientRef }, lmx: { ...lmx, ref: lmxRef } }
 }
 

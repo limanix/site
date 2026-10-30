@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { loadCatalog } from './catalog.mjs'
+import { referenceDir } from './reference.mjs'
 
 const root = process.argv[2] ?? 'pages'
 
@@ -35,6 +36,7 @@ const route = (file) =>
 
 const isFence = (line) => /^\s*(```|~~~)/.test(line)
 
+const shown = new Set()
 const included = (file, target) => {
   const [path, name] = target.split('#')
   const text = readFileSync(resolve(dirname(file), path), 'utf8')
@@ -43,9 +45,9 @@ const included = (file, target) => {
     new RegExp(`<!-- #region ${name} -->\\n([\\s\\S]*?)\\n<!-- #endregion ${name} -->`),
   )
   if (!match) throw new Error(`${relative(root, file)}: no region ${name} in ${path}`)
-  return path.includes('.reference/')
-    ? `<!-- generated -->\n${match[1]}\n<!-- /generated -->`
-    : match[1]
+  if (!path.includes('.reference/')) return match[1]
+  shown.add(match[1])
+  return `<!-- generated -->\n${match[1]}\n<!-- /generated -->`
 }
 
 const pages = new Map()
@@ -151,6 +153,15 @@ for (const [path, page] of pages) {
       else if (hash && !dest.anchors.has(hash)) report(page, n, `no such anchor: ${href}`)
     }
   })
+}
+
+for (const name of readdirSync(referenceDir)) {
+  const text = readFileSync(join(referenceDir, name), 'utf8')
+  for (const [, region, body] of text.matchAll(
+    /<!-- #region (\S+) -->\n([\s\S]*?)\n<!-- #endregion \1 -->/g,
+  )) {
+    if (!shown.has(body)) problems.push(`.reference/${name}: region ${region} is on no page`)
+  }
 }
 
 if (problems.length) {

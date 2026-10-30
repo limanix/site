@@ -12,37 +12,25 @@ description: Every command, argument and flag of the limanix command on the Mac,
 
 ::: code-group
 
-```sh [Mac]
-limanix COMMAND [ARGUMENTS] [FLAGS]
-```
+<!-- @include: ../../.reference/cli.md#limanix-usage -->
 
 :::
 
 `limanix` without a command prints its help. `create` and `update` take the VM name from the `name` setting of the file you pass with `--config`; the other VM commands take the name as an argument.
 
-| Flag              | Type    | Default | Description                                                      |
-| ----------------- | ------- | ------- | ---------------------------------------------------------------- |
-| `-h`, `--help`    | boolean | `false` | Print the help of `limanix` or of the command it follows.        |
-| `-v`, `--version` | boolean | `false` | Print the version of the client. Only `limanix` itself takes it. |
+<!-- @include: ../../.reference/cli.md#limanix -->
+
+Only `limanix` itself takes `-v`.
 
 Results go to standard output. Errors, as `limanix: MESSAGE`, and the build output of `create` and `update` go to standard error. For scripts, `list` and `modules list` take `-q` to print only names, and every command with a result takes `--json`; see [Use LimaNix in scripts](/vms/#use-limanix-in-scripts).
 
 ### Exit status
 
-| Status | Meaning                                                                                                                           |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| `0`    | Success.                                                                                                                          |
-| `1`    | The command failed. `limanix doctor` and `limanix network check` also exit with `1`, after printing every check, when one failed. |
-| `2`    | Usage error, such as an unknown command, a missing argument, a missing `--config`, or `-q` with `--json`.                         |
-| `130`  | The command was interrupted, for example with Ctrl-C.                                                                             |
-| Other  | `limanix shell` exits with the status of the guest command or shell.                                                              |
+<!-- @include: ../../.reference/cli.md#limanix-exit-statuses -->
 
 ### Environment variables
 
-| Variable       | Default                                 | Description                                                                                         |
-| -------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `LIMANIX_HOME` | `~/Library/Application Support/Limanix` | LimaNix state: VM records, prepared configurations and imported modules.                            |
-| `LIMA_HOME`    | `~/.lima`                               | Lima's instances, each in a directory with its host agent logs `ha.stdout.log` and `ha.stderr.log`. |
+<!-- @include: ../../.reference/cli.md#limanix-environment -->
 
 Neither variable moves existing VMs or homes. Use the same values for every command that works on an existing VM. [Paths and ports](/reference/paths) lists what each folder holds.
 
@@ -58,7 +46,15 @@ Neither variable moves existing VMs or homes. Use the same values for every comm
 
 <!-- @include: ../../.reference/cli.md#limanix-create -->
 
-`create` reads the VM name from the file, allocates the VM and its managed home, builds the NixOS system, restarts the VM into it and checks the development account. It prints the build output to standard error, then `Created NAME. Managed home: PATH`, or the VM as JSON with `--json`. It downloads the base image when needed; the first run needs network access for the image and the Nix dependencies.
+`create` reads the VM name from the file, allocates the VM and its managed home, builds the NixOS system, restarts the VM into it and checks the development account. It downloads the base image when needed; the first run needs network access for the image and the Nix dependencies. It prints the build output to standard error, then:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-create-output -->
+
+:::
+
+With `--json`, it prints the VM as an object with the fields of [`limanix list --json`](#limanix-list).
 
 A name that already has saved state is rejected with `VM 'NAME' already has state; use update or delete`. When `create` fails after the VM exists, `limanix list` shows it with the state `error`: fix the problem and run `limanix update` with the same file.
 
@@ -76,7 +72,15 @@ Guide: [Using virtual machines](/vms/).
 
 <!-- @include: ../../.reference/cli.md#limanix-update -->
 
-`update` selects the VM by the `name` in the file, keeps its disk and managed home, builds the new system in the VM and restarts it. It prints the build output to standard error, then `Updated NAME.`, or the VM as JSON with `--json`. The VM is running afterwards, even if it was stopped before.
+`update` selects the VM by the `name` in the file, keeps its disk and managed home, builds the new system in the VM and restarts it. The VM is running afterwards, even if it was stopped before. It prints the build output to standard error, then:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-update-output -->
+
+:::
+
+With `--json`, it prints the VM as an object with the fields of [`limanix list --json`](#limanix-list).
 
 - A running VM keeps running during the build and restarts once, after it. A stopped VM, or one whose disk or memory grows, gets the new Lima settings before the build.
 - A failed build does not restart the VM, which keeps its current system and environment files. Steps before the failure are not undone: Lima settings applied before the build stay. A failure after the build can leave the VM stopped.
@@ -95,13 +99,19 @@ Guide: [Changing a VM](/vms/update).
 
 :::
 
-| Argument | Type   | Default  | Description |
-| -------- | ------ | -------- | ----------- |
-| `NAME`   | string | required | VM name.    |
+<!-- @include: ../../.reference/cli.md#limanix-start-arguments -->
 
 <!-- @include: ../../.reference/cli.md#limanix-start -->
 
-`start` boots the saved VM and prints `Started NAME.`, or the VM as JSON with `--json`. It does not read `limanix.toml`, rebuild the system or reset an earlier operation error: `limanix update` does that.
+`start` boots the saved VM and prints:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-start-output -->
+
+:::
+
+With `--json`, it prints the VM as an object with the fields of [`limanix list --json`](#limanix-list). `start` does not read `limanix.toml`, rebuild the system or reset an earlier operation error: `limanix update` does that.
 
 Guide: [Using virtual machines](/vms/).
 
@@ -115,13 +125,19 @@ Guide: [Using virtual machines](/vms/).
 
 :::
 
-| Argument | Type   | Default  | Description |
-| -------- | ------ | -------- | ----------- |
-| `NAME`   | string | required | VM name.    |
+<!-- @include: ../../.reference/cli.md#limanix-stop-arguments -->
 
 <!-- @include: ../../.reference/cli.md#limanix-stop -->
 
-`stop` shuts the VM down and prints `Stopped NAME.`, or the VM as JSON with `--json`. Running processes in the VM end.
+`stop` shuts the VM down, and the running processes in the VM end. It prints:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-stop-output -->
+
+:::
+
+With `--json`, it prints the VM as an object with the fields of [`limanix list --json`](#limanix-list).
 
 Guide: [Using virtual machines](/vms/).
 
@@ -135,10 +151,7 @@ Guide: [Using virtual machines](/vms/).
 
 :::
 
-| Argument      | Type    | Default  | Description                                                                                         |
-| ------------- | ------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `NAME`        | string  | required | VM name.                                                                                            |
-| `COMMAND ...` | strings | none     | Guest command and its arguments, after `--`. They reach the guest unchanged, without a guest shell. |
+<!-- @include: ../../.reference/cli.md#limanix-shell-arguments -->
 
 <!-- @include: ../../.reference/cli.md#limanix-shell -->
 
@@ -172,13 +185,7 @@ Guide: [Shell and sessions](/vms/shell).
 
 <!-- @include: ../../.reference/cli.md#limanix-list -->
 
-| Column    | Content                                                                                                                                                                 |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NAME`    | VM name.                                                                                                                                                                |
-| `STATUS`  | Lima's power state, such as `Running` or `Stopped`. `Missing` when no Lima instance matches the saved VM, or its identity record cannot be read.                        |
-| `STATE`   | The last LimaNix operation: `ready`, `error` or `interrupted`; `creating`, `updating` or `deleting` while one runs; `corrupt` when the operation record cannot be read. |
-| `ADDRESS` | The guest's IPv4 address on the shared network, or `-` when none was read.                                                                                              |
-| `DISK`    | Used share of the guest disk, by bytes or, when they are scarcer, by inodes, such as `97% inodes`. `-` when the VM is stopped or did not answer.                        |
+<!-- @include: ../../.reference/cli.md#limanix-list-columns -->
 
 Under a row, `list` prints the saved error of the last operation and a notice that says what to do, such as `the guest has no lmx yet; run limanix update`. `ADDRESS` and `DISK` come from `lmx status`, which `list` runs in each running VM with a 10-second limit. Without VMs, it prints `No VMs managed by Limanix.`
 
@@ -186,20 +193,7 @@ Under a row, `list` prints the saved error of the last operation and a notice th
 
 `--json` prints an array with one object per VM:
 
-| Field       | Value                                                                                         |
-| ----------- | --------------------------------------------------------------------------------------------- |
-| `name`      | VM name.                                                                                      |
-| `status`    | As `STATUS`; `null` when no Lima instance matches.                                            |
-| `state`     | As `STATE`; `null` when the operation record cannot be read.                                  |
-| `arch`      | Guest architecture, `arm64` or `amd64`.                                                       |
-| `address`   | Guest IPv4 address, or an empty string.                                                       |
-| `disk`      | `bytes`, `free_bytes`, `inodes` and `free_inodes` of the guest disk, or `null` when not read. |
-| `home`      | Path of the managed home on the Mac.                                                          |
-| `lima_name` | Name of the Lima instance.                                                                    |
-| `error`     | Saved error of the last operation, or `null`.                                                 |
-| `notice`    | What to do to make the guest answer. Present only when there is a notice.                     |
-
-`arch`, `home`, `lima_name` and `status` are `null` when the VM's identity record cannot be read.
+<!-- @include: ../../.reference/cli.md#limanix-list-json -->
 
 Guide: [Using virtual machines](/vms/).
 
@@ -213,9 +207,7 @@ Guide: [Using virtual machines](/vms/).
 
 :::
 
-| Argument | Type   | Default  | Description |
-| -------- | ------ | -------- | ----------- |
-| `NAME`   | string | required | VM name.    |
+<!-- @include: ../../.reference/cli.md#limanix-doctor-arguments -->
 
 <!-- @include: ../../.reference/cli.md#limanix-doctor -->
 
@@ -223,7 +215,9 @@ Guide: [Using virtual machines](/vms/).
 
 <!-- @include: ../../.reference/cli.md#limanix-doctor-checks -->
 
-A VM that is stopped, or that another `limanix` command is changing, shows only `vm`. `doctor` does not repair or restart anything, and a warning does not fail it. `--json` prints an object with `name` and `checks`, each check with `check`, `status`, `message` and, when there is one, `hint`.
+A VM that is stopped, or that another `limanix` command is changing, shows only `vm`. `doctor` does not repair or restart anything, and a warning does not fail it. `--json` prints an object with these fields:
+
+<!-- @include: ../../.reference/cli.md#limanix-doctor-json -->
 
 Guide: [Using virtual machines](/vms/). Problems by symptom: [Troubleshooting](/troubleshooting).
 
@@ -237,13 +231,21 @@ Guide: [Using virtual machines](/vms/). Problems by symptom: [Troubleshooting](/
 
 :::
 
-| Argument | Type   | Default  | Description |
-| -------- | ------ | -------- | ----------- |
-| `NAME`   | string | required | VM name.    |
+<!-- @include: ../../.reference/cli.md#limanix-delete-arguments -->
 
 <!-- @include: ../../.reference/cli.md#limanix-delete -->
 
-`delete` stops a running VM, then removes its guest disk, its Lima instance and its saved record. It prints `Deleted NAME.` and, without `--remove-home`, `Preserved managed home: PATH`. With `--json`, it prints an object with `name` and `home`, the path of the preserved home, or `null` with `--remove-home`. It also removes the record of a VM whose Lima instance is already missing.
+`delete` stops a running VM, then removes its guest disk, its Lima instance and its saved record. It also removes the record of a VM whose Lima instance is already missing. It prints these lines, the second one only without `--remove-home`:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-delete-output -->
+
+:::
+
+With `--json`, it prints an object with these fields:
+
+<!-- @include: ../../.reference/cli.md#limanix-delete-json -->
 
 - There is no confirmation prompt.
 - Your `limanix.toml` and the folders shared with `[[mounts]]` stay on the Mac.
@@ -255,6 +257,12 @@ Guide: [Files and storage](/vms/storage).
 ## `limanix network`
 
 <!-- @include: ../../.reference/cli.md#limanix-network-about -->
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-network-usage -->
+
+:::
 
 `limanix network` without a subcommand prints its help.
 
@@ -289,10 +297,7 @@ Guide: [Resources and architecture](/vms/resources).
 
 :::
 
-| Argument | Type    | Default  | Description                  |
-| -------- | ------- | -------- | ---------------------------- |
-| `NAME`   | string  | required | VM name.                     |
-| `PORT`   | integer | required | Port number from 1 to 65535. |
+<!-- @include: ../../.reference/cli.md#limanix-network-check-arguments -->
 
 <!-- @include: ../../.reference/cli.md#limanix-network-check -->
 
@@ -300,7 +305,9 @@ The checks run in this order:
 
 <!-- @include: ../../.reference/cli.md#limanix-network-check-checks -->
 
-`--json` prints an object with `name`, `port`, `protocol` and `checks`, as in `limanix doctor`.
+`--json` prints an object with these fields:
+
+<!-- @include: ../../.reference/cli.md#limanix-network-check-json -->
 
 ::: code-group
 
@@ -315,6 +322,12 @@ Guide: [Network](/vms/network).
 ## `limanix modules`
 
 <!-- @include: ../../.reference/cli.md#limanix-modules-about -->
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-modules-usage -->
+
+:::
 
 `limanix modules` without a subcommand is a usage error.
 
@@ -340,13 +353,7 @@ Each row shows a selector, its kind and its description, or the error of an impo
 
 The list comes from the catalog built into the client and from your imported modules. It does not download anything or evaluate Nix code. `--json` prints an array of objects with these fields:
 
-| Field         | Value                                                                          |
-| ------------- | ------------------------------------------------------------------------------ |
-| `name`        | Full selector, such as `lmx:docker`, `lmx:go-1.27` or `third-party:my-tools`.  |
-| `source`      | `lmx` or `third-party`.                                                        |
-| `kind`        | `modules`, `toolchains` or `shell`. Imported modules are `modules`.            |
-| `description` | Catalog description, or `Locally imported NixOS module`.                       |
-| `error`       | `null`, or a diagnostic for an imported module that fails the registry checks. |
+<!-- @include: ../../.reference/cli.md#limanix-modules-list-json -->
 
 Guide: [The catalog](/modules/).
 
@@ -360,12 +367,17 @@ Guide: [The catalog](/modules/).
 
 :::
 
-| Argument    | Type   | Default  | Description                                                                                                                                         |
-| ----------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NAME`      | string | required | Module name without `third-party:`: up to 63 lowercase letters, digits and single hyphens, with every hyphen-separated part starting with a letter. |
-| `DIRECTORY` | string | required | Directory with a regular file named `default.nix` at its root. It may be relative, absolute or start with `~`.                                      |
+<!-- @include: ../../.reference/cli.md#limanix-modules-add-arguments -->
 
-`add` copies the whole directory, hidden files included, into the module registry and prints `Imported third-party:NAME.` Select it in `limanix.toml` as `third-party:NAME`.
+`add` copies the whole directory, hidden files included, into the module registry and prints:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-modules-add-output -->
+
+:::
+
+Select it in `limanix.toml` as `third-party:NAME`.
 
 - It checks the structure, not the Nix code: errors in the code appear when a VM is built.
 - Symlinks and special files inside the directory are rejected.
@@ -384,11 +396,17 @@ Guide: [Your own modules](/modules/custom).
 
 :::
 
-| Argument | Type   | Default  | Description                                         |
-| -------- | ------ | -------- | --------------------------------------------------- |
-| `NAME`   | string | required | Name of an imported module, without `third-party:`. |
+<!-- @include: ../../.reference/cli.md#limanix-modules-remove-arguments -->
 
-`remove` prints `Removed third-party:NAME from the catalog.` It removes only imported modules; the `lmx:` modules belong to the client. A VM that selects the module keeps its current system, but its next `create` or `update` fails until you import the module again or remove the selector.
+`remove` prints:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-modules-remove-output -->
+
+:::
+
+It removes only imported modules; the `lmx:` modules belong to the client. A VM that selects the module keeps its current system, but its next `create` or `update` fails until you import the module again or remove the selector.
 
 Guide: [Your own modules](/modules/custom).
 
@@ -402,28 +420,28 @@ Guide: [Your own modules](/modules/custom).
 
 :::
 
-| Argument | Type   | Default           | Description                                      |
-| -------- | ------ | ----------------- | ------------------------------------------------ |
-| `PATH`   | string | current directory | Existing directory to write `limanix.toml` into. |
+<!-- @include: ../../.reference/cli.md#limanix-first-config-arguments -->
 
-`first-config` writes the [defaults](/reference/config#defaults) with a comment for each setting, then prints `Wrote` and the path of the file. It does not create missing directories.
+`first-config` writes the [defaults](/reference/config#defaults) with a comment for each setting, then prints:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-first-config-output -->
+
+:::
+
+It does not create missing directories.
 
 Guide: [The limanix.toml file](/config/).
 
 ## `limanix help`
 
-Print the help of a command.
+<!-- @include: ../../.reference/cli.md#limanix-help-about -->
 
 ::: code-group
 
-```sh [Mac]
-limanix help [COMMAND ...]
-```
+<!-- @include: ../../.reference/cli.md#limanix-help-usage -->
 
 :::
 
-| Argument      | Type    | Default | Description                                  |
-| ------------- | ------- | ------- | -------------------------------------------- |
-| `COMMAND ...` | strings | none    | Command to explain, such as `network check`. |
-
-`limanix help COMMAND` is the same as `limanix COMMAND --help`. Without a command, it prints the help of `limanix`.
+<!-- @include: ../../.reference/cli.md#limanix-help-arguments -->

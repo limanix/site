@@ -12,44 +12,29 @@ description: Every command and option of lmx, the command inside each LimaNix VM
 
 ::: code-group
 
-```sh [VM]
-lmx [COMMAND]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-usage -->
 
 :::
 
 `lmx` without a command, `lmx --help` and `lmx -h` print the guest help page: the VM, your account, the selected modules, and the commands inside the VM and on the Mac. `lmx COMMAND --help` prints the options of one command.
 
-| Option            | Description                                                       |
-| ----------------- | ----------------------------------------------------------------- |
-| `-h`, `--help`    | Print the guest help page, or the help of the command it follows. |
-| `-V`, `--version` | Print the version of `lmx`.                                       |
+<!-- @include: ../../.reference/lmx.md#lmx -->
 
 `--json`, on the commands that take it, answers with the JSON host contract instead of text: one line with `contract`, `ok`, and `data` or `error`. `limanix` on the Mac reads these answers.
 
-Colors follow `[theme]` in `limanix.toml`. Output that does not go to a terminal, `NO_COLOR` and `TERM=dumb` turn them off.
+Colors follow `[theme]` in `limanix.toml`. Output that does not go to a terminal has no colors, and these variables turn them off:
+
+<!-- @include: ../../.reference/lmx.md#lmx-environment -->
 
 ### Privileges
 
-| Command                                              | Needs                                                                                                   |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `lmx store reserve`, `lmx apply`, `lmx apply cancel` | Root, with `sudo`, and a running `lmxd`.                                                                |
-| `lmx status --wait`                                  | A running `lmxd`.                                                                                       |
-| `lmx logs`                                           | Root, or membership in the `wheel` or `systemd-journal` group, which may read the journal of `lmxd`.    |
-| `lmx dotfiles link`                                  | The development account. It refuses any other user, root included.                                      |
-| `lmx status`, `lmx doctor`, `lmx net check`          | Nothing. With `sudo` they read more: the generation the Mac selected, and the processes of other users. |
-| Every other command                                  | Nothing.                                                                                                |
+<!-- @include: ../../.reference/lmx.md#lmx-privileges -->
+
+Every other command needs nothing.
 
 ### Exit status
 
-| Status | Meaning                                                                                           |
-| ------ | ------------------------------------------------------------------------------------------------- |
-| `0`    | Success.                                                                                          |
-| `1`    | The command failed, or a check of `lmx doctor` or `lmx net check` failed.                         |
-| `2`    | Usage error.                                                                                      |
-| `3`    | `lmxd` is unavailable. Only `store reserve`, `apply`, `apply cancel` and `status --wait` need it. |
-| `127`  | `lmx session` or `limanix-session` found no session provider.                                     |
-| `130`  | The apply was cancelled.                                                                          |
+<!-- @include: ../../.reference/lmx.md#lmx-exit-statuses -->
 
 ## `lmx help`
 
@@ -57,9 +42,7 @@ Colors follow `[theme]` in `limanix.toml`. Output that does not go to a terminal
 
 ::: code-group
 
-```sh [VM]
-lmx help [TOPIC]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-help-usage -->
 
 :::
 
@@ -73,9 +56,7 @@ Without a topic, `lmx help` prints the guest help page, whose `lmx help TOPIC` l
 
 ::: code-group
 
-```sh [VM]
-lmx info
-```
+<!-- @include: ../../.reference/lmx.md#lmx-info-usage -->
 
 :::
 
@@ -87,9 +68,7 @@ lmx info
 
 ::: code-group
 
-```sh [VM]
-lmx welcome
-```
+<!-- @include: ../../.reference/lmx.md#lmx-welcome-usage -->
 
 :::
 
@@ -101,11 +80,7 @@ The welcome appears once per session when the development account opens an inter
 
 ::: code-group
 
-```sh [VM]
-lmx status [--json]
-lmx status --short
-lmx status --wait converged --generation GENERATION [--timeout DURATION] [--json]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-status-usage -->
 
 :::
 
@@ -113,29 +88,13 @@ lmx status --wait converged --generation GENERATION [--timeout DURATION] [--json
 
 <!-- @include: ../../.reference/lmx.md#lmx-status-values -->
 
-| Line           | Shows                                                                                                                      |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `Generation`   | The generation the Mac selected (`desired`), the one built for the next boot (`built`) and the one running now (`booted`). |
-| `Disk`         | Free space on the disk that holds the Nix store. On a file system with an inode table, free inodes too.                    |
-| `Network`      | The guest's interfaces and addresses.                                                                                      |
-| `Failed units` | systemd units that failed.                                                                                                 |
-| `Owner`        | The version of `lmxd` and what it is doing.                                                                                |
-| `Condition`    | What needs attention and why, when something does.                                                                         |
-| `Problem`      | Why a fact could not be read. That fact shows `unknown`; the other lines still show.                                       |
+<!-- @include: ../../.reference/lmx.md#lmx-status-lines -->
 
 Without `sudo`, the generation the Mac selected may show as `unknown`: its mount is readable only by root.
 
 `--short` prints one word per thing that needs attention, and nothing while all is well. It never waits more than 200 ms for `lmxd` and exits with status `0`.
 
-| Word       | Meaning                                                  |
-| ---------- | -------------------------------------------------------- |
-| `degraded` | The running generation failed its health check.          |
-| `finalize` | The update works, but removing older generations failed. |
-| `disk-low` | Less than 10% of the store disk is free.                 |
-| `restart`  | A new generation is built and waits for a restart.       |
-| `applying` | An update is being built now.                            |
-| `apply`    | The Mac selected a generation that is not built yet.     |
-| `lmxd?`    | `lmxd` did not answer within 200 ms.                     |
+<!-- @include: ../../.reference/lmx.md#lmx-short-words -->
 
 `--wait` asks `lmxd` every two seconds until the generation is converged, then answers as `lmx status` does. A failed finalize of that generation ends the wait at once. At the timeout, the command fails. `limanix update` runs it after it restarts the VM.
 
@@ -145,9 +104,7 @@ Without `sudo`, the generation the Mac selected may show as `unknown`: its mount
 
 ::: code-group
 
-```sh [VM]
-lmx doctor [--json]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-doctor-usage -->
 
 :::
 
@@ -157,12 +114,7 @@ Each line is one check: its status, its name and a message, with what to do on a
 
 <!-- @include: ../../.reference/lmx.md#lmx-doctor-checks -->
 
-| Status    | Meaning                                                               |
-| --------- | --------------------------------------------------------------------- |
-| `ok`      | Fine.                                                                 |
-| `warning` | Worth knowing; nothing is broken.                                     |
-| `failed`  | Broken. The command exits with status `1`.                            |
-| `unknown` | Your account cannot read what the check needs. Run `sudo lmx doctor`. |
+<!-- @include: ../../.reference/lmx.md#lmx-check-statuses -->
 
 `lmx doctor` works without `lmxd`. On the Mac, [`limanix doctor NAME`](/reference/cli#limanix-doctor) runs the same checks and adds the VM and its address.
 
@@ -170,15 +122,19 @@ Each line is one check: its status, its name and a message, with what to do on a
 
 <!-- @include: ../../.reference/lmx.md#lmx-net-about -->
 
+::: code-group
+
+<!-- @include: ../../.reference/lmx.md#lmx-net-usage -->
+
+:::
+
 ### `lmx net check`
 
 <!-- @include: ../../.reference/lmx.md#lmx-net-check-about -->
 
 ::: code-group
 
-```sh [VM]
-lmx net check PORT [--udp] [--json]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-net-check-usage -->
 
 :::
 
@@ -194,9 +150,7 @@ The command exits with status `1` when a check failed. Run it with `sudo` to see
 
 ::: code-group
 
-```sh [VM]
-sudo lmx logs KIND [--previous]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-logs-usage -->
 
 :::
 
@@ -215,9 +169,7 @@ Use `sudo lmx logs apply --previous` when the build ran in the boot immediately 
 
 ::: code-group
 
-```sh [VM]
-lmx version [--json]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-version-usage -->
 
 :::
 
@@ -229,15 +181,19 @@ It prints `lmx VERSION (host contract N)`.
 
 <!-- @include: ../../.reference/lmx.md#lmx-store-about -->
 
+::: code-group
+
+<!-- @include: ../../.reference/lmx.md#lmx-store-usage -->
+
+:::
+
 ### `lmx store reserve`
 
 <!-- @include: ../../.reference/lmx.md#lmx-store-reserve-about -->
 
 ::: code-group
 
-```sh [VM]
-sudo lmx store reserve [--json]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-store-reserve-usage -->
 
 :::
 
@@ -251,9 +207,7 @@ When less than 20% of the store disk is free, `lmxd` collects the store paths th
 
 ::: code-group
 
-```sh [VM]
-sudo lmx apply --generation GENERATION [--follow] [--json]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-apply-usage -->
 
 :::
 
@@ -267,9 +221,7 @@ sudo lmx apply --generation GENERATION [--follow] [--json]
 
 ::: code-group
 
-```sh [VM]
-sudo lmx apply cancel --generation GENERATION [--json]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-apply-cancel-usage -->
 
 :::
 
@@ -281,15 +233,19 @@ sudo lmx apply cancel --generation GENERATION [--json]
 
 <!-- @include: ../../.reference/lmx.md#lmx-clipboard-about -->
 
+::: code-group
+
+<!-- @include: ../../.reference/lmx.md#lmx-clipboard-usage -->
+
+:::
+
 ### `lmx clipboard copy`
 
 <!-- @include: ../../.reference/lmx.md#lmx-clipboard-copy-about -->
 
 ::: code-group
 
-```sh [VM]
-lmx clipboard copy < FILE
-```
+<!-- @include: ../../.reference/lmx.md#lmx-clipboard-copy-usage -->
 
 :::
 
@@ -303,9 +259,7 @@ Guide: [Clipboard](/inside/clipboard).
 
 ::: code-group
 
-```sh [VM]
-lmx clipboard paste
-```
+<!-- @include: ../../.reference/lmx.md#lmx-clipboard-paste-usage -->
 
 :::
 
@@ -319,9 +273,7 @@ Guide: [Clipboard](/inside/clipboard).
 
 ::: code-group
 
-```sh [VM]
-lmx session NAME
-```
+<!-- @include: ../../.reference/lmx.md#lmx-session-usage -->
 
 :::
 
@@ -335,15 +287,19 @@ Guide: [Shell and sessions](/vms/shell).
 
 <!-- @include: ../../.reference/lmx.md#lmx-dotfiles-about -->
 
+::: code-group
+
+<!-- @include: ../../.reference/lmx.md#lmx-dotfiles-usage -->
+
+:::
+
 ### `lmx dotfiles status`
 
 <!-- @include: ../../.reference/lmx.md#lmx-dotfiles-status-about -->
 
 ::: code-group
 
-```sh [VM]
-lmx dotfiles [status]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-dotfiles-status-usage -->
 
 :::
 
@@ -357,9 +313,7 @@ Guide: [Dotfiles](/config/dotfiles).
 
 ::: code-group
 
-```sh [VM]
-lmx dotfiles link [--quiet]
-```
+<!-- @include: ../../.reference/lmx.md#lmx-dotfiles-link-usage -->
 
 :::
 

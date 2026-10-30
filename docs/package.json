@@ -8,7 +8,7 @@
     "reference": "node scripts/reference.mjs",
     "predev": "npm run catalog && npm run reference",
     "dev": "vitepress dev",
-    "prebuild": "npm run catalog && npm run reference",
+    "prebuild": "npm run catalog && npm run reference && node scripts/check-pages.mjs pages",
     "build": "vitepress build",
     "preview": "vitepress preview",
     "pretest": "npm run catalog && npm run reference",

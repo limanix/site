@@ -26,6 +26,7 @@ export interface CatalogModule {
   with: string[]
   kind: CatalogKind | null
   module: string | null
+  page: string | null
 }
 
 interface GraphNode {
@@ -35,6 +36,7 @@ interface GraphNode {
   with: string[]
   kind?: string | null
   module?: string | null
+  page?: string | null
 }
 
 export type HomeContent = Omit<Home, 'hero' | 'features' | 'steps' | 'catalog'> & {
@@ -66,5 +68,6 @@ export const catalogModules: CatalogModule[] = (graph as { modules: GraphNode[] 
     ...node,
     kind: kinds.includes(node.kind ?? '') ? (node.kind as CatalogKind) : null,
     module: node.module ?? null,
+    page: node.page ?? null,
   }),
 )

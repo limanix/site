@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { catalogSlug } from '../../docs/scripts/catalog.mjs'
 
 const repository = 'limanix/modules'
 const target = new URL('../.catalog/graph.json', import.meta.url)
@@ -27,6 +28,10 @@ const { ref, graph } = await load()
 if (!Array.isArray(graph.modules) || !graph.modules.length) {
   throw new Error(`Catalog ${ref} has no graph nodes`)
 }
+const modules = graph.modules.map((node) => ({
+  ...node,
+  page: node.module ? catalogSlug(node.module) : null,
+}))
 await mkdir(new URL('./', target), { recursive: true })
-await writeFile(target, `${JSON.stringify(graph)}\n`)
+await writeFile(target, `${JSON.stringify({ ...graph, modules })}\n`)
 console.log(`Catalog ${ref}: ${graph.modules.length} graph nodes`)

@@ -61,12 +61,6 @@ resource "aws_cloudfront_response_headers_policy" "site" {
       override                   = true
       preload                    = true
     }
-
-    xss_protection {
-      mode_block = true
-      override   = true
-      protection = true
-    }
   }
 
   custom_headers_config {
@@ -92,10 +86,10 @@ resource "aws_cloudfront_response_headers_policy" "site" {
 
 resource "aws_cloudfront_function" "uri_rewrite" {
   name    = "${local.name_prefix}-uri-rewrite"
-  comment = "Resolve site directory URLs to their S3 objects"
+  comment = "Redirect .html and directory URLs, resolve clean URLs to their S3 objects"
   runtime = "cloudfront-js-2.0"
 
-  code    = file("${path.module}/functions/uri-rewrite.js")
+  code    = replace(file("${path.module}/functions/uri-rewrite.js"), "DIRECTORIES", jsonencode(local.directories))
   publish = true
 }
 

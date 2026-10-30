@@ -12,6 +12,7 @@ export default defineConfig({
     },
   },
   build: {
+    assetsInlineLimit: 0,
     rolldownOptions: {
       input: { index: page('index'), download: page('download'), catalog: page('catalog') },
       output: {

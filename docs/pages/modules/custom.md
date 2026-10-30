@@ -90,7 +90,7 @@ A module can use standard NixOS options and the public interface that LimaNix su
 | `limanix.help.<topic>`                                 | Add a help card for `lmx help TOPIC`                                                                                 |
 | `limanix.session.command`                              | Provide named sessions for `limanix shell --session`: an executable's absolute path, which receives the session name |
 | `lmx.capabilities.languageSupport`                     | Offer language servers and parsers to editors; AstroNvim configures the declared servers                             |
-| `lmx.capabilities.theme`                               | Read the guest's colors: `flavor`, which `[theme]` chooses, and the read-only `palette` and `ansi`                   |
+| `lmx.capabilities.theme`                               | Read the guest's colors: `name`, which `[theme]` chooses, and the read-only `palette`, `colors`, `dark` and `ansi`   |
 | Documented `lmx.<module>.*` options                    | Change a setting that a catalog module documents, such as `lmx.tmux.navigation.enable`                               |
 | Standard NixOS options                                 | Packages, services, firewall rules and other system settings                                                         |
 

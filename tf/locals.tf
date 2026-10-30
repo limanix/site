@@ -3,6 +3,10 @@ locals {
   name_prefix          = join("-", reverse(slice(local.domain_labels, 0, length(local.domain_labels) - 1)))
   cloudfront_origin_id = "s3-${var.site_bucket_name}"
 
+  directories = {
+    for page in fileset("${path.module}/../docs/pages", "*/**/index.md") : "/${dirname(page)}" => true
+  }
+
   content_security_policy = join("; ", [
     "default-src 'self'",
     "base-uri 'self'",

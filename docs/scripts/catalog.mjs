@@ -20,6 +20,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const repository = 'https://github.com/limanix/modules'
 export const catalogFile = fileURLToPath(new URL('../.catalog/catalog.json', import.meta.url))
 export const kinds = { shell: 'Shell components', toolchains: 'Toolchains', modules: 'Modules' }
+// Keep the existing public address of Claude Code.
+export const catalogSlug = (name) => (name === 'claude' ? 'claude-code' : name)
 
 export function readCatalog(root, ref) {
   const entries = []
@@ -34,8 +36,7 @@ export function readCatalog(root, ref) {
       const markdown = readFileSync(join(root, source), 'utf8')
       const title = markdown.match(/^# (.+)\r?$/m)?.[1]
       if (!title) throw new Error(`Missing title in ${source}`)
-      // Keep the existing public address of Claude Code.
-      const slug = name === 'claude' ? 'claude-code' : name
+      const slug = catalogSlug(name)
       if (['index', 'custom'].includes(slug) || entries.some((entry) => entry.slug === slug)) {
         throw new Error(`Duplicate or reserved catalog page: ${slug}`)
       }

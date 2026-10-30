@@ -32,7 +32,6 @@ export default defineConfig({
     ['link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }],
     ['meta', { name: 'theme-color', content: '#1b1b1f', media: '(prefers-color-scheme: dark)' }],
     ['meta', { name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' }],
-    ['meta', { name: 'robots', content: 'index, follow' }],
     ['meta', { name: 'author', content: 'LimaNix contributors' }],
     ['meta', { name: 'keywords', content: keywords }],
     ['meta', { property: 'og:type', content: 'website' }],
@@ -49,11 +48,13 @@ export default defineConfig({
   ],
 
   transformHead({ pageData }) {
+    if (pageData.isNotFound) return [['meta', { name: 'robots', content: 'noindex' }]]
     const path = pageData.relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')
     const url = `${docs}/${path}`
     const title = pageData.title ? `${pageData.title} | LimaNix Docs` : 'LimaNix Docs'
     const summary = pageData.description || description
     const head: HeadConfig[] = [
+      ['meta', { name: 'robots', content: 'index, follow' }],
       ['link', { rel: 'canonical', href: url }],
       ['meta', { property: 'og:url', content: url }],
       ['meta', { property: 'og:title', content: title }],
@@ -75,6 +76,7 @@ export default defineConfig({
 
   vite: {
     envDir: fileURLToPath(new URL('..', import.meta.url)),
+    build: { assetsInlineLimit: 0 },
   },
 
   markdown: {

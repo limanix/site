@@ -10,7 +10,6 @@ const props = defineProps<{ content: CatalogContent; modules: CatalogModule[]; l
 const chosen = defineModel<string | null>('chosen', { default: null })
 
 const LIMIT = 8
-const PAGES: Record<string, string> = { claude: 'claude-code' }
 const MOVES: Record<string, [number, number]> = {
   ArrowLeft: [80, 0],
   ArrowRight: [-80, 0],
@@ -50,8 +49,8 @@ const matches = computed(() =>
   query.value.trim() ? new Set(found.value.map((module) => module.id)) : null,
 )
 const guide = computed(() => {
-  const module = current.value?.module
-  return module ? `${siteContent.links.docs}/modules/${PAGES[module] ?? module}` : null
+  const page = current.value?.page
+  return page ? `${siteContent.links.docs}/modules/${page}` : null
 })
 
 function dismiss() {

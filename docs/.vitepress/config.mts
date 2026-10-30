@@ -3,6 +3,9 @@ import { defineConfig, type HeadConfig } from 'vitepress'
 import { kinds, loadCatalog } from '../scripts/catalog.mjs'
 
 const catalog = loadCatalog()
+const catalogPages = new Map(
+  catalog.entries.map(({ slug, content }) => [`modules/${slug}.md`, content]),
+)
 
 const site = 'https://limanix.dev'
 const docs = 'https://docs.limanix.dev'
@@ -175,7 +178,15 @@ export default defineConfig({
       },
     ],
 
-    search: { provider: 'local' },
+    search: {
+      provider: 'local',
+      options: {
+        async _render(src, env, md) {
+          const html = await md.renderAsync(catalogPages.get(env.relativePath) ?? src, env)
+          return env.frontmatter?.search === false ? '' : html
+        },
+      },
+    },
     socialLinks: [{ icon: 'github', link: 'https://github.com/limanix' }],
     editLink: {
       pattern: ({ frontmatter, relativePath }) =>

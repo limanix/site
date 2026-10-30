@@ -22,6 +22,7 @@ export const catalogFile = fileURLToPath(new URL('../.catalog/catalog.json', imp
 const publicDir = fileURLToPath(new URL('../pages/public/', import.meta.url))
 export const previewKinds = ['themes', 'prompts']
 export const kinds = { shell: 'Shell components', toolchains: 'Toolchains', modules: 'Modules' }
+const promptShells = { bash: ['Bash', 'minimal'], zsh: ['Zsh', 'terminal'] }
 // Keep the existing public address of Claude Code.
 export const catalogSlug = (name) => (name === 'claude' ? 'claude-code' : name)
 
@@ -135,6 +136,19 @@ export function catalogIndex(catalog) {
   )
 }
 
+export function promptTable(prompts) {
+  const rows = prompts.map((prompt) => {
+    const shells = prompt.shells.map((shell) => {
+      if (!promptShells[shell]) throw new Error(`Unknown shell of prompt ${prompt.name}: ${shell}`)
+      return promptShells[shell]
+    })
+    const titles = shells.map(([title]) => title).join(', ')
+    const presets = shells.map(([, preset]) => `\`${preset}\``).join(', ')
+    return `| [\`${prompt.name}\`](/modules/${catalogSlug(prompt.name)}) | ${titles} | ${presets} |`
+  })
+  return ['| `prompt` | Shells | Presets |', '| --- | --- | --- |', ...rows].join('\n') + '\n'
+}
+
 async function download(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(60_000) })
   if (!response.ok) throw new Error(`Catalog download failed: ${response.status} ${url}`)
@@ -171,6 +185,7 @@ async function prepare() {
   mkdirSync(dirname(catalogFile), { recursive: true })
   writeFileSync(catalogFile, `${JSON.stringify(pages, null, 2)}\n`)
   writeFileSync(join(dirname(catalogFile), 'index.md'), catalogIndex(catalog))
+  writeFileSync(join(dirname(catalogFile), 'prompts.md'), promptTable(previews.prompts))
   for (const [kind, items] of Object.entries(previews)) {
     const data = items.map(({ svg, ...item }) => item)
     writeFileSync(join(dirname(catalogFile), `${kind}.json`), `${JSON.stringify(data, null, 2)}\n`)

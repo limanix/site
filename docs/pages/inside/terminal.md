@@ -30,7 +30,7 @@ Each new shell session starts with the welcome: the state of the VM, its resourc
 ## Zsh and the prompt
 
 The [Zsh guide](/modules/zsh) covers completion, history, directory navigation and project environments.
-It also explains the Pure and Starship prompts and personal startup files.
+It also covers personal startup files; [Prompts](/config/prompts) shows the prompts you can choose.
 
 ## CLI tools
 

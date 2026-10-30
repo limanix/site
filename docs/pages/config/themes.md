@@ -19,7 +19,7 @@ Apply a change with `limanix update --config limanix.toml`; the VM restarts with
 
 ## Choose a theme
 
-<ThemeGallery />
+<PreviewGallery kind="themes" />
 
 Each preview shows the VM's own tmux, Neovim, `eza -l` and `git diff` through delta, drawn in a terminal with the theme. `system`, the default, has no preview: it takes the colors of your terminal.
 

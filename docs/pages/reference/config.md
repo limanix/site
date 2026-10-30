@@ -111,9 +111,9 @@ dotfiles = "~/dotfiles"
 
 <!-- @include: ../../.reference/config.md#config-shell -->
 
-`none` leaves a component out of the VM. With `preset = "minimal"`, the defaults of `prompt`, `editor` and `multiplexer` are `none`; name an editor or a multiplexer to add it.
+`none` leaves a component out of the VM. With `preset = "minimal"`, the defaults of `prompt`, `editor` and `multiplexer` are `none`; name a prompt that runs in Bash, an editor or a multiplexer to add it.
 
-Guides: [Shell](/config/shell), [Dotfiles](/config/dotfiles).
+Guides: [Shell](/config/shell), [Prompts](/config/prompts), [Dotfiles](/config/dotfiles).
 
 ## `[toolchains]`
 

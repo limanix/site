@@ -11,7 +11,7 @@ The `[shell]` table chooses what you work in when you open a shell in the VM: th
 ```toml [limanix.toml]
 [shell]
 preset = "terminal"   # terminal or minimal
-prompt = "pure"       # pure, starship or none
+prompt = "pure"       # a catalog prompt or none
 editor = "astronvim"  # astronvim, neovim or none
 multiplexer = "tmux"  # tmux or none
 ```
@@ -40,13 +40,14 @@ These are the defaults: a file without a `[shell]` table gets the same shell. Ap
 See [CLI tools](/modules/cli-tools) for the shared commands and [Zsh](/modules/zsh) for shell features.
 [The terminal](/inside/terminal) shows how to use the tools together.
 
-`none` leaves a component out of the VM. With `minimal`, name an editor or a multiplexer to add it:
+`none` leaves a component out of the VM. With `minimal`, name a prompt, an editor or a multiplexer to add it:
 
 ::: code-group
 
 ```toml [limanix.toml]
 [shell]
 preset = "minimal"
+prompt = "starship"
 editor = "neovim"
 ```
 
@@ -56,15 +57,7 @@ The minimal preset has no GitHub CLI: add it with `packages = ["gh"]` in [`[nixo
 
 ## Choose a prompt
 
-The prompt belongs to Zsh and needs the `terminal` preset. With `minimal`, leave `prompt` out or set it to `none`: `limanix create` and `limanix update` reject a prompt there, and Bash shows your account, the VM's hostname and the directory in the theme's accent colors.
-
-| `prompt`            | What you get                                                                                                          |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `pure`, the default | Pure on two lines: the directory, the Git state, how long a command took and a different color after a failed command |
-| `starship`          | Starship, which also shows the hostname, the language versions it detects and the exit status                         |
-| `none`              | No managed prompt: set `PROMPT` in your `~/.zshrc`                                                                    |
-
-See [Zsh prompts](/modules/zsh#prompt) for colors, VM status and personal settings.
+`prompt` names one of the catalog's prompts, or `none`. The prompt must run in the shell of your preset: Zsh with `terminal`, Bash with `minimal`. [Prompts](/config/prompts) shows each prompt, the presets it runs in and what `none` leaves you with.
 
 ## Choose an editor
 

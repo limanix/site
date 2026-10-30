@@ -26,19 +26,19 @@ Editing the file changes nothing by itself. Apply it with `limanix update --conf
 
 ## The tables at a glance
 
-| In the file                    | Configures                                             | Page                                                                     |
-| ------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `schema_version`, `name`       | The file format version and the VM name                | [Below](#schema-version-and-name)                                        |
-| `[resources]`                  | Architecture, CPUs, memory and disk                    | [Resources and architecture](/vms/resources)                             |
-| `[user]`                       | Your account in the VM                                 | [Environment and account](/config/environment#set-up-your-account)       |
-| `[home]`                       | Where your home folder in the VM is kept on the Mac    | [Files and storage](/vms/storage)                                        |
-| `[shell]`                      | Shell preset, prompt, editor, multiplexer and dotfiles | [Shell](/config/shell), [Dotfiles](/config/dotfiles)                     |
-| `[toolchains]`                 | Language toolchains, one version per language          | [Toolchains](/config/toolchains)                                         |
-| `[nixos]`                      | Catalog modules and packages                           | [Modules and packages](/config/modules)                                  |
-| `[theme]`                      | Colors                                                 | [Themes](/config/themes)                                                 |
-| `[network]`, `[network.ports]` | Network mode and firewall ports                        | [Network](/vms/network)                                                  |
-| `[env]`                        | Environment variables                                  | [Environment and account](/config/environment#set-environment-variables) |
-| `[[mounts]]`                   | Shared folders                                         | [Shared folders](/config/mounts)                                         |
+| In the file                    | Configures                                             | Page                                                                             |
+| ------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `schema_version`, `name`       | The file format version and the VM name                | [Below](#schema-version-and-name)                                                |
+| `[resources]`                  | Architecture, CPUs, memory and disk                    | [Resources and architecture](/vms/resources)                                     |
+| `[user]`                       | Your account in the VM                                 | [Environment and account](/config/environment#set-up-your-account)               |
+| `[home]`                       | Where your home folder in the VM is kept on the Mac    | [Files and storage](/vms/storage)                                                |
+| `[shell]`                      | Shell preset, prompt, editor, multiplexer and dotfiles | [Shell](/config/shell), [Prompts](/config/prompts), [Dotfiles](/config/dotfiles) |
+| `[toolchains]`                 | Language toolchains, one version per language          | [Toolchains](/config/toolchains)                                                 |
+| `[nixos]`                      | Catalog modules and packages                           | [Modules and packages](/config/modules)                                          |
+| `[theme]`                      | Colors                                                 | [Themes](/config/themes)                                                         |
+| `[network]`, `[network.ports]` | Network mode and firewall ports                        | [Network](/vms/network)                                                          |
+| `[env]`                        | Environment variables                                  | [Environment and account](/config/environment#set-environment-variables)         |
+| `[[mounts]]`                   | Shared folders                                         | [Shared folders](/config/mounts)                                                 |
 
 The [limanix.toml reference](/reference/config) lists every key with its type and default.
 

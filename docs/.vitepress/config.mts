@@ -131,6 +131,7 @@ export default defineConfig({
         items: [
           { text: 'The limanix.toml file', link: '/config/' },
           { text: 'Shell', link: '/config/shell' },
+          { text: 'Prompts', link: '/config/prompts' },
           { text: 'Toolchains', link: '/config/toolchains' },
           { text: 'Modules and packages', link: '/config/modules' },
           { text: 'Shared folders', link: '/config/mounts' },

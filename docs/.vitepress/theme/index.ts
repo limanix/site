@@ -4,7 +4,7 @@ import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import LimanixFlow from './components/LimanixFlow.vue'
 import LimanixOverview from './components/LimanixOverview.vue'
-import ThemeGallery from './components/ThemeGallery.vue'
+import PreviewGallery from './components/PreviewGallery.vue'
 import './style.css'
 
 export default {
@@ -12,7 +12,7 @@ export default {
   enhanceApp({ app }) {
     app.component('LimanixFlow', LimanixFlow)
     app.component('LimanixOverview', LimanixOverview)
-    app.component('ThemeGallery', ThemeGallery)
+    app.component('PreviewGallery', PreviewGallery)
     const beacon = import.meta.env.VITE_CF_BEACON_TOKEN
     if (import.meta.env.SSR || !beacon) return
     const script = document.createElement('script')

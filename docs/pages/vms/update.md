@@ -121,8 +121,8 @@ When a built generation waits for a restart, the welcome in the VM shows a line 
 
 :::
 
-A short word also appears in tmux's status line, or outside tmux in the `pure` or `starship`
-prompt:
+A short word also appears in tmux's status line, or outside tmux in a
+[catalog prompt](/config/prompts):
 
 | Word       | Meaning                                                | What to do                                          |
 | ---------- | ------------------------------------------------------ | --------------------------------------------------- |

@@ -341,6 +341,19 @@ async function readJSON(root, repository, ref, path) {
   return (await download(`https://raw.githubusercontent.com/${repository}/${ref}/${path}`)).json()
 }
 
+async function readGuide(root, repository) {
+  const text = root
+    ? readFileSync(resolve(root, 'CONTRIBUTING.md'), 'utf8')
+    : await (
+        await download(`https://raw.githubusercontent.com/${repository}/main/CONTRIBUTING.md`)
+      ).text()
+  return text.replace(/\]\(([^)\s]+)\)/g, (_, href) =>
+    /^(?:[a-z]+:|\/|#)/i.test(href)
+      ? `](${href})`
+      : `](https://github.com/${repository}/blob/main/${href})`,
+  )
+}
+
 export async function loadSources(env = process.env) {
   const clientRef = env.CLIENT_ROOT
     ? 'local'
@@ -361,15 +374,29 @@ export async function loadSources(env = process.env) {
   const lmxRef = env.LMX_ROOT ? 'local' : `v${pin.version}`
   const lmx = await readJSON(env.LMX_ROOT, 'limanix/lmx', lmxRef, 'reference.json')
   checkFields('lmx', lmx)
-  return { client: { ...client, ref: clientRef }, lmx: { ...lmx, ref: lmxRef } }
+  return {
+    client: { ...client, ref: clientRef },
+    lmx: { ...lmx, ref: lmxRef },
+    guides: {
+      client: await readGuide(env.CLIENT_ROOT, 'limanix/client'),
+      lmx: await readGuide(env.LMX_ROOT, 'limanix/lmx'),
+      catalog: await readGuide(env.MODULES_ROOT, 'limanix/modules'),
+    },
+  }
 }
 
 async function prepare() {
-  const { client, lmx } = await loadSources()
+  const { client, lmx, guides } = await loadSources()
   mkdirSync(referenceDir, { recursive: true })
   writeFileSync(join(referenceDir, 'cli.md'), renderCli(client, lmx))
   writeFileSync(join(referenceDir, 'lmx.md'), renderLmx(lmx))
   writeFileSync(join(referenceDir, 'config.md'), renderConfig(client))
+  writeFileSync(
+    join(referenceDir, 'contributing.md'),
+    Object.entries(guides)
+      .map(([name, guide]) => region(`contributing-${name}`, guide))
+      .join('\n'),
+  )
   console.log(`Reference: client ${client.ref}, lmx ${lmx.ref}`)
 }
 

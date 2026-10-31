@@ -51,7 +51,7 @@ Owner         lmxd 0.1.0, idle
 
 ### Status words in tmux and the prompt
 
-The tmux status line, or the Pure or Starship prompt outside tmux, shows a short word when the VM needs attention. It comes from `lmx status --short` and stays empty while all is well.
+The tmux status line, or a [catalog prompt](/config/prompts) outside tmux, shows a short word when the VM needs attention. It comes from `lmx status --short` and stays empty while all is well.
 
 | Word       | Means                                                   | What to do                                    |
 | ---------- | ------------------------------------------------------- | --------------------------------------------- |

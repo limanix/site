@@ -131,11 +131,13 @@ export default defineConfig({
         items: [
           { text: 'The limanix.toml file', link: '/config/' },
           { text: 'Shell', link: '/config/shell' },
+          { text: 'Prompts', link: '/config/prompts' },
           { text: 'Toolchains', link: '/config/toolchains' },
           { text: 'Modules and packages', link: '/config/modules' },
           { text: 'Shared folders', link: '/config/mounts' },
           { text: 'Dotfiles', link: '/config/dotfiles' },
-          { text: 'Environment and theme', link: '/config/environment' },
+          { text: 'Environment and account', link: '/config/environment' },
+          { text: 'Themes', link: '/config/themes' },
         ],
       },
       {
@@ -167,6 +169,15 @@ export default defineConfig({
         items: [
           { text: 'Troubleshooting', link: '/troubleshooting' },
           { text: 'How it works', link: '/architecture' },
+        ],
+      },
+      {
+        text: 'Contributing',
+        items: [
+          { text: 'How to contribute', link: '/contributing/' },
+          { text: 'The client', link: '/contributing/client' },
+          { text: 'The lmx command', link: '/contributing/lmx' },
+          { text: 'The catalog', link: '/contributing/catalog' },
         ],
       },
       {

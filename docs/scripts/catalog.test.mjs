@@ -86,6 +86,10 @@ test('discovery includes every kind and keeps the published Claude Code address'
     writeFileSync(join(directory, 'module.toml'), 'description = "Test module"\n')
     writeFileSync(join(directory, 'README.md'), `# ${title}\n\nDescription.\n`)
   }
+  mkdirSync(join(root, 'previews'))
+  for (const kind of ['themes', 'prompts']) {
+    writeFileSync(join(root, 'previews', `${kind}.json`), '[]\n')
+  }
   const catalog = readCatalog(root, 'v7')
   assert.deepEqual(
     catalog.entries.map(({ slug }) => slug),

@@ -30,7 +30,7 @@ Each new shell session starts with the welcome: the state of the VM, its resourc
 ## Zsh and the prompt
 
 The [Zsh guide](/modules/zsh) covers completion, history, directory navigation and project environments.
-It also explains the Pure and Starship prompts and personal startup files.
+It also covers personal startup files; [Prompts](/config/prompts) shows the prompts you can choose.
 
 ## CLI tools
 
@@ -74,8 +74,8 @@ In the VM, run `cd /workspace` and `nvim .` to open the project in the editor. P
 
 Fonts, colors and the clipboard belong to the terminal on your Mac, not to the VM:
 
-- Choose a Nerd Font and turn on true color.
+- Choose a Nerd Font and turn on true color. `limanix shell` passes the terminal's `COLORTERM` to the VM when it is `truecolor` or `24bit`; the VM's tools then draw a theme's exact colors.
 - Allow OSC 52 clipboard access; see [Clipboard](/inside/clipboard).
 - Send Option as Alt, for Alt keys such as Alt-H/J/K/L.
 
-The VM knows Ghostty's terminal type, `xterm-ghostty`. By default, the tools draw in the colors and on the background of your terminal's theme; [Environment and theme](/config/environment) has the other choices.
+The VM knows Ghostty's terminal type, `xterm-ghostty`. By default, the tools draw in the colors and on the background of your terminal's theme; [Themes](/config/themes) has the other choices.

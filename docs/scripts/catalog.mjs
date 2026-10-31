@@ -19,7 +19,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const repository = 'https://github.com/limanix/modules'
 export const catalogFile = fileURLToPath(new URL('../.catalog/catalog.json', import.meta.url))
+const publicDir = fileURLToPath(new URL('../pages/public/', import.meta.url))
+export const previewKinds = ['themes', 'prompts']
 export const kinds = { shell: 'Shell components', toolchains: 'Toolchains', modules: 'Modules' }
+const promptShells = { bash: ['Bash', 'minimal'], zsh: ['Zsh', 'terminal'] }
 // Keep the existing public address of Claude Code.
 export const catalogSlug = (name) => (name === 'claude' ? 'claude-code' : name)
 
@@ -44,6 +47,15 @@ export function readCatalog(root, ref) {
     }
   }
   if (!entries.length) throw new Error('The catalog is empty')
+  const previews = Object.fromEntries(
+    previewKinds.map((kind) => [
+      kind,
+      JSON.parse(readFileSync(join(root, 'previews', `${kind}.json`), 'utf8')).map((item) => ({
+        ...item,
+        svg: readFileSync(join(root, 'previews', kind, `${item.name}.svg`), 'utf8'),
+      })),
+    ]),
+  )
   entries.sort((a, b) => a.title.localeCompare(b.title, 'en'))
   const routes = new Map(entries.map((entry) => [entry.source, `/modules/${entry.slug}`]))
   return {
@@ -52,6 +64,7 @@ export function readCatalog(root, ref) {
       ...entry,
       content: renderPage(markdown, entry.source, ref, routes),
     })),
+    previews,
   }
 }
 
@@ -123,6 +136,19 @@ export function catalogIndex(catalog) {
   )
 }
 
+export function promptTable(prompts) {
+  const rows = prompts.map((prompt) => {
+    const shells = prompt.shells.map((shell) => {
+      if (!promptShells[shell]) throw new Error(`Unknown shell of prompt ${prompt.name}: ${shell}`)
+      return promptShells[shell]
+    })
+    const titles = shells.map(([title]) => title).join(', ')
+    const presets = shells.map(([, preset]) => `\`${preset}\``).join(', ')
+    return `| [\`${prompt.name}\`](/modules/${catalogSlug(prompt.name)}) | ${titles} | ${presets} |`
+  })
+  return ['| `prompt` | Shells | Presets |', '| --- | --- | --- |', ...rows].join('\n') + '\n'
+}
+
 async function download(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(60_000) })
   if (!response.ok) throw new Error(`Catalog download failed: ${response.status} ${url}`)
@@ -155,10 +181,23 @@ async function prepare() {
       rmSync(temporary, { recursive: true, force: true })
     }
   }
+  const { previews, ...pages } = catalog
   mkdirSync(dirname(catalogFile), { recursive: true })
-  writeFileSync(catalogFile, `${JSON.stringify(catalog, null, 2)}\n`)
+  writeFileSync(catalogFile, `${JSON.stringify(pages, null, 2)}\n`)
   writeFileSync(join(dirname(catalogFile), 'index.md'), catalogIndex(catalog))
-  console.log(`Catalog ${catalog.ref}: ${catalog.entries.length} module pages`)
+  writeFileSync(join(dirname(catalogFile), 'prompts.md'), promptTable(previews.prompts))
+  for (const [kind, items] of Object.entries(previews)) {
+    const data = items.map(({ svg, ...item }) => item)
+    writeFileSync(join(dirname(catalogFile), `${kind}.json`), `${JSON.stringify(data, null, 2)}\n`)
+    const directory = join(publicDir, kind)
+    rmSync(directory, { recursive: true, force: true })
+    mkdirSync(directory, { recursive: true })
+    for (const item of items) writeFileSync(join(directory, `${item.name}.svg`), item.svg)
+  }
+  const counts = Object.entries(previews).map(([kind, items]) => `${items.length} ${kind}`)
+  console.log(
+    `Catalog ${catalog.ref}: ${catalog.entries.length} module pages, ${counts.join(', ')}`,
+  )
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

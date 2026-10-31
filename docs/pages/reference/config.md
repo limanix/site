@@ -50,7 +50,7 @@ sudo = true
 
 The account uses the numeric UID of your Mac account for shared files; its name can differ from your Mac account's name.
 
-Guide: [Environment and theme](/config/environment).
+Guide: [Environment and account](/config/environment).
 
 ## `[resources]`
 
@@ -111,9 +111,9 @@ dotfiles = "~/dotfiles"
 
 <!-- @include: ../../.reference/config.md#config-shell -->
 
-`none` leaves a component out of the VM. With `preset = "minimal"`, the defaults of `prompt`, `editor` and `multiplexer` are `none`; name an editor or a multiplexer to add it.
+`none` leaves a component out of the VM. With `preset = "minimal"`, the defaults of `prompt`, `editor` and `multiplexer` are `none`; name a prompt that runs in Bash, an editor or a multiplexer to add it.
 
-Guides: [Shell](/config/shell), [Dotfiles](/config/dotfiles).
+Guides: [Shell](/config/shell), [Prompts](/config/prompts), [Dotfiles](/config/dotfiles).
 
 ## `[toolchains]`
 
@@ -169,14 +169,14 @@ Guides: [Modules and packages](/config/modules), [The catalog](/modules/).
 
 ```toml [limanix.toml]
 [theme]
-flavor = "system"
+name = "system"
 ```
 
 :::
 
 <!-- @include: ../../.reference/config.md#config-theme -->
 
-Guide: [Environment and theme](/config/environment).
+Guide: [Themes](/config/themes).
 
 ## `[network]`
 
@@ -237,7 +237,7 @@ Without `env` in the file, the guest gets no variables.
 
 The values are plaintext. They are written to runtime files and installed under `/etc/limanix`, readable by root and by the development account's group. They stay outside the Nix store, but this is not encrypted secret storage.
 
-Guide: [Environment and theme](/config/environment).
+Guide: [Environment and account](/config/environment).
 
 ## `[[mounts]]`
 

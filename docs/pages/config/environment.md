@@ -1,10 +1,10 @@
 ---
-description: Set environment variables, the colors and your account in a VM.
+description: Set environment variables and your account in a VM.
 ---
 
-# Environment and theme
+# Environment and account
 
-Three small tables shape the VM around you. `[env]` sets environment variables, `[theme]` picks the colors, and `[user]` sets up the account you work in.
+Two small tables shape the VM around you. `[env]` sets environment variables, and `[user]` sets up the account you work in. [Themes](/config/themes) describes `[theme]`, which picks the colors.
 
 ## Set environment variables
 
@@ -33,36 +33,6 @@ Without an `[env]` table, the VM gets no variables. A table with entries sets ex
 ::: warning
 `[env]` is plain text, not secret storage. The values are written to files under `/etc/limanix` in the VM, readable by root and your account's group.
 :::
-
-## Choose a theme
-
-::: code-group
-
-```toml [limanix.toml]
-[theme]
-flavor = "system"
-```
-
-:::
-
-| Flavor                | Colors                                               |
-| --------------------- | ---------------------------------------------------- |
-| `system`, the default | Your terminal's own 16 colors and its background     |
-| `latte`               | [Catppuccin](https://catppuccin.com/palette/), light |
-| `frappe`              | Catppuccin, dark                                     |
-| `macchiato`           | Catppuccin, darker                                   |
-| `mocha`               | Catppuccin, darkest                                  |
-
-`lmx` and the catalog tools with colors share the theme, among them the Zsh prompt, tmux, AstroNvim, Yazi, Lazygit, Posting and Harlequin.
-
-With `system`, the VM draws in the colors of your terminal's theme on the Mac, on its background. When you change that theme, or the terminal switches between light and dark, the VM follows at once; there is nothing to apply. A few tools keep colors of their own:
-
-| Tool      | With `system`                                                                                                 |
-| --------- | ------------------------------------------------------------------------------------------------------------- |
-| AstroNvim | Catppuccin text colors on a transparent background: Latte on a light terminal background, Mocha on a dark one |
-| Harlequin | Catppuccin Mocha                                                                                              |
-
-A Catppuccin flavor sets its colors in every tool, and several tools also paint its background: choose the flavor that matches your terminal. Apply it with `limanix update --config limanix.toml`; the VM restarts with the new colors. Settings you make in a tool itself still take precedence. `NO_COLOR` or `TERM=dumb` turn the colors of `lmx` off.
 
 ## Set up your account
 

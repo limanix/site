@@ -2,44 +2,49 @@
 [![docs.limanix.dev](https://img.shields.io/website?url=https%3A%2F%2Fdocs.limanix.dev&label=docs.limanix.dev&up_message=online)](https://docs.limanix.dev)
 [![License: Apache-2.0](https://img.shields.io/github/license/limanix/site?label=license)](LICENSE)
 
+<div align="center">
 <p align="center">
   <img src=".github/assets/readme-header.png"
        alt="LimaNix"
        width="100%">
 </p>
 
-The website and documentation of [LimaNix](https://github.com/limanix/client):
-NixOS development machines on your Mac, declared in one file.
+<p align="center">
+<a href="https://docs.limanix.dev/quick-start"><code>→ Get started</code></a>&nbsp;
+<a href="https://docs.limanix.dev/"><code>Documentation</code></a>
+</p>
+<p align="center"><sub>macOS 26 or newer | Apple Silicon and Intel</sub></p>
+</div>
 
-[Website](https://limanix.dev) |
-[Docs](https://docs.limanix.dev) |
-[Client](https://github.com/limanix/client) |
-[Modules](https://github.com/limanix/modules) |
-[lmx](https://github.com/limanix/lmx)
+## Development
 
-## Contributing
+You need [Task](https://taskfile.dev) 3.53.1 or newer and Docker; every task runs in a container.
 
-Catalog pages come from the READMEs in [`modules/catalog`](https://github.com/limanix/modules/tree/main/catalog).
-Edit module descriptions there; this repository owns the general guides and navigation.
-The catalog map on the landing page comes from `catalog/graph.json` in the same repository.
+| Task | Does |
+| -- | -- |
+| `task run/docs`, `task run/app` | Previews the docs at http://localhost:5174 or the landing page at http://localhost:5173 |
+| `task ci/node/build APP=docs` | Lints and builds the docs into `docs/dist`, or the landing page into `app/dist` with `APP=app` |
+| `task ci/node/test APP=docs` | Runs the tests; for the docs they also check the links, code blocks and style of the pages |
+| `task ci/node/audit APP=docs` | Audits the npm dependencies |
+| `task ci/terraform/fmt`, `task ci/terraform/validate` | Check the hosting in `tf/` |
 
-The docs build reads the latest published modules release once, then uses that tag for every module page.
-It prints the tag and shows it on the pages.
-Run `task ci/node/build APP=docs` to build, or `task run/docs` to preview.
-A new modules release is picked up on the next site build; it does not publish the site by itself.
+The build reads module pages, the catalog graph, references and the contribution guide from the other repositories.
+The [contribution guide](https://github.com/limanix/.github/blob/main/CONTRIBUTING.md#what-the-site-reads) lists what comes from where, and the build prints the releases it read.
+A release elsewhere reaches the site with the next tag `v<version>` on `main`; it does not publish the site by itself.
 
-For a specific release or unpublished README edits, run from `docs/` with Node.js 22 and npm:
+To build from other sources, run from `docs/` with Node.js 22 and npm:
 
 ```sh
 npm ci
-MODULES_REF=v7 npm run build
-MODULES_ROOT=../../modules npm run dev
+MODULES_REF=v12 CLIENT_REF=v0.3.1 npm run build
+MODULES_ROOT=../../modules CLIENT_ROOT=../../client LMX_ROOT=../../lmx ORG_ROOT=../../.github npm run dev
 ```
 
-`MODULES_ROOT` takes precedence over `MODULES_REF` and marks pages as a local preview.
-Restart the preview after changing a module README.
-The build uses Node.js and `tar`; downloaded catalog data stays in the ignored `docs/.catalog/` directory.
-`npm test` checks the page links, including imported READMEs, and the catalog loader's key behavior.
+`MODULES_REF` and `CLIENT_REF` select a release instead of the latest one; an older client fails the build when the pages use a command it lacks.
+`MODULES_ROOT`, `CLIENT_ROOT`, `LMX_ROOT` and `ORG_ROOT` read a local checkout and take precedence.
+Restart the preview after changing a source.
+The build uses Node.js and `tar`; downloaded data stays in the ignored `docs/.catalog/` and `docs/.reference/` directories.
 
-Follow the
-[contribution guide](https://github.com/limanix/.github/blob/main/CONTRIBUTING.md).
+## Contributing
+
+Follow the [contribution guide](https://github.com/limanix/.github/blob/main/CONTRIBUTING.md).

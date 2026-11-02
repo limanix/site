@@ -38,4 +38,4 @@ A prompt must run in the shell of your preset: Zsh with `terminal`, Bash with `m
 
 Each prompt reads your own settings from its own place, such as `~/.config/starship.toml` for [Starship](/modules/starship) or `~/.p10k.zsh` for [Powerlevel10k](/modules/powerlevel10k). The catalog page of each prompt names that place under Configuration and integration, and the settings that carry its colors under Colors.
 
-A new prompt is added in the catalog; the [catalog guide](/contributing/catalog) describes how.
+A new prompt is added in the catalog; the [catalog contract](https://github.com/limanix/modules/blob/main/catalog/README.md#prompts) describes how.

@@ -56,16 +56,16 @@ const inputs = files.map((file) => ({
   text: readFileSync(file, 'utf8').replace(/<!-- @include: (.+?) -->/g, (_, target) =>
     included(file, target),
   ),
-  catalog: false,
+  external: relative(root, file).startsWith('contributing/'),
 }))
 inputs.push(
   ...loadCatalog().entries.map(({ slug, content }) => ({
     file: join(root, 'modules', `${slug}.md`),
     text: content,
-    catalog: true,
+    external: true,
   })),
 )
-for (const { file, text: source, catalog } of inputs) {
+for (const { file, text: source, external } of inputs) {
   const text = source.replace(/^---\n[\s\S]*?\n---\n/, '')
   const anchors = new Set()
   const seen = new Map()
@@ -87,7 +87,7 @@ for (const { file, text: source, catalog } of inputs) {
     if (count) slug = `${slug}-${count}`
     anchors.add(slug)
   }
-  pages.set(route(file), { file, text, anchors, catalog })
+  pages.set(route(file), { file, text, anchors, external })
 }
 
 const banned = [
@@ -120,7 +120,7 @@ for (const [path, page] of pages) {
     if (open && !fence) {
       fence = open[1]
       const info = open[2].trim() || '(no language)'
-      if (!page.catalog) {
+      if (!page.external) {
         if (!group) report(page, n, `code block outside a code group: ${info}`)
         else if (!/\[[^\]]+\]/.test(info)) report(page, n, `code block without a label: ${info}`)
       }
@@ -134,8 +134,8 @@ for (const [path, page] of pages) {
     else if (/^\s*:::\s*$/.test(line)) group = false
 
     const prose = line.replace(/`[^`]*`/g, '')
-    // Catalog prose is checked in its own repository; keep checking its links here.
-    for (const word of page.catalog || generated ? [] : banned) {
+    // External prose is checked in its own repository; keep checking its links here.
+    for (const word of page.external || generated ? [] : banned) {
       const match = prose.match(word)
       if (match) report(page, n, `style: "${match[0]}"`)
     }

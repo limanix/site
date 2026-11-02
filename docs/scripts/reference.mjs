@@ -342,17 +342,20 @@ async function readJSON(root, repository, ref, path) {
   return (await download(`https://raw.githubusercontent.com/${repository}/${ref}/${path}`)).json()
 }
 
-async function readGuide(root, repository) {
+async function readGuide(root) {
   const text = root
     ? readFileSync(resolve(root, 'CONTRIBUTING.md'), 'utf8')
     : await (
-        await download(`https://raw.githubusercontent.com/${repository}/main/CONTRIBUTING.md`)
+        await download('https://raw.githubusercontent.com/limanix/.github/main/CONTRIBUTING.md')
       ).text()
-  return text.replace(/\]\(([^)\s]+)\)/g, (_, href) =>
-    /^(?:[a-z]+:|\/|#)/i.test(href)
+  return text.replace(/\]\(([^)\s]+)\)/g, (_, href) => {
+    if (href.startsWith('https://docs.limanix.dev/')) {
+      return `](${href.slice('https://docs.limanix.dev'.length)})`
+    }
+    return /^(?:[a-z]+:|\/|#)/i.test(href)
       ? `](${href})`
-      : `](https://github.com/${repository}/blob/main/${href})`,
-  )
+      : `](https://github.com/limanix/.github/blob/main/${href})`
+  })
 }
 
 export async function loadSources(env = process.env) {
@@ -376,26 +379,17 @@ export async function loadSources(env = process.env) {
   return {
     client: { ...client, ref: clientRef },
     lmx: { ...lmx, ref: lmxRef },
-    guides: {
-      client: await readGuide(env.CLIENT_ROOT, 'limanix/client'),
-      lmx: await readGuide(env.LMX_ROOT, 'limanix/lmx'),
-      catalog: await readGuide(env.MODULES_ROOT, 'limanix/modules'),
-    },
+    guide: await readGuide(env.ORG_ROOT),
   }
 }
 
 async function prepare() {
-  const { client, lmx, guides } = await loadSources()
+  const { client, lmx, guide } = await loadSources()
   mkdirSync(referenceDir, { recursive: true })
   writeFileSync(join(referenceDir, 'cli.md'), renderCli(client, lmx))
   writeFileSync(join(referenceDir, 'lmx.md'), renderLmx(lmx))
   writeFileSync(join(referenceDir, 'config.md'), renderConfig(client))
-  writeFileSync(
-    join(referenceDir, 'contributing.md'),
-    Object.entries(guides)
-      .map(([name, guide]) => region(`contributing-${name}`, guide))
-      .join('\n'),
-  )
+  writeFileSync(join(referenceDir, 'contributing.md'), region('contributing', guide))
   console.log(`Reference: client ${client.ref}, lmx ${lmx.ref}`)
 }
 

@@ -35,7 +35,7 @@ tasks:
           CMD: "sh -c 'npm install && exec npm run dev -- --host 0.0.0.0 --port 5174'"
 
   ci/node/build:
-    desc: Lint and build APP into APP/dist
+    desc: Build static
     requires: &app
       vars:
         - name: APP
@@ -47,7 +47,7 @@ tasks:
           CMD: "sh -c 'npm ci && npm run lint && npm run build'"
 
   ci/node/test:
-    desc: Run the tests of APP
+    desc: Run tests
     requires: *app
     cmds:
       - task: node:run
@@ -56,7 +56,7 @@ tasks:
           SCRIPT: test
 
   ci/node/audit:
-    desc: Audit the dependencies of APP
+    desc: Run dependencies audit
     requires: *app
     cmds:
       - task: node:audit

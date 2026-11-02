@@ -59,4 +59,4 @@ A theme paints the backgrounds of tmux, the editor and the full-screen tools, wh
 
 Settings you make in a tool itself take precedence: a personal configuration file, a variable in the `[env]` table or a line in a startup file replaces the theme's value. `NO_COLOR` or `TERM=dumb` turn the colors of `lmx` off.
 
-A new theme is added in the catalog; the [catalog guide](/contributing/catalog) describes how.
+A new theme is added in the catalog; the [catalog contract](https://github.com/limanix/modules/blob/main/catalog/README.md#colors-and-themes) describes how.

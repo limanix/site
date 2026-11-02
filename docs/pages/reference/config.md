@@ -283,6 +283,9 @@ Guide: [Shared folders](/config/mounts).
 
 ## Fixed at creation
 
+- `fixed`: `limanix update` rejects a change. Create a new VM and copy the files you need.
+- `grow`: `limanix update` can raise it. It cannot shrink.
+
 <!-- @include: ../../.reference/config.md#config-update -->
 
 Another `name` selects another VM. Every other key changes with `limanix update`, which restarts the VM.

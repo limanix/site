@@ -1,10 +1,11 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig, type HeadConfig } from 'vitepress'
-import { kinds, loadCatalog } from '../scripts/catalog.mjs'
+import { loadCatalog } from '../scripts/lib/artifacts.mjs'
+import { catalogKinds } from '../scripts/lib/catalog/render.mjs'
 
 const catalog = loadCatalog()
 const catalogPages = new Map(
-  catalog.entries.map(({ slug, content }) => [`modules/${slug}.md`, content]),
+  catalog.entries.map(({ name, content }) => [`modules/${name}.md`, content]),
 )
 
 const site = 'https://limanix.dev'
@@ -159,12 +160,12 @@ export default defineConfig({
         text: 'Modules',
         items: [
           { text: 'The catalog', link: '/modules/' },
-          ...Object.entries(kinds).map(([kind, text]) => ({
+          ...Object.entries(catalogKinds).map(([kind, text]) => ({
             text,
             collapsed: true,
             items: catalog.entries
               .filter((entry) => entry.kind === kind)
-              .map((entry) => ({ text: entry.title, link: `/modules/${entry.slug}` })),
+              .map((entry) => ({ text: entry.title, link: `/modules/${entry.name}` })),
           })),
           { text: 'Your own modules', link: '/modules/custom' },
         ],

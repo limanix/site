@@ -1,35 +1,22 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
-import { catalogSlug, latestRelease } from '../../docs/scripts/catalog.mjs'
+import { join } from 'node:path'
+import { download, latestRelease } from '../../docs/scripts/lib/sources.mjs'
 
-const repository = 'limanix/modules'
+const { MODULES_ROOT } = process.env
 const target = new URL('../.catalog/graph.json', import.meta.url)
 
-async function download(url) {
-  const response = await fetch(url, { signal: AbortSignal.timeout(60_000) })
-  if (!response.ok) throw new Error(`Catalog download failed: ${response.status} ${url}`)
-  return response.json()
-}
+const ref = MODULES_ROOT ? 'local' : await latestRelease('limanix/modules')
+const text = MODULES_ROOT
+  ? await readFile(join(MODULES_ROOT, 'catalog/graph.json'), 'utf8')
+  : await downloadGraph(ref)
 
-async function load() {
-  if (process.env.MODULES_ROOT) {
-    const file = resolve(process.env.MODULES_ROOT, 'catalog/graph.json')
-    return { ref: 'local', graph: JSON.parse(await readFile(file, 'utf8')) }
-  }
-  const ref = process.env.MODULES_REF || (await latestRelease(repository))
-  if (!/^v[1-9][0-9]*$/.test(ref)) throw new Error(`Invalid modules release: ${ref}`)
-  const url = `https://raw.githubusercontent.com/${repository}/${ref}/catalog/graph.json`
-  return { ref, graph: await download(url) }
-}
-
-const { ref, graph } = await load()
-if (!Array.isArray(graph.modules) || !graph.modules.length) {
-  throw new Error(`Catalog ${ref} has no graph nodes`)
-}
-const modules = graph.modules.map((node) => ({
-  ...node,
-  page: node.module ? catalogSlug(node.module) : null,
-}))
 await mkdir(new URL('./', target), { recursive: true })
-await writeFile(target, `${JSON.stringify({ ...graph, modules })}\n`)
-console.log(`Catalog ${ref}: ${graph.modules.length} graph nodes`)
+await writeFile(target, text)
+
+console.log(`Catalog ${ref}: ${JSON.parse(text).modules.length} graph nodes`)
+
+async function downloadGraph(release) {
+  const url = `https://raw.githubusercontent.com/limanix/modules/${release}/catalog/graph.json`
+  const response = await download(url)
+  return response.text()
+}

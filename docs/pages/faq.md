@@ -175,4 +175,6 @@ limanix delete dev-box --remove-home  # removes it too
 
 :::
 
-A new VM gets a new, empty home: copy what you need from the old one. See [Files and storage](/vms/storage).
+A new VM gets a new, empty home: copy what you need from the old one. `limanix homes list` shows the homes that stayed, and `limanix homes remove` removes them. See [Files and storage](/vms/storage).
+
+Deleting a VM returns less space than `du` shows for its disk, because the disk shares blocks with Lima's download cache. See [The image cache](/reference/paths#the-image-cache).

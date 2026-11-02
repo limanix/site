@@ -150,7 +150,11 @@ limanix delete dev-box --remove-home  # removes it too
 
 `delete` stops the VM if it runs, then removes its disk and its saved record. The managed home stays
 on the Mac unless you add `--remove-home`, and the command prints its path. Your `limanix.toml` and
-shared project folders stay too. `delete` also cleans up a VM that Lima no longer has.
+shared project folders stay too. `delete` also cleans up a VM that Lima no longer has, and removes
+the cached base disks of other catalog releases; see [The image cache](/reference/paths#the-image-cache).
+
+`limanix homes list` shows the homes that stayed, and `limanix homes remove` removes them; see
+[Clean up kept homes](/vms/storage#clean-up-kept-homes).
 
 ::: warning
 `delete` does not ask for confirmation. Save what you need from the guest disk first; see
@@ -163,8 +167,9 @@ create the VM again from the same file, see [Recreate a VM](/vms/storage#recreat
 ## Use LimaNix in scripts
 
 Standard output carries only results: errors and the build output of `create` and `update` go to
-standard error. `limanix list -q` prints only the VM names, one per line, and
-`limanix modules list -q` only the selectors. Stop every VM:
+standard error. `limanix list -q` prints only the VM names, one per line,
+`limanix modules list -q` only the selectors and `limanix homes list -q` only the names of the kept
+homes. Stop every VM:
 
 ::: code-group
 
@@ -185,6 +190,7 @@ With `--json`, a command prints its result as JSON:
 | `delete`                            | `name`, and `home`: the preserved home, or `null` with `--remove-home` |
 | `doctor`, `network check`           | The checks                                                             |
 | `modules list`                      | An array of modules                                                    |
+| `homes list`                        | An array of kept homes                                                 |
 
 Start a VM and read its address with `jq`, which comes with macOS:
 

@@ -77,6 +77,6 @@ An update is not a transaction: completed steps are not undone. Lima settings ap
 
 ## Where state lives
 
-Three folders on the Mac hold everything outside the VMs: the state folder with the generations, Lima's folder with the guest disks, and the managed homes. [Paths and ports](/reference/paths) lists what each holds, and [Files and storage](/vms/storage) what each command keeps.
+Four folders on the Mac hold everything outside the VMs: the state folder with the generations, Lima's folder with the guest disks, Lima's download cache with the base disks, and the managed homes. [Paths and ports](/reference/paths) lists what each holds, and [Files and storage](/vms/storage) what each command keeps.
 
 A lock per VM keeps two commands from changing the same VM at once; `limanix shell` does not take it. `limanix list --json` reports Lima's power state and the last LimaNix operation as separate values. `LIMANIX_HOME` and `LIMA_HOME` do not move existing VMs: use the same values whenever you work with them.

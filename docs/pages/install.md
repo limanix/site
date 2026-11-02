@@ -108,7 +108,7 @@ done
 
 :::
 
-Add `--remove-home` after `"$vm"` to remove the homes too; LimaNix can no longer remove a home after its VM is deleted. Then remove the binary:
+Add `--remove-home` after `"$vm"` to remove the homes too, and run `limanix homes remove --all` for the homes of VMs you deleted earlier. Then remove the binary:
 
 ::: code-group
 
@@ -126,3 +126,4 @@ These stay on your Mac; [Paths and ports](/reference/paths) describes each folde
 | LimaNix state, such as imported modules and records of kept homes                      | `~/Library/Application Support/Limanix`, or `LIMANIX_HOME` when set    |
 | Your `limanix.toml` files and project folders                                          | Where you keep them                                                    |
 | The network helper and Lima's sudoers rules, if `limanix network setup` installed them | `/opt/socket_vmnet/bin/socket_vmnet` and `/private/etc/sudoers.d/lima` |
+| Cached base disks and other Lima downloads                                             | `~/Library/Caches/lima`                                                |

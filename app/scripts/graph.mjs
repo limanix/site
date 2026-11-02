@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { catalogSlug } from '../../docs/scripts/catalog.mjs'
+import { catalogSlug, latestRelease } from '../../docs/scripts/catalog.mjs'
 
 const repository = 'limanix/modules'
 const target = new URL('../.catalog/graph.json', import.meta.url)
@@ -16,9 +16,7 @@ async function load() {
     const file = resolve(process.env.MODULES_ROOT, 'catalog/graph.json')
     return { ref: 'local', graph: JSON.parse(await readFile(file, 'utf8')) }
   }
-  const ref =
-    process.env.MODULES_REF ||
-    (await download(`https://api.github.com/repos/${repository}/releases/latest`)).tag_name
+  const ref = process.env.MODULES_REF || (await latestRelease(repository))
   if (!/^v[1-9][0-9]*$/.test(ref)) throw new Error(`Invalid modules release: ${ref}`)
   const url = `https://raw.githubusercontent.com/${repository}/${ref}/catalog/graph.json`
   return { ref, graph: await download(url) }

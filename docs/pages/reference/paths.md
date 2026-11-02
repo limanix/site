@@ -4,7 +4,7 @@ description: Where LimaNix keeps its files on the Mac, what each folder holds an
 
 # Paths and ports
 
-LimaNix keeps everything outside the VMs in three folders on your Mac, and gives each VM an SSH port
+LimaNix keeps everything outside the VMs in four folders on your Mac, and gives each VM an SSH port
 on the Mac's own address, `127.0.0.1`. Leave the folders to the `limanix` commands, and read
 [Troubleshooting](/troubleshooting) before you change anything in them by hand.
 
@@ -15,6 +15,7 @@ on the Mac's own address, `127.0.0.1`. Leave the folders to the `limanix` comman
 | `~/Library/Application Support/Limanix` | LimaNix state: the record of each VM, its prepared builds, imported modules and SSH settings | `LIMANIX_HOME`                |
 | `~/.lima`                               | Lima's VMs: their guest disks, Lima settings and logs, and the SSH key that `limanix` uses   | `LIMA_HOME`                   |
 | `~/.limanix`                            | Managed homes: your home folder in each VM                                                   | `home.root` in `limanix.toml` |
+| `~/Library/Caches/lima`                 | Lima's download cache: the base disks that new VMs start from                                | Cannot be moved               |
 
 ::: warning
 `LIMANIX_HOME` and `LIMA_HOME` do not move existing VMs. Use the same values for every command:
@@ -37,8 +38,29 @@ other values show other VMs.
 | `ssh/config`                   | SSH settings for editors; see [SSH ports](#ssh-ports)                                                                    |
 
 `limanix delete` removes the VM's folder in `instances/` and records its managed home in `homes/`.
-With `--remove-home`, it removes the home and that record too. [Install](/install#remove-limanix)
-lists what stays on the Mac after you remove LimaNix.
+With `--remove-home`, it removes the home and that record too, and `limanix homes remove` does the
+same later. [Install](/install#remove-limanix) lists what stays on the Mac after you remove LimaNix.
+
+## The image cache
+
+Lima downloads a base disk once and keeps it in `~/Library/Caches/lima`, a few GiB for each catalog release. On one APFS volume, a new guest disk is a clone of the cached file and takes space only for what the VM changes:
+
+- `du` counts the shared blocks in both folders: the guest disk looks bigger than the space it takes.
+- `limanix delete` returns what the VM wrote, not the full size of its disk. `df -h ~` shows what the Mac really has free.
+- A VM needs the cache only to create its disk. Removing the cache does not affect existing VMs.
+
+`limanix delete` removes the cached base disks of other catalog releases. It keeps the disks of the release that this `limanix` carries, which the next `create` uses without a download, and it leaves other downloads alone, such as the images of your own Lima VMs.
+
+To free the rest, remove the folder. `limanix create` and Lima download what they need again:
+
+::: code-group
+
+```sh [Mac]
+du -sh ~/Library/Caches/lima
+rm -rf ~/Library/Caches/lima
+```
+
+:::
 
 ## SSH ports
 

@@ -22,7 +22,7 @@ description: Every command, argument and flag of the limanix command on the Mac,
 
 Only `limanix` itself takes `-v`.
 
-Results go to standard output. Errors, as `limanix: MESSAGE`, and the build output of `create` and `update` go to standard error. For scripts, `list` and `modules list` take `-q` to print only names, and every command with a result takes `--json`; see [Use LimaNix in scripts](/vms/#use-limanix-in-scripts).
+Results go to standard output. Errors, as `limanix: MESSAGE`, and the build output of `create` and `update` go to standard error. For scripts, `list`, `modules list` and `homes list` take `-q` to print only names, and every command with a result takes `--json`; see [Use LimaNix in scripts](/vms/#use-limanix-in-scripts).
 
 ### Exit status
 
@@ -250,9 +250,75 @@ With `--json`, it prints an object with these fields:
 - There is no confirmation prompt.
 - Your `limanix.toml` and the folders shared with `[[mounts]]` stay on the Mac.
 - `--force` does not imply `--remove-home`.
-- A preserved home is not attached to a new VM of the same name. After the VM is deleted, `delete --remove-home` can no longer remove it; keep the printed path to clean it up by hand.
+- A preserved home is not attached to a new VM of the same name. After the VM is deleted, `delete --remove-home` can no longer remove it; use [`limanix homes remove`](#limanix-homes-remove).
+- `delete` also removes the cached base disks of other catalog releases, and only warns when it cannot; see [The image cache](/reference/paths#the-image-cache).
 
 Guide: [Files and storage](/vms/storage).
+
+## `limanix homes`
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-about -->
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-usage -->
+
+:::
+
+`limanix homes` without a subcommand is a usage error.
+
+### `limanix homes list`
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-list-about -->
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-list-usage -->
+
+:::
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-list -->
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-list-columns -->
+
+`list` shows the homes recorded in `homes/` of the [state folder](/reference/paths#the-limanix-state-folder); other folders under `home.root` do not appear. It warns about a record or a home that it cannot read and leaves that row out. Without kept homes, it prints `No kept homes.`
+
+`-q` prints only the names, one per line, and nothing without kept homes. It cannot be combined with `--json`.
+
+`--json` prints an array with one object per home:
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-list-json -->
+
+Guide: [Clean up kept homes](/vms/storage#clean-up-kept-homes).
+
+### `limanix homes remove`
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-remove-about -->
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-remove-usage -->
+
+:::
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-remove-arguments -->
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-remove -->
+
+`remove` prints this line for each removed home:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-homes-remove-output -->
+
+:::
+
+- There is no confirmation prompt, and the files cannot be recovered.
+- It removes the home and its record in `homes/`. The home of an existing VM has no such record; `limanix delete --remove-home` removes it.
+- Names and `--all` exclude each other, and passing neither is a usage error.
+- When it cannot remove a home, it prints the error, goes on with the other names and exits with `1`.
+
+Guide: [Clean up kept homes](/vms/storage#clean-up-kept-homes).
 
 ## `limanix network`
 

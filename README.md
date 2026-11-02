@@ -3,48 +3,35 @@
 [![License: Apache-2.0](https://img.shields.io/github/license/limanix/site?label=license)](LICENSE)
 
 <div align="center">
-<p align="center">
-  <img src=".github/assets/readme-header.png"
-       alt="LimaNix"
-       width="100%">
-</p>
+<img src=".github/assets/readme-header.png" alt="LimaNix" width="100%">
 
 <p align="center">
-<a href="https://docs.limanix.dev/quick-start"><code>→ Get started</code></a>&nbsp;
+<a href="https://docs.limanix.dev/quick-start"><code>→ Get started</code></a>
 <a href="https://docs.limanix.dev/"><code>Documentation</code></a>
+<a href="https://docs.limanix.dev/contributing"><code>Contributing</code></a>
 </p>
+
 <p align="center"><sub>macOS 26 or newer | Apple Silicon and Intel</sub></p>
 </div>
 
+## Website and documentation
+
+The public website and documentation for LimaNix: discover the project, explore
+its catalog, download the client and find the guides for your next step.
+
+- **Get to know the project.** See the workflow, configuration examples and
+  answers to common questions on limanix.dev.
+- **Explore the catalog.** Browse an interactive map of shell components,
+  toolchains and services, see their connections and open their documentation.
+- **Download the client.** Choose Apple Silicon or Intel and follow the
+  installation steps for your Mac.
+- **Find practical guidance.** Use docs.limanix.dev for the first VM,
+  configuration examples, command references and troubleshooting.
+
 ## Development
 
-You need [Task](https://taskfile.dev) 3.53.1 or newer and Docker; every task runs in a container.
+> Requires [Task](https://taskfile.dev) 3.53.1+ and Docker. 
 
-| Task | Does |
-| -- | -- |
-| `task run/docs`, `task run/app` | Previews the docs at http://localhost:5174 or the landing page at http://localhost:5173 |
-| `task ci/node/build APP=docs` | Lints and builds the docs into `docs/dist`, or the landing page into `app/dist` with `APP=app` |
-| `task ci/node/test APP=docs` | Runs the tests; for the docs they also check the links, code blocks and style of the pages |
-| `task ci/node/audit APP=docs` | Audits the npm dependencies |
-| `task ci/terraform/fmt`, `task ci/terraform/validate` | Check the hosting in `tf/` |
+Preview with `task run/app` or `task run/docs`; use `task -l` to list checks.
 
-The build reads module pages, the catalog graph, references and the contribution guide from the other repositories.
-The [contribution guide](https://github.com/limanix/.github/blob/main/CONTRIBUTING.md#what-the-site-reads) lists what comes from where, and the build prints the releases it read.
-A release elsewhere reaches the site with the next tag `v<version>` on `main`; it does not publish the site by itself.
-
-To build from other sources, run from `docs/` with Node.js 22 and npm:
-
-```sh
-npm ci
-MODULES_REF=v12 CLIENT_REF=v0.3.1 npm run build
-MODULES_ROOT=../../modules CLIENT_ROOT=../../client LMX_ROOT=../../lmx ORG_ROOT=../../.github npm run dev
-```
-
-`MODULES_REF` and `CLIENT_REF` select a release instead of the latest one; an older client fails the build when the pages use a command it lacks.
-`MODULES_ROOT`, `CLIENT_ROOT`, `LMX_ROOT` and `ORG_ROOT` read a local checkout and take precedence.
-Restart the preview after changing a source.
-The build uses Node.js and `tar`; downloaded data stays in the ignored `docs/.catalog/` and `docs/.reference/` directories.
-
-## Contributing
-
-Follow the [contribution guide](https://github.com/limanix/.github/blob/main/CONTRIBUTING.md).
+See the [contribution guide](https://github.com/limanix/.github/blob/main/CONTRIBUTING.md).

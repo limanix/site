@@ -86,10 +86,13 @@ resource "aws_cloudfront_response_headers_policy" "site" {
 
 resource "aws_cloudfront_function" "uri_rewrite" {
   name    = "${local.name_prefix}-uri-rewrite"
-  comment = "Redirect .html and directory URLs, resolve clean URLs to their S3 objects"
+  comment = "Redirect www, .html and directory URLs"
   runtime = "cloudfront-js-2.0"
 
-  code    = replace(file("${path.module}/functions/uri-rewrite.js"), "DIRECTORIES", jsonencode(local.directories))
+  code = replace(
+    replace(file("${path.module}/functions/uri-rewrite.js"), "DIRECTORIES", jsonencode(local.directories)),
+    "CANONICAL_HOST", jsonencode(var.domain_name)
+  )
   publish = true
 }
 
@@ -101,7 +104,7 @@ resource "aws_cloudfront_distribution" "site" {
   enabled             = true
   is_ipv6_enabled     = true
 
-  aliases = [var.domain_name]
+  aliases = var.domain_name == "limanix.dev" ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
 
   origin {
     domain_name              = aws_s3_bucket.site.bucket_regional_domain_name

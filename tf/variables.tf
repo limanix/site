@@ -1,23 +1,23 @@
 variable "aws_region" {
-  description = "AWS region for bucket."
+  description = "Bucket AWS region"
   type        = string
   nullable    = false
 }
 
 variable "domain_name" {
-  description = "Hostname of the site."
+  description = "Hostname"
   type        = string
   nullable    = false
 }
 
 variable "site_bucket_name" {
-  description = "S3 bucket name for the static contents."
+  description = "Static S3 bucket name"
   type        = string
   nullable    = false
 }
 
 variable "acm_certificate_arn" {
-  description = "ARN of an issued ACM certificate."
+  description = "ACM certificate ARN"
   type        = string
   nullable    = false
 }

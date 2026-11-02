@@ -155,18 +155,20 @@ async function download(url) {
   return response
 }
 
+export async function latestRelease(repository) {
+  const url = `https://github.com/${repository}/releases/latest`
+  const response = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(60_000) })
+  const tag = response.headers.get('location')?.split('/releases/tag/')[1]
+  if (!tag) throw new Error(`No latest release: ${response.status} ${url}`)
+  return tag
+}
+
 async function prepare() {
   let catalog
   if (process.env.MODULES_ROOT) {
     catalog = readCatalog(resolve(process.env.MODULES_ROOT), 'local')
   } else {
-    const ref =
-      process.env.MODULES_REF ||
-      (
-        await (
-          await download('https://api.github.com/repos/limanix/modules/releases/latest')
-        ).json()
-      ).tag_name
+    const ref = process.env.MODULES_REF || (await latestRelease('limanix/modules'))
     if (!/^v[1-9][0-9]*$/.test(ref)) throw new Error(`Invalid modules release: ${ref}`)
     const temporary = mkdtempSync(join(tmpdir(), 'limanix-catalog-'))
     try {

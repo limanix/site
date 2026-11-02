@@ -12,13 +12,14 @@ how the guest disk keeps free space.
 
 ## Where your files live
 
-| Place                                                      | Where the files are                                                                                                                                                      | After `limanix delete`                                      |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| [Guest disk](#the-guest-disk)                              | A disk image in `~/.lima`, seen only in the VM: NixOS and data written outside mounts                                                                                    | Removed                                                     |
-| [Managed home](#the-managed-home)                          | On the Mac beneath `~/.limanix`; appears read-write at `user.home` inside the VM                                                                                         | Kept by default; `--remove-home` removes it                 |
-| [Project folders](/config/mounts)                          | Folders of your Mac, such as your project at `/workspace`: as many as you list in `[[mounts]]`, each read-write (`rw`) or read-only (`ro`) in the VM                     | Kept on the Mac                                             |
-| [Dotfiles](/config/dotfiles)                               | Your dotfiles folder on the Mac, read-write at `/mnt/dotfiles` in the VM; each interactive Bash or Zsh shell of the development account links its entries into your home | Kept on the Mac                                             |
-| [LimaNix state](/reference/paths#the-limanix-state-folder) | The record of each VM in `~/Library/Application Support/Limanix`; none of your files                                                                                     | The VM's record is removed; the record of a kept home stays |
+| Place                                                      | Where the files are                                                                                                                                                      | After `limanix delete`                                                |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| [Guest disk](#the-guest-disk)                              | A disk image in `~/.lima`, seen only in the VM: NixOS and data written outside mounts                                                                                    | Removed                                                               |
+| [Managed home](#the-managed-home)                          | On the Mac beneath `~/.limanix`; appears read-write at `user.home` inside the VM                                                                                         | Kept by default; `--remove-home` or `limanix homes remove` removes it |
+| [Project folders](/config/mounts)                          | Folders of your Mac, such as your project at `/workspace`: as many as you list in `[[mounts]]`, each read-write (`rw`) or read-only (`ro`) in the VM                     | Kept on the Mac                                                       |
+| [Dotfiles](/config/dotfiles)                               | Your dotfiles folder on the Mac, read-write at `/mnt/dotfiles` in the VM; each interactive Bash or Zsh shell of the development account links its entries into your home | Kept on the Mac                                                       |
+| [LimaNix state](/reference/paths#the-limanix-state-folder) | The record of each VM in `~/Library/Application Support/Limanix`; none of your files                                                                                     | The VM's record is removed; the record of a kept home stays           |
+| [Image cache](/reference/paths#the-image-cache)            | The base disks that new VMs start from in `~/Library/Caches/lima`; none of your files                                                                                    | Disks of other catalog releases are removed; the current stay         |
 
 <div class="parts">
 
@@ -41,6 +42,10 @@ The guest disk holds NixOS, the Nix store and every file outside the shared fold
 service data under `/var`, such as Docker images and volumes. It keeps only the NixOS system the VM
 runs; each update removes the older ones. Its size is `disk` in `[resources]`; see
 [Resources and architecture](/vms/resources).
+
+A new guest disk is a clone of the base disk in [the image cache](/reference/paths#the-image-cache).
+`limanix delete` returns the space that the VM wrote, which can be much less than `du` shows for the
+disk.
 
 ## The managed home
 
@@ -101,8 +106,46 @@ After a delete, `limanix create --config limanix.toml` creates a new VM from the
 new, empty managed home. The old home stays at the path that `delete` printed, and LimaNix does not
 attach it again. Copy the files you need into the new home or a project folder.
 
-Once the VM is deleted, `limanix delete --remove-home` can no longer remove its old home. Keep the
-printed path and remove that folder yourself when you no longer need it.
+## Clean up kept homes
+
+A home that `limanix delete` kept stays on the Mac until you remove it, and no later VM uses it.
+`limanix homes list` shows these homes and the space each one takes:
+
+::: code-group
+
+```sh [Mac]
+limanix homes list
+```
+
+```text [Output]
+NAME                  SIZE     CREATED     PATH
+dev-box-0f9e8d7c6b5a  0 B      2026-10-05  /Users/you/.limanix/dev-box-0f9e8d7c6b5a
+dev-box-a1b2c3d4e5f6  4.5 GiB  2026-10-21  /Users/you/.limanix/dev-box-a1b2c3d4e5f6
+```
+
+:::
+
+Look through a home before you remove it: it can hold your shell history, tool settings and the only
+copy of a file. Toolchains and caches, such as `.rustup` and `.cargo`, usually take most of the space
+and download again in a new VM.
+
+Remove the homes you no longer need, by name or all at once:
+
+::: code-group
+
+```sh [Mac]
+limanix homes remove dev-box-a1b2c3d4e5f6  # removes one
+limanix homes remove --all                 # removes every kept home
+```
+
+:::
+
+::: warning
+`limanix homes remove` does not ask for confirmation, and the files cannot be recovered.
+:::
+
+`limanix delete --remove-home` works only while the VM exists. See
+[`limanix homes`](/reference/cli#limanix-homes) for the columns and flags.
 
 ## Keep the disk free
 

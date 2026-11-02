@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { latestRelease } from './catalog.mjs'
 
 export const referenceDir = fileURLToPath(new URL('../.reference/', import.meta.url))
 
@@ -357,9 +358,7 @@ async function readGuide(root, repository) {
 export async function loadSources(env = process.env) {
   const clientRef = env.CLIENT_ROOT
     ? 'local'
-    : env.CLIENT_REF ||
-      (await (await download('https://api.github.com/repos/limanix/client/releases/latest')).json())
-        .tag_name
+    : env.CLIENT_REF || (await latestRelease('limanix/client'))
   if (!env.CLIENT_ROOT && !/^v[0-9]+\.[0-9]+\.[0-9]+(\+[0-9]+)?$/.test(clientRef)) {
     throw new Error(`Invalid client release: ${clientRef}`)
   }

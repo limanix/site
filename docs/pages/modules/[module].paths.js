@@ -1,9 +1,9 @@
-import { loadCatalog } from '../../scripts/catalog.mjs'
+import { loadCatalog } from '../../scripts/lib/artifacts.mjs'
 
 export default {
   paths() {
-    return loadCatalog().entries.map(({ slug, content }) => ({
-      params: { module: slug },
+    return loadCatalog().entries.map(({ name, content }) => ({
+      params: { module: name },
       content,
     }))
   },

@@ -49,8 +49,8 @@ const matches = computed(() =>
   query.value.trim() ? new Set(found.value.map((module) => module.id)) : null,
 )
 const guide = computed(() => {
-  const page = current.value?.page
-  return page ? `${siteContent.links.docs}/modules/${page}` : null
+  const module = current.value?.module
+  return module ? `${siteContent.links.docs}/modules/${module}` : null
 })
 
 function dismiss() {

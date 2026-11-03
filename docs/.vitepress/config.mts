@@ -1,10 +1,11 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig, type HeadConfig } from 'vitepress'
-import { kinds, loadCatalog } from '../scripts/catalog.mjs'
+import { loadCatalog } from '../scripts/lib/artifacts.mjs'
+import { catalogKinds } from '../scripts/lib/catalog/render.mjs'
 
 const catalog = loadCatalog()
 const catalogPages = new Map(
-  catalog.entries.map(({ slug, content }) => [`modules/${slug}.md`, content]),
+  catalog.entries.map(({ name, content }) => [`modules/${name}.md`, content]),
 )
 
 const site = 'https://limanix.dev'
@@ -82,6 +83,11 @@ export default defineConfig({
   markdown: {
     theme: { light: 'catppuccin-mocha', dark: 'catppuccin-mocha' },
     config(md) {
+      const fence = md.renderer.rules.fence!
+      md.renderer.rules.fence = (tokens, index, options, env, self) =>
+        tokens[index].info.trim() === 'mermaid'
+          ? `<MermaidDiagram code="${md.utils.escapeHtml(tokens[index].content)}" />`
+          : fence(tokens, index, options, env, self)
       const render = md.renderer.rules.code_inline!
       md.renderer.rules.code_inline = (tokens, index, options, env, self) => {
         const { content } = tokens[index]
@@ -154,12 +160,12 @@ export default defineConfig({
         text: 'Modules',
         items: [
           { text: 'The catalog', link: '/modules/' },
-          ...Object.entries(kinds).map(([kind, text]) => ({
+          ...Object.entries(catalogKinds).map(([kind, text]) => ({
             text,
             collapsed: true,
             items: catalog.entries
               .filter((entry) => entry.kind === kind)
-              .map((entry) => ({ text: entry.title, link: `/modules/${entry.slug}` })),
+              .map((entry) => ({ text: entry.title, link: `/modules/${entry.name}` })),
           })),
           { text: 'Your own modules', link: '/modules/custom' },
         ],
@@ -173,12 +179,7 @@ export default defineConfig({
       },
       {
         text: 'Contributing',
-        items: [
-          { text: 'How to contribute', link: '/contributing/' },
-          { text: 'The client', link: '/contributing/client' },
-          { text: 'The lmx command', link: '/contributing/lmx' },
-          { text: 'The catalog', link: '/contributing/catalog' },
-        ],
+        items: [{ text: 'How to contribute', link: '/contributing/' }],
       },
       {
         text: 'Reference',
@@ -203,9 +204,10 @@ export default defineConfig({
     socialLinks: [{ icon: 'github', link: 'https://github.com/limanix' }],
     editLink: {
       pattern: ({ frontmatter, relativePath }) =>
-        frontmatter.catalogSource
+        frontmatter.editSource ??
+        (frontmatter.catalogSource
           ? `https://github.com/limanix/modules/edit/main/${frontmatter.catalogSource}`
-          : `https://github.com/limanix/site/edit/main/docs/pages/${relativePath}`,
+          : `https://github.com/limanix/site/edit/main/docs/pages/${relativePath}`),
       text: 'Edit this page on GitHub',
     },
     outline: { level: [2, 3], label: 'On this page' },

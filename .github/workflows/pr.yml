@@ -13,6 +13,18 @@ permissions:
   contents: read
 
 jobs:
+  markdown:
+    name: Markdown formatting
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: mr-chelyshkin/actions/task-run@772ed02edbc40cbc539a507e0f55972da7cc7c8e # v3
+        with:
+          task: ci/markdown/fmt
+
   node:
     name: node (${{ matrix.app }})
     strategy:
@@ -28,42 +40,24 @@ jobs:
       cache-dependency-path: ${{ matrix.app }}/package-lock.json
 
   terraform:
-    name: terraform (${{ matrix.app }})
+    name: Terraform ${{ matrix.check }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - app: app
-            state-key: ${{ vars.SITE_TF_STATE_KEY }}
-            domain-name: ${{ vars.SITE_DOMAIN_NAME }}
-            bucket-name: ${{ vars.SITE_BUCKET_NAME }}
-            certificate-arn: ${{ vars.SITE_ACM_CERTIFICATE_ARN }}
-          - app: docs
-            state-key: ${{ vars.DOCS_TF_STATE_KEY }}
-            domain-name: ${{ vars.DOCS_DOMAIN_NAME }}
-            bucket-name: ${{ vars.DOCS_BUCKET_NAME }}
-            certificate-arn: ${{ vars.DOCS_ACM_CERTIFICATE_ARN }}
-    uses: mr-chelyshkin/actions/.github/workflows/ci-terraform.yml@772ed02edbc40cbc539a507e0f55972da7cc7c8e # v3
-    permissions:
-      contents: read
-      id-token: write
-    with:
-      aws-role-arn: ${{ vars.AWS_TERRAFORM_PLAN_ROLE_ARN }}
-      aws-region: ${{ vars.AWS_REGION }}
-      env-vars: |
-        {
-          "TF_STATE_KEY": ${{ toJSON(matrix.state-key) }},
-          "TF_VAR_aws_region": ${{ toJSON(vars.AWS_REGION) }},
-          "TF_STATE_REGION": ${{ toJSON(vars.TF_STATE_REGION) }},
-          "TF_STATE_BUCKET": ${{ toJSON(vars.TF_STATE_BUCKET) }},
-          "TF_VAR_domain_name": ${{ toJSON(matrix.domain-name) }},
-          "TF_VAR_site_bucket_name": ${{ toJSON(matrix.bucket-name) }},
-          "TF_VAR_acm_certificate_arn": ${{ toJSON(matrix.certificate-arn) }}
-        }
+        check: [fmt, validate]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: mr-chelyshkin/actions/task-run@772ed02edbc40cbc539a507e0f55972da7cc7c8e # v3
+        with:
+          task: ci/terraform/${{ matrix.check }}
 
   gate:
     if: always()
-    needs: [node, terraform]
+    needs: [markdown, node, terraform]
     runs-on: ubuntu-24.04
     permissions:
       contents: read

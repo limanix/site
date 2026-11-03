@@ -4,15 +4,20 @@ description: Every table and key of limanix.toml, with its type, allowed values 
 
 # limanix.toml
 
-`limanix.toml` describes one VM. `limanix create` and `limanix update` read it on the Mac; editing the file changes nothing until you run one of them. [The limanix.toml file](/config/) explains the layout with examples.
+`limanix.toml` describes one VM. `limanix create` and `limanix update` read it
+on the Mac; editing the file changes nothing until you run one of them.
+[The limanix.toml file](/config/) explains the layout with examples.
 
 ## File rules
 
 - The file is TOML in UTF-8. Top-level keys come before the first table.
-- Unknown keys and wrong types are rejected, including typos such as `resources.cpus`.
+- Unknown keys and wrong types are rejected, including typos such as
+  `resources.cpus`.
 - An omitted key keeps its default, listed in [Defaults](#defaults).
-- An empty string does not ask for a default: `source = ""` is an error, while `APP_ENV = ""` is an empty value.
-- An error names the key without its value, such as `limanix: resources.cpu: must be positive`.
+- An empty string does not ask for a default: `source = ""` is an error, while
+  `APP_ENV = ""` is an empty value.
+- An error names the key without its value, such as
+  `limanix: resources.cpu: must be positive`.
 
 ## Top-level keys
 
@@ -48,7 +53,8 @@ sudo = true
 
 <!-- @include: ../../.reference/config.md#config-user -->
 
-The account uses the numeric UID of your Mac account for shared files; its name can differ from your Mac account's name.
+The account uses the numeric UID of your Mac account for shared files; its name
+can differ from your Mac account's name.
 
 Guide: [Environment and account](/config/environment).
 
@@ -88,7 +94,8 @@ root = "~/.limanix"
 
 <!-- @include: ../../.reference/config.md#config-home -->
 
-`limanix create` prints the path of the managed home, and `limanix list --json` shows it in `home`.
+`limanix create` prints the path of the managed home, and `limanix list --json`
+shows it in `home`.
 
 Guide: [Files and storage](/vms/storage).
 
@@ -111,9 +118,12 @@ dotfiles = "~/dotfiles"
 
 <!-- @include: ../../.reference/config.md#config-shell -->
 
-`none` leaves a component out of the VM. With `preset = "minimal"`, the defaults of `prompt`, `editor` and `multiplexer` are `none`; name a prompt that runs in Bash, an editor or a multiplexer to add it.
+`none` leaves a component out of the VM. With `preset = "minimal"`, the defaults
+of `prompt`, `editor` and `multiplexer` are `none`; name a prompt that runs in
+Bash, an editor or a multiplexer to add it.
 
-Guides: [Shell](/config/shell), [Prompts](/config/prompts), [Dotfiles](/config/dotfiles).
+Guides: [Shell](/config/shell), [Prompts](/config/prompts),
+[Dotfiles](/config/dotfiles).
 
 ## `[toolchains]`
 
@@ -137,7 +147,11 @@ gradle = "9"
 
 <!-- @include: ../../.reference/config.md#config-toolchains -->
 
-A line is a version such as `1.27` and must exist in the catalog of your client: `limanix modules list` shows each line as a selector of kind `toolchains`, such as `lmx:go-1.27`. An unknown line fails with the lines the catalog has. `maven` or `gradle` without `java` fails with `toolchains.gradle: needs a JDK: add java to [toolchains], such as java = "21"`.
+A line is a version such as `1.27` and must exist in the catalog of your client:
+`limanix modules list` shows each line as a selector of kind `toolchains`, such
+as `lmx:go-1.27`. An unknown line fails with the lines the catalog has. `maven`
+or `gradle` without `java` fails with
+`toolchains.gradle: needs a JDK: add java to [toolchains], such as java = "21"`.
 
 Guide: [Toolchains](/config/toolchains).
 
@@ -157,7 +171,11 @@ packages = ["jq", "unstable:kubernetes-helm"]
 
 <!-- @include: ../../.reference/config.md#config-nixos -->
 
-`[shell]` and `[toolchains]` choose the other catalog modules. A shell component or a toolchain in `modules` fails with the table that chooses it, such as `nixos.modules[0]: lmx:go is a toolchain; choose its version in [toolchains], such as go = "1.27"`. The `terminal` preset also installs the GitHub CLI, `gh`; a package of the same name in `packages` takes its place.
+`[shell]` and `[toolchains]` choose the other catalog modules. A shell component
+or a toolchain in `modules` fails with the table that chooses it, such as
+`nixos.modules[0]: lmx:go is a toolchain; choose its version in [toolchains], such as go = "1.27"`.
+The `terminal` preset also installs the GitHub CLI, `gh`; a package of the same
+name in `packages` takes its place.
 
 Guides: [Modules and packages](/config/modules), [The catalog](/modules/).
 
@@ -211,7 +229,10 @@ udp = []
 
 <!-- @include: ../../.reference/config.md#config-network-ports -->
 
-A port is an integer from 1 to 65535. The lists only open the firewall: they do not start services or forward ports of the Mac, and `localhost` on the Mac does not reach them. Selected modules can open ports of their own, also when the lists are empty.
+A port is an integer from 1 to 65535. The lists only open the firewall: they do
+not start services or forward ports of the Mac, and `localhost` on the Mac does
+not reach them. Selected modules can open ports of their own, also when the
+lists are empty.
 
 Guide: [Network](/vms/network).
 
@@ -229,13 +250,15 @@ APP_PORT = "8080"
 
 :::
 
-| Key    | Type   | Default | Description                                                                                                                                                                                                                                          |
-| ------ | ------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NAME` | string | none    | The environment variable `NAME`. A name has ASCII letters, digits and `_`, and does not start with a digit. A value is a string, also for numbers, and may be empty. Values are literal: `"$TOKEN"` is the text `$TOKEN`, not a variable of the Mac. |
+| Key | Type | Default | Description |
+| -- | -- | -- | -- |
+| `NAME` | string | none | The environment variable `NAME`. A name has ASCII letters, digits and `_`, and does not start with a digit. A value is a string, also for numbers, and may be empty. Values are literal: `"$TOKEN"` is the text `$TOKEN`, not a variable of the Mac. |
 
 Without `env` in the file, the guest gets no variables.
 
-The values are plaintext. They are written to runtime files and installed under `/etc/limanix`, readable by root and by the development account's group. They stay outside the Nix store, but this is not encrypted secret storage.
+The values are plaintext. They are written to runtime files and installed under
+`/etc/limanix`, readable by root and by the development account's group. They
+stay outside the Nix store, but this is not encrypted secret storage.
 
 Guide: [Environment and account](/config/environment).
 
@@ -258,11 +281,15 @@ mode = "rw"
 
 <!-- @include: ../../.reference/config.md#config-mounts -->
 
-- Targets cannot overlap: `/workspace` and `/workspace/cache` cannot both be targets.
-- A target cannot be `user.home` or a directory above it. A target inside the home, such as `/home/dev/.config/nvim`, is allowed.
-- Without `[[mounts]]` in the file, the guest has no shared folders. The managed home is mounted in any case.
+- Targets cannot overlap: `/workspace` and `/workspace/cache` cannot both be
+  targets.
+- A target cannot be `user.home` or a directory above it. A target inside the
+  home, such as `/home/dev/.config/nvim`, is allowed.
+- Without `[[mounts]]` in the file, the guest has no shared folders. The managed
+  home is mounted in any case.
 
-A read-write mount shares the same files with the Mac: a change or a deletion on either side changes both.
+A read-write mount shares the same files with the Mac: a change or a deletion on
+either side changes both.
 
 Guide: [Shared folders](/config/mounts).
 
@@ -270,26 +297,42 @@ Guide: [Shared folders](/config/mounts).
 
 `home.root`, `shell.dotfiles` and `mounts.source` are paths on the Mac.
 
-- A leading `~` is your home on the Mac. `$HOME` and other variables stay literal.
-- A relative path is resolved from the directory of `limanix.toml`, not from the directory where you run the command. For a symlinked `limanix.toml`, the directory of the real file counts. Symlinks inside the path are resolved.
+- A leading `~` is your home on the Mac. `$HOME` and other variables stay
+  literal.
+- A relative path is resolved from the directory of `limanix.toml`, not from the
+  directory where you run the command. For a symlinked `limanix.toml`, the
+  directory of the real file counts. Symlinks inside the path are resolved.
 
 ## Guest paths
 
 `user.home` and `mounts.target` are paths inside the VM.
 
 - A path is absolute, starts with a single `/` and is not `/` itself.
-- It contains no spaces, tabs, line breaks, `:` or `..` components. Repeated slashes and `.` components are normalized.
-- These destinations and everything below them are reserved for the guest system: `/etc`, `/boot`, `/usr`, `/var`, `/nix`, `/run`, `/dev`, `/proc`, `/sys`, `/bin`, `/sbin`, `/mnt/limanix`, `/mnt/dotfiles` and `/home/limanix-admin`. `/home` is not available either: it would cover `/home/limanix-admin`.
+- It contains no spaces, tabs, line breaks, `:` or `..` components. Repeated
+  slashes and `.` components are normalized.
+- These destinations and everything below them are reserved for the guest
+  system: `/etc`, `/boot`, `/usr`, `/var`, `/nix`, `/run`, `/dev`, `/proc`,
+  `/sys`, `/bin`, `/sbin`, `/mnt/limanix`, `/mnt/dotfiles` and
+  `/home/limanix-admin`. `/home` is not available either: it would cover
+  `/home/limanix-admin`.
 
 ## Fixed at creation
 
+- `fixed`: `limanix update` rejects a change. Create a new VM and copy the files
+  you need.
+- `grow`: `limanix update` can raise it. It cannot shrink.
+
 <!-- @include: ../../.reference/config.md#config-update -->
 
-Another `name` selects another VM. Every other key changes with `limanix update`, which restarts the VM.
+Another `name` selects another VM. Every other key changes with
+`limanix update`, which restarts the VM.
 
 ## Defaults
 
-[`limanix first-config`](/reference/cli#limanix-first-config) writes this file: every setting with its default and a comment, and the empty `dotfiles` and toolchain keys as commented-out examples. An empty `limanix.toml` gives the same settings. On an Intel Mac, `arch` is `"amd64"`.
+[`limanix first-config`](/reference/cli#limanix-first-config) writes this file:
+every setting with its default and a comment, and the empty `dotfiles` and
+toolchain keys as commented-out examples. An empty `limanix.toml` gives the same
+settings. On an Intel Mac, `arch` is `"amd64"`.
 
 ::: code-group
 

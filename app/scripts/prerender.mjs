@@ -11,7 +11,11 @@ for (const [url, file] of Object.entries(pages)) {
   const path = new URL(file, dist)
   const html = await readFile(path, 'utf8')
   if (!html.includes(mount)) throw new Error(`${file} has no ${mount}`)
-  await writeFile(path, html.replace(mount, `<div id="app">${await render(url)}</div>`))
+  const content = await render(url)
+  await writeFile(
+    path,
+    html.replace(mount, () => `<div id="app">${content}</div>`),
+  )
   console.log(`prerendered ${url} into ${file}`)
 }
 

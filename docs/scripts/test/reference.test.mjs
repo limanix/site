@@ -1,15 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {
-  argumentsTable,
-  checksTable,
-  configTable,
-  flagsTable,
-  renderCli,
-  renderConfig,
-  renderLmx,
-  slug,
-} from './reference.mjs'
+import { renderCli, renderLmx } from '../lib/reference/commands.mjs'
+import { renderConfig } from '../lib/reference/config.mjs'
 
 const arg = (fields) => ({
   short: null,
@@ -98,58 +90,53 @@ const lmx = {
 }
 
 test('flags take their type and default from the argument', () => {
-  const rows = flagsTable(client.commands[0]).split('\n').slice(2)
+  const rows = tableRows(renderCli(client, lmx), 'limanix-network-check')
   assert.deepEqual(rows, [
     '| `--udp` | boolean | `false` | Check a UDP port instead of a TCP one. |',
-    '| `-q`, `--quiet` | boolean | `false` | Print only names. |',
+    '| `-q`, `--quiet` | boolean | `false` | Print only names |',
     '| `--config` | string | none | Path to the configuration file. |',
   ])
 })
 
 test('the guest checks of lmx come before the client check that replaces them', () => {
-  const ids = checksTable(client.commands[0], { commands: [] })
-    .split('\n')
-    .slice(2)
-    .map((row) => row.split('`')[1])
-  assert.deepEqual(ids, ['vm', 'address', 'guest', 'connect'])
-  const merged = checksTable(
-    { ...client.commands[0], name: 'limanix network check' },
-    { commands: [{ ...lmx.commands[0], name: 'lmx net check' }] },
+  const ids = tableRows(renderCli(client, { commands: [] }), 'limanix-network-check-checks').map(
+    (row) => row.split('`')[1],
   )
-    .split('\n')
-    .slice(2)
-    .map((row) => row.split('`')[1])
+  assert.deepEqual(ids, ['vm', 'address', 'guest', 'connect'])
+  const merged = tableRows(renderCli(client, lmx), 'limanix-network-check-checks').map(
+    (row) => row.split('`')[1],
+  )
   assert.deepEqual(merged, ['vm', 'address', 'firewall', 'listener', 'guest', 'connect'])
 })
 
 test('lmx arguments show positional ones as required and a stated default in its column', () => {
-  const rows = argumentsTable(lmx.commands[0]).split('\n').slice(2)
+  const rows = tableRows(renderLmx(lmx), 'lmx-net-check')
   assert.deepEqual(rows.slice(0, 2), [
-    '| `PORT` | required | Port to check. |',
-    '| `--timeout` | `10m` | Longest wait. |',
+    '| `PORT` | required | Port to check |',
+    '| `--timeout` | `10m` | Longest wait |',
   ])
   const rendered = renderLmx(lmx)
   assert.match(rendered, /<!-- #region lmx-net-check-values -->\n\| Value of `KIND` \| Meaning \|/)
-  assert.match(rendered, /\| `firewall` \| The firewall opens the port\. \|/)
+  assert.match(rendered, /\| `firewall` \| The firewall opens the port \|/)
 })
 
 test('configuration tables list the keys of one table with choices and defaults', () => {
-  assert.deepEqual(configTable(client.config, '').split('\n').slice(2), [
+  const config = renderConfig(client)
+  assert.deepEqual(tableRows(config, 'config-top'), [
     '| `name` | string | `"example-box"` | VM name. |',
     '| `env` | table[string, string] | `{}` | Environment. |',
     '| `mounts` | array of tables | `[]` | Shared folders. |',
   ])
-  assert.deepEqual(configTable(client.config, 'resources').split('\n').slice(2), [
+  assert.deepEqual(tableRows(config, 'config-resources'), [
     '| `arch` | `"arm64"` or `"amd64"` | — | Guest architecture; the Mac\'s own by default. |',
   ])
-  assert.deepEqual(configTable(client.config, 'mounts[]').split('\n').slice(2), [
-    '| `mode` | `"rw"`, `"ro"` or `"none"` | `"rw"` | Mount access. |',
+  assert.deepEqual(tableRows(config, 'config-mounts'), [
+    '| `mode` | `"rw"`, `"ro"` or `"none"` | `"rw"` | Mount access |',
     '| `source` | string | required | Host directory. |',
   ])
 })
 
 test('every command and table gets a region named by its slug', () => {
-  assert.equal(slug('limanix network check'), 'limanix-network-check')
   const cli = renderCli(client, lmx)
   for (const name of [
     'limanix-network-check-about',
@@ -177,7 +164,46 @@ test('angle brackets outside code cannot open an element on the page', () => {
       doc: 'Host root <root>/<name>; keeps `<code>`',
     }),
   ]
-  assert.deepEqual(configTable(fields, '').split('\n').slice(2), [
-    '| `root` | string | `""` | Host root &lt;root&gt;/&lt;name&gt;; keeps `<code>`. |',
+  assert.deepEqual(tableRows(renderConfig({ ...client, config: fields }), 'config-top'), [
+    '| `root` | string | `""` | Host root &lt;root&gt;/&lt;name&gt;; keeps `<code>` |',
   ])
 })
+
+test('renderers preserve source punctuation and ignore additional metadata', () => {
+  const extendedClient = {
+    ...client,
+    metadata: { version: 2 },
+    commands: client.commands.map((command) => ({
+      ...command,
+      metadata: 'unused',
+      about: 'Check the network;',
+      args: command.args.map((argument) => ({ ...argument, metadata: 'unused' })),
+    })),
+  }
+  const rendered = renderCli(extendedClient, { ...lmx, metadata: 'unused' })
+  assert.match(rendered, /<!-- #region limanix-network-check-about -->\nCheck the network;\n/)
+  assert.doesNotMatch(rendered, /Check the network;\./)
+  assert.match(rendered, /\| `-q`, `--quiet` \| boolean \| `false` \| Print only names \|/)
+  assert.equal(renderLmx({ ...lmx, metadata: 'unused' }), renderLmx(lmx))
+  assert.equal(renderConfig({ ...client, metadata: 'unused' }), renderConfig(client))
+})
+
+test('configuration update values come from the source without a local rule list', () => {
+  const config = renderConfig({
+    ...client,
+    config: [
+      field({ key: 'example', type: 'string', doc: 'Example field', update: 'future-rule' }),
+    ],
+  })
+
+  assert.deepEqual(tableRows(config, 'config-update'), ['| `example` | `future-rule` |'])
+  assert.deepEqual(tableRows(config, 'config-top'), ['| `example` | string | — | Example field |'])
+})
+
+function tableRows(markdown, region) {
+  const body = markdown.match(
+    new RegExp(`<!-- #region ${region} -->\\n([\\s\\S]*?)\\n<!-- #endregion ${region} -->`),
+  )?.[1]
+  assert.ok(body, `Missing reference region: ${region}`)
+  return body.split('\n').slice(2)
+}

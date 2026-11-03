@@ -30,8 +30,12 @@ its catalog, download the client and find the guides for your next step.
 
 ## Development
 
-> Requires [Task](https://taskfile.dev) 3.53.1+ and Docker. 
+> Requires [Task](https://taskfile.dev) 3.53.1+ and Docker.
 
 Preview with `task run/app` or `task run/docs`; use `task -l` to list checks.
 
-See the [contribution guide](https://github.com/limanix/.github/blob/main/CONTRIBUTING.md).
+Check source Markdown with `task ci/markdown/fmt`; format it with
+`task markdown/fix`.
+
+See the
+[contribution guide](https://github.com/limanix/.github/blob/main/CONTRIBUTING.md).

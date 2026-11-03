@@ -4,9 +4,11 @@ description: Install LimaNix, create a NixOS VM from limanix.toml, open a shell 
 
 # Quick start
 
-This page takes you from the download to a shell in a NixOS VM, then through a change and cleanup.
+This page takes you from the download to a shell in a NixOS VM, then through a
+change and cleanup.
 
 :::: info Requirements
+
 macOS 26 or newer on an Apple Silicon or Intel Mac. To check, run:
 
 ::: code-group
@@ -22,7 +24,8 @@ uname -m                 # arm64 on Apple Silicon, x86_64 on Intel
 
 ## Install the client
 
-[Download](https://limanix.dev/download) the binary for your Mac, or get it from [GitHub releases](https://github.com/limanix/client/releases). Then install it:
+[Download](https://limanix.dev/download) the binary for your Mac, or get it from
+[GitHub releases](https://github.com/limanix/client/releases). Then install it:
 
 ::: code-group
 
@@ -44,7 +47,8 @@ limanix --version
 
 ## Write limanix.toml
 
-Save this file as `limanix.toml` in your project folder, such as `~/projects/my-project`:
+Save this file as `limanix.toml` in your project folder, such as
+`~/projects/my-project`:
 
 ::: code-group
 
@@ -62,7 +66,8 @@ preset = "minimal"
 
 :::
 
-The file declares a VM named `dev-box` with 2 CPUs, 4 GiB of memory and a 16 GiB disk, and the minimal shell: Bash with Git and the command-line tools.
+The file declares a VM named `dev-box` with 2 CPUs, 4 GiB of memory and a 16 GiB
+disk, and the minimal shell: Bash with Git and the command-line tools.
 
 [The limanix.toml file](/config/) describes every setting.
 
@@ -76,7 +81,11 @@ limanix create --config ~/projects/my-project/limanix.toml
 
 :::
 
-LimaNix downloads the base image if needed, boots the VM, builds its NixOS system and restarts the VM into it. The first run needs network access for the image and Nix packages. When it finishes, the command prints the VM name and the path of the VM's home on your Mac, under `~/.limanix`. `limanix list` now shows `dev-box` as `Running` and `ready`.
+LimaNix downloads the base image if needed, boots the VM, builds its NixOS
+system and restarts the VM into it. The first run needs network access for the
+image and Nix packages. When it finishes, the command prints the VM name and the
+path of the VM's home on your Mac, under `~/.limanix`. `limanix list` now shows
+`dev-box` as `Running` and `ready`.
 
 ## Open a shell
 
@@ -88,7 +97,10 @@ limanix shell dev-box
 
 :::
 
-You are `dev` in `/home/dev`, on Linux. The shell opens with a welcome from `lmx`: the VM's state, its NixOS version and architecture, CPUs, memory and free disk, its address and open ports, the shared folders and modules, and commands to try. Look around:
+You are `dev` in `/home/dev`, on Linux. The shell opens with a welcome from
+`lmx`: the VM's state, its NixOS version and architecture, CPUs, memory and free
+disk, its address and open ports, the shared folders and modules, and commands
+to try. Look around:
 
 ::: code-group
 
@@ -101,11 +113,13 @@ exit
 
 :::
 
-`lmx help` lists the commands in the VM and on the Mac, and `lmx welcome` shows the welcome again. `exit` returns you to the Mac; the VM keeps running.
+`lmx help` lists the commands in the VM and on the Mac, and `lmx welcome` shows
+the welcome again. `exit` returns you to the Mac; the VM keeps running.
 
 ## Change the VM
 
-Share your project with the VM and add a package. Add these tables at the end of `limanix.toml`:
+Share your project with the VM and add a package. Add these tables at the end of
+`limanix.toml`:
 
 ::: code-group
 
@@ -121,7 +135,8 @@ mode = "rw"
 
 :::
 
-`.` is the folder that holds `limanix.toml`. The update restarts the VM: save any work in it, then apply the file:
+`.` is the folder that holds `limanix.toml`. The update restarts the VM: save
+any work in it, then apply the file:
 
 ::: code-group
 
@@ -133,14 +148,23 @@ limanix shell dev-box -- ls /workspace
 
 :::
 
-The update builds the new system first and restarts the VM only when the build succeeds. If the build fails, the VM keeps its current system and the error is in the output. In the VM, `/workspace` holds the same files as your project folder: a change or deletion on either side affects both.
+The update builds the new system first and restarts the VM only when the build
+succeeds. If the build fails, the VM keeps its current system and the error is
+in the output. In the VM, `/workspace` holds the same files as your project
+folder: a change or deletion on either side affects both.
 
 ## Stop, start and delete
 
-`stop` shuts the VM down and keeps its disk and home. `start` boots the saved system; it does not read `limanix.toml`. `delete` removes the VM's disk, keeps its home on the Mac and prints the home's path; add `--remove-home` to remove the home too. Your project folder stays where it is.
+`stop` shuts the VM down and keeps its disk and home. `start` boots the saved
+system; it does not read `limanix.toml`. `delete` removes the VM's disk, keeps
+its home on the Mac and prints the home's path; add `--remove-home` to remove
+the home too. Your project folder stays where it is.
 
 ::: warning
-`limanix delete` does not ask for confirmation. Copy what you need from the VM first.
+
+`limanix delete` does not ask for confirmation. Copy what you need from the VM
+first.
+
 :::
 
 ::: code-group
@@ -158,7 +182,8 @@ limanix delete dev-box
 <div class="parts">
 
 - [Editors and IDEs](/vms/editors)\
-  After one line in `~/.ssh/config`, each VM is an SSH host that your editor opens projects in:
+  After one line in `~/.ssh/config`, each VM is an SSH host that your editor
+  opens projects in:
 
   ::: code-group
 

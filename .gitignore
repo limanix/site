@@ -23,6 +23,8 @@
 # Site
 /docs/.catalog/
 /docs/.reference/
+/docs/pages/public/themes/
+/docs/pages/public/prompts/
 /app/.catalog/
 /app/node_modules/
 /app/dist/

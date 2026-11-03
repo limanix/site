@@ -26,7 +26,7 @@
   --vp-code-block-divider-color: rgb(255 255 255 / 8%);
   --vp-code-lang-color: #a1a1aa;
   --vp-code-line-highlight-color: rgb(255 255 255 / 6%);
-  --vp-code-line-number-color: #71717a;
+  --vp-code-line-number-color: #797982;
   --vp-code-copy-code-bg: #18181b;
   --vp-code-copy-code-hover-bg: #27272a;
   --vp-code-copy-code-active-text: #a1a1aa;
@@ -64,7 +64,7 @@
   --vp-code-block-divider-color: #000000;
   --vp-code-lang-color: #6a6a71;
   --vp-code-line-highlight-color: rgb(101 117 133 / 16%);
-  --vp-code-line-number-color: #6a6a71;
+  --vp-code-line-number-color: #7f7f86;
   --vp-code-copy-code-bg: #202127;
   --vp-code-copy-code-hover-bg: #1b1b1f;
   --vp-code-copy-code-active-text: #98989f;

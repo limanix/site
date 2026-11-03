@@ -6,7 +6,8 @@ description: Answers to common questions about LimaNix, from supported Macs to f
 
 ## Is LimaNix free?
 
-Yes. LimaNix is open source under the Apache License 2.0. The source is on [GitHub](https://github.com/limanix).
+Yes. LimaNix is open source under the Apache License 2.0. The source is on
+[GitHub](https://github.com/limanix).
 
 ## Which Macs does it support?
 
@@ -14,11 +15,15 @@ Apple Silicon and Intel Macs with macOS 26 or newer. See [Install](/install).
 
 ## Do I need to know Nix?
 
-No. `limanix.toml` covers the shell, toolchains, modules and packages. When you need more, a NixOS module of your own plugs into the same VM; see [Your own modules](/modules/custom).
+No. `limanix.toml` covers the shell, toolchains, modules and packages. When you
+need more, a NixOS module of your own plugs into the same VM; see
+[Your own modules](/modules/custom).
 
 ## Do I install Lima or Nix?
 
-No. Lima is built into `limanix`, and Nix runs inside the VM. Only a guest of the other architecture, such as an Intel guest on Apple Silicon, needs QEMU on the Mac; see [Set up QEMU](/vms/resources#set-up-qemu).
+No. Lima is built into `limanix`, and Nix runs inside the VM. Only a guest of
+the other architecture, such as an Intel guest on Apple Silicon, needs QEMU on
+the Mac; see [Set up QEMU](/vms/resources#set-up-qemu).
 
 ## How is it different from Lima?
 
@@ -32,7 +37,8 @@ LimaNix runs its VMs with Lima, built into `limanix`. On top, it adds:
 
 ## Can I run containers?
 
-Yes. Add Docker to the modules, and Docker Engine with Compose runs inside the VM:
+Yes. Add Docker to the modules, and Docker Engine with Compose runs inside the
+VM:
 
 ::: code-group
 
@@ -43,21 +49,24 @@ modules = ["lmx:docker"]
 
 :::
 
-Images, containers and volumes live on the VM's disk, which `limanix delete` removes. See [Docker](/modules/docker).
+Images, containers and volumes live on the VM's disk, which `limanix delete`
+removes. See [Docker](/modules/docker).
 
 ## Where do my files live?
 
-| What                           | Where                                                |
-| ------------------------------ | ---------------------------------------------------- |
-| Your project folders           | On the Mac, shared into the VM                       |
-| Your home in the VM            | On the Mac; it survives updates and `limanix delete` |
-| The system and everything else | On the VM's disk                                     |
+| What | Where |
+| -- | -- |
+| Your project folders | On the Mac, shared into the VM |
+| Your home in the VM | On the Mac; it survives updates and `limanix delete` |
+| The system and everything else | On the VM's disk |
 
 See [Files and storage](/vms/storage).
 
 ## Can I use my Mac editor?
 
-Yes. VS Code, Cursor, Zed and JetBrains IDEs open a project in the VM over SSH. The window stays on the Mac, and the language servers see the project's Linux dependencies. After one line in `~/.ssh/config`, each VM is an SSH host:
+Yes. VS Code, Cursor, Zed and JetBrains IDEs open a project in the VM over SSH.
+The window stays on the Mac, and the language servers see the project's Linux
+dependencies. After one line in `~/.ssh/config`, each VM is an SSH host:
 
 ::: code-group
 
@@ -67,7 +76,9 @@ code --remote ssh-remote+dev-box.limanix /workspace
 
 :::
 
-See [Editors and IDEs](/vms/editors). You can also edit a shared project folder on the Mac directly while builds and tests run in the VM; see [Shared folders](/config/mounts).
+See [Editors and IDEs](/vms/editors). You can also edit a shared project folder
+on the Mac directly while builds and tests run in the VM; see
+[Shared folders](/config/mounts).
 
 ## How do I add a package?
 
@@ -100,7 +111,8 @@ nix shell nixpkgs#tree
 
 :::
 
-See [Modules and packages](/config/modules#install-packages) and [Packages on the fly](/inside/packages).
+See [Modules and packages](/config/modules#install-packages) and
+[Packages on the fly](/inside/packages).
 
 ## When do my edits apply?
 
@@ -114,17 +126,23 @@ limanix update --config ~/projects/my-project/limanix.toml
 
 :::
 
-`update` applies the file and restarts the VM. `limanix start` boots the saved system without reading the file. See [Changing a VM](/vms/update).
+`update` applies the file and restarts the VM. `limanix start` boots the saved
+system without reading the file. See [Changing a VM](/vms/update).
 
 ## What if an update fails?
 
-If the build fails, the VM keeps its current system and does not restart into the new one.
-The build error appears on your Mac: fix the file and run `limanix update` again.
+If the build fails, the VM keeps its current system and does not restart into
+the new one. The build error appears on your Mac: fix the file and run
+`limanix update` again.
 
-If a health check fails after the restart, the VM is already running the new system, but `update` reports an error.
-Run `limanix doctor dev-box` to see which check failed.
+If a health check fails after the restart, the VM is already running the new
+system, but `update` reports an error. Run `limanix doctor dev-box` to see which
+check failed.
 
-A running VM keeps its settings and `[env]` values until the build succeeds. A stopped VM, or one whose disk or memory grows, gets its new Lima settings before the build, and a failed build does not undo them. See [Troubleshooting](/troubleshooting).
+A running VM keeps its settings and `[env]` values until the build succeeds. A
+stopped VM, or one whose disk or memory grows, gets its new Lima settings before
+the build, and a failed build does not undo them. See
+[Troubleshooting](/troubleshooting).
 
 ## How do I reach a server?
 
@@ -139,14 +157,18 @@ A running VM keeps its settings and `[env]` values until the build succeeds. A s
 
    :::
 
-2. Make the server listen on `0.0.0.0`, not only on `127.0.0.1`.
-3. Connect to the VM's address from `limanix list`, such as `http://ADDRESS:8080`. LimaNix does not forward ports to the Mac's `localhost`.
+1. Make the server listen on `0.0.0.0`, not only on `127.0.0.1`.
+
+1. Connect to the VM's address from `limanix list`, such as
+   `http://ADDRESS:8080`. LimaNix does not forward ports to the Mac's
+   `localhost`.
 
 See [Network](/vms/network).
 
 ## Can I script LimaNix?
 
-Yes. Results go to standard output, and errors and build output to standard error. `-q` prints only names, and `--json` prints results as JSON:
+Yes. Results go to standard output, and errors and build output to standard
+error. `-q` prints only names, and `--json` prints results as JSON:
 
 ::: code-group
 
@@ -164,7 +186,8 @@ See [Use LimaNix in scripts](/vms/#use-limanix-in-scripts).
 
 ## What does delete keep?
 
-Your home in the VM, your `limanix.toml` and your project folders stay on the Mac; the VM's disk is removed. `--remove-home` removes the home too:
+Your home in the VM, your `limanix.toml` and your project folders stay on the
+Mac; the VM's disk is removed. `--remove-home` removes the home too:
 
 ::: code-group
 
@@ -175,4 +198,10 @@ limanix delete dev-box --remove-home  # removes it too
 
 :::
 
-A new VM gets a new, empty home: copy what you need from the old one. See [Files and storage](/vms/storage).
+A new VM gets a new, empty home: copy what you need from the old one.
+`limanix homes list` shows the homes that stayed, and `limanix homes remove`
+removes them. See [Files and storage](/vms/storage).
+
+Deleting a VM returns less space than `du` shows for its disk, because the disk
+shares blocks with Lima's download cache. See
+[The image cache](/reference/paths#the-image-cache).

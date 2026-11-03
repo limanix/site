@@ -1,8 +1,12 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig, type HeadConfig } from 'vitepress'
-import { kinds, loadCatalog } from '../scripts/catalog.mjs'
+import { loadCatalog } from '../scripts/lib/artifacts.mjs'
+import { catalogKinds } from '../scripts/lib/catalog/render.mjs'
 
 const catalog = loadCatalog()
+const catalogPages = new Map(
+  catalog.entries.map(({ name, content }) => [`modules/${name}.md`, content]),
+)
 
 const site = 'https://limanix.dev'
 const docs = 'https://docs.limanix.dev'
@@ -29,7 +33,6 @@ export default defineConfig({
     ['link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }],
     ['meta', { name: 'theme-color', content: '#1b1b1f', media: '(prefers-color-scheme: dark)' }],
     ['meta', { name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' }],
-    ['meta', { name: 'robots', content: 'index, follow' }],
     ['meta', { name: 'author', content: 'LimaNix contributors' }],
     ['meta', { name: 'keywords', content: keywords }],
     ['meta', { property: 'og:type', content: 'website' }],
@@ -46,11 +49,13 @@ export default defineConfig({
   ],
 
   transformHead({ pageData }) {
+    if (pageData.isNotFound) return [['meta', { name: 'robots', content: 'noindex' }]]
     const path = pageData.relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')
     const url = `${docs}/${path}`
     const title = pageData.title ? `${pageData.title} | LimaNix Docs` : 'LimaNix Docs'
     const summary = pageData.description || description
     const head: HeadConfig[] = [
+      ['meta', { name: 'robots', content: 'index, follow' }],
       ['link', { rel: 'canonical', href: url }],
       ['meta', { property: 'og:url', content: url }],
       ['meta', { property: 'og:title', content: title }],
@@ -72,11 +77,17 @@ export default defineConfig({
 
   vite: {
     envDir: fileURLToPath(new URL('..', import.meta.url)),
+    build: { assetsInlineLimit: 0 },
   },
 
   markdown: {
     theme: { light: 'catppuccin-mocha', dark: 'catppuccin-mocha' },
     config(md) {
+      const fence = md.renderer.rules.fence!
+      md.renderer.rules.fence = (tokens, index, options, env, self) =>
+        tokens[index].info.trim() === 'mermaid'
+          ? `<MermaidDiagram code="${md.utils.escapeHtml(tokens[index].content)}" />`
+          : fence(tokens, index, options, env, self)
       const render = md.renderer.rules.code_inline!
       md.renderer.rules.code_inline = (tokens, index, options, env, self) => {
         const { content } = tokens[index]
@@ -126,11 +137,13 @@ export default defineConfig({
         items: [
           { text: 'The limanix.toml file', link: '/config/' },
           { text: 'Shell', link: '/config/shell' },
+          { text: 'Prompts', link: '/config/prompts' },
           { text: 'Toolchains', link: '/config/toolchains' },
           { text: 'Modules and packages', link: '/config/modules' },
           { text: 'Shared folders', link: '/config/mounts' },
           { text: 'Dotfiles', link: '/config/dotfiles' },
-          { text: 'Environment and theme', link: '/config/environment' },
+          { text: 'Environment and account', link: '/config/environment' },
+          { text: 'Themes', link: '/config/themes' },
         ],
       },
       {
@@ -147,12 +160,12 @@ export default defineConfig({
         text: 'Modules',
         items: [
           { text: 'The catalog', link: '/modules/' },
-          ...Object.entries(kinds).map(([kind, text]) => ({
+          ...Object.entries(catalogKinds).map(([kind, text]) => ({
             text,
             collapsed: true,
             items: catalog.entries
               .filter((entry) => entry.kind === kind)
-              .map((entry) => ({ text: entry.title, link: `/modules/${entry.slug}` })),
+              .map((entry) => ({ text: entry.title, link: `/modules/${entry.name}` })),
           })),
           { text: 'Your own modules', link: '/modules/custom' },
         ],
@@ -165,6 +178,10 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Contributing',
+        items: [{ text: 'How to contribute', link: '/contributing/' }],
+      },
+      {
         text: 'Reference',
         items: [
           { text: 'limanix command', link: '/reference/cli' },
@@ -175,13 +192,22 @@ export default defineConfig({
       },
     ],
 
-    search: { provider: 'local' },
+    search: {
+      provider: 'local',
+      options: {
+        async _render(src, env, md) {
+          const html = await md.renderAsync(catalogPages.get(env.relativePath) ?? src, env)
+          return env.frontmatter?.search === false ? '' : html
+        },
+      },
+    },
     socialLinks: [{ icon: 'github', link: 'https://github.com/limanix' }],
     editLink: {
       pattern: ({ frontmatter, relativePath }) =>
-        frontmatter.catalogSource
+        frontmatter.editSource ??
+        (frontmatter.catalogSource
           ? `https://github.com/limanix/modules/edit/main/${frontmatter.catalogSource}`
-          : `https://github.com/limanix/site/edit/main/docs/pages/${relativePath}`,
+          : `https://github.com/limanix/site/edit/main/docs/pages/${relativePath}`),
       text: 'Edit this page on GitHub',
     },
     outline: { level: [2, 3], label: 'On this page' },

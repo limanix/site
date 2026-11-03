@@ -3,7 +3,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
-import { catalogIndex, readCatalog, renderPage } from './catalog.mjs'
+import { readCatalog } from '../lib/catalog/read.mjs'
+import { catalogIndex, renderPage } from '../lib/catalog/render.mjs'
 
 test('catalog links use site pages; source links keep the selected release', () => {
   const source = 'catalog/toolchains/python/README.md'
@@ -47,33 +48,64 @@ test('local previews are labeled and never link to an invented local tag', () =>
   assert.doesNotMatch(content, /\/tag\/local|\/blob\/local/)
 })
 
-test('configuration and integration opens on demand', () => {
+test('code samples keep their links until a matching fence closes the block', () => {
+  for (const marker of ['`', '~']) {
+    const opening = marker.repeat(4)
+    const shorter = marker.repeat(3)
+    const other = (marker === '`' ? '~' : '`').repeat(4)
+    const example = [
+      `${opening}markdown`,
+      `${shorter}sh`,
+      '[Shorter fence](./shorter.nix)',
+      shorter,
+      other,
+      '[Other marker](./other.nix)',
+      other,
+      `${opening} trailing text`,
+      '[Not a closing fence](./trailing.nix)',
+      `${opening}${marker}  `,
+    ].join('\n')
+    const content = renderPage(
+      `# Go\n\nDescription.\n\n${example}\n\n[Source](./default.nix)\n`,
+      'catalog/toolchains/go/README.md',
+      'v7',
+      new Map(),
+    )
+
+    assert.ok(content.includes(example), `Code sample changed for ${marker} fences`)
+    assert.match(
+      content,
+      /\[Source\]\(https:\/\/github.com\/limanix\/modules\/blob\/v7\/catalog\/toolchains\/go\/default.nix\)/,
+    )
+  }
+})
+
+test('source sections retain their headings and content', () => {
   const render = (markdown) =>
     renderPage(markdown, 'catalog/toolchains/go/README.md', 'v7', new Map())
-  const middle = render(`# Go
-
-Description.
-
-## Configuration and integration
+  const section = `## Configuration and integration
 
 | Boundary | Contract |
 | -- | -- |
 | Services | No daemon |
 
 ## Corner cases
+`
+  const content = render(`# Go
+
+Description.
+
+${section}
 `)
-  assert.match(
-    middle,
-    /\n::: details Configuration and integration\n\n\| Boundary[\s\S]*\n\n:::\n\n## Corner cases\n/,
-  )
-  assert.doesNotMatch(middle, /## Configuration and integration/)
+  assert.ok(content.includes(section))
+  assert.doesNotMatch(content, /::: details/)
   assert.match(
     render('# Go\n\nDescription.\n\n## Configuration and integration\n\nText.\n'),
-    /::: details Configuration and integration\n\nText.\n\n:::\n$/,
+    /## Configuration and integration\n\nText.\n$/,
   )
 })
 
-test('discovery includes every kind and keeps the published Claude Code address', (t) => {
+test('discovery includes every kind and names each page after its module', (t) => {
   const root = mkdtempSync(join(tmpdir(), 'catalog-test-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))
   for (const [kind, name, title] of [
@@ -86,13 +118,17 @@ test('discovery includes every kind and keeps the published Claude Code address'
     writeFileSync(join(directory, 'module.toml'), 'description = "Test module"\n')
     writeFileSync(join(directory, 'README.md'), `# ${title}\n\nDescription.\n`)
   }
+  mkdirSync(join(root, 'previews'))
+  for (const kind of ['themes', 'prompts']) {
+    writeFileSync(join(root, 'previews', `${kind}.json`), '[]\n')
+  }
   const catalog = readCatalog(root, 'v7')
   assert.deepEqual(
-    catalog.entries.map(({ slug }) => slug),
-    ['claude-code', 'go', 'zsh'],
+    catalog.entries.map(({ name }) => name),
+    ['claude', 'go', 'zsh'],
   )
   const index = catalogIndex(catalog)
-  for (const entry of catalog.entries) assert.ok(index.includes(`/modules/${entry.slug}`))
+  for (const entry of catalog.entries) assert.ok(index.includes(`/modules/${entry.name}`))
   assert.match(index, /releases\/tag\/v7/)
   rmSync(join(root, 'catalog/modules/claude/README.md'))
   assert.throws(() => readCatalog(root, 'v7'), /ENOENT/)

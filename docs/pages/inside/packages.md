@@ -4,7 +4,9 @@ description: Install a package for your user without changing limanix.toml.
 
 # Packages on the fly
 
-When no module or toolchain gives you a tool, take it straight from Nixpkgs, the package collection of NixOS. You run these commands inside the VM, for your own account, and none of them needs `sudo`.
+When no module or toolchain gives you a tool, take it straight from Nixpkgs, the
+package collection of NixOS. You run these commands inside the VM, for your own
+account, and none of them needs `sudo`.
 
 ## Try a tool once
 
@@ -16,7 +18,9 @@ nix shell nixpkgs#openssl --command openssl version
 
 :::
 
-This runs one command with the tool. Without `--command`, `nix shell nixpkgs#openssl` opens a shell with the tool on your `PATH`; `exit` drops it again.
+This runs one command with the tool. Without `--command`,
+`nix shell nixpkgs#openssl` opens a shell with the tool on your `PATH`; `exit`
+drops it again.
 
 ## Install a package
 
@@ -28,24 +32,31 @@ nix profile add nixpkgs#ripgrep
 
 :::
 
-The package goes into your profile and stays there until you remove it. `nixpkgs` here is the VM's own NixOS release: the same package set that the system and the modules use. A tool you add shares their libraries, and nothing is downloaded twice.
+The package goes into your profile and stays there until you remove it.
+`nixpkgs` here is the VM's own NixOS release: the same package set that the
+system and the modules use. A tool you add shares their libraries, and nothing
+is downloaded twice.
 
 ## Manage your profile
 
-| Task                                       | Command                      |
-| ------------------------------------------ | ---------------------------- |
-| List what you installed                    | `nix profile list`           |
-| Remove a package                           | `nix profile remove ripgrep` |
-| Delete all but the current profile version | `nix profile wipe-history`   |
+| Task | Command |
+| -- | -- |
+| List what you installed | `nix profile list` |
+| Remove a package | `nix profile remove ripgrep` |
+| Delete all but the current profile version | `nix profile wipe-history` |
 
 Other versions of your profile can keep removed packages in the Nix store.
-`nix profile wipe-history` deletes every profile version except the current one, but does not delete the packages themselves.
-Garbage collection removes store paths once no profile or other garbage-collector root refers to them.
-`lmxd` leaves your profile history alone; see [The disk is full](/troubleshooting#the-disk-is-full) for collection commands.
+`nix profile wipe-history` deletes every profile version except the current one,
+but does not delete the packages themselves. Garbage collection removes store
+paths once no profile or other garbage-collector root refers to them. `lmxd`
+leaves your profile history alone; see
+[The disk is full](/troubleshooting#the-disk-is-full) for collection commands.
 
 ## Find a package name
 
-Search [search.nixos.org](https://search.nixos.org/packages) in the channel of your VM's NixOS release. `nixos-version` shows it, such as 26.05. Or search in the VM, in the same package set that `nixpkgs#` names:
+Search [search.nixos.org](https://search.nixos.org/packages) in the channel of
+your VM's NixOS release. `nixos-version` shows it, such as 26.05. Or search in
+the VM, in the same package set that `nixpkgs#` names:
 
 ::: code-group
 
@@ -59,7 +70,9 @@ The first search reads the whole package set and takes a while.
 
 ## Profile or limanix.toml
 
-Your profile belongs to this VM. A tool that every VM of yours should have belongs in `limanix.toml`, where it is part of the system that the VM is built from:
+Your profile belongs to this VM. A tool that every VM of yours should have
+belongs in `limanix.toml`, where it is part of the system that the VM is built
+from:
 
 ::: code-group
 
@@ -70,11 +83,12 @@ packages = ["tree"]
 
 :::
 
-| Use                          | When                                                                                                            |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `nix shell`                  | You need a tool once                                                                                            |
-| `nix profile add`            | You want to keep a tool for yourself in this VM                                                                 |
-| `packages` in `limanix.toml` | Every VM made from the file should have it; `limanix update` applies it and restarts the VM                     |
-| `[toolchains]` or a module   | A language, or a tool that needs more than its package, such as a service or the language server for the editor |
+| Use | When |
+| -- | -- |
+| `nix shell` | You need a tool once |
+| `nix profile add` | You want to keep a tool for yourself in this VM |
+| `packages` in `limanix.toml` | Every VM made from the file should have it; `limanix update` applies it and restarts the VM |
+| `[toolchains]` or a module | A language, or a tool that needs more than its package, such as a service or the language server for the editor |
 
-[Modules and packages](/config/modules#install-packages) explains the `packages` list, and [Toolchains](/config/toolchains) the languages.
+[Modules and packages](/config/modules#install-packages) explains the `packages`
+list, and [Toolchains](/config/toolchains) the languages.

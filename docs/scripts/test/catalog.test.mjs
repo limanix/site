@@ -48,6 +48,38 @@ test('local previews are labeled and never link to an invented local tag', () =>
   assert.doesNotMatch(content, /\/tag\/local|\/blob\/local/)
 })
 
+test('code samples keep their links until a matching fence closes the block', () => {
+  for (const marker of ['`', '~']) {
+    const opening = marker.repeat(4)
+    const shorter = marker.repeat(3)
+    const other = (marker === '`' ? '~' : '`').repeat(4)
+    const example = [
+      `${opening}markdown`,
+      `${shorter}sh`,
+      '[Shorter fence](./shorter.nix)',
+      shorter,
+      other,
+      '[Other marker](./other.nix)',
+      other,
+      `${opening} trailing text`,
+      '[Not a closing fence](./trailing.nix)',
+      `${opening}${marker}  `,
+    ].join('\n')
+    const content = renderPage(
+      `# Go\n\nDescription.\n\n${example}\n\n[Source](./default.nix)\n`,
+      'catalog/toolchains/go/README.md',
+      'v7',
+      new Map(),
+    )
+
+    assert.ok(content.includes(example), `Code sample changed for ${marker} fences`)
+    assert.match(
+      content,
+      /\[Source\]\(https:\/\/github.com\/limanix\/modules\/blob\/v7\/catalog\/toolchains\/go\/default.nix\)/,
+    )
+  }
+})
+
 test('source sections retain their headings and content', () => {
   const render = (markdown) =>
     renderPage(markdown, 'catalog/toolchains/go/README.md', 'v7', new Map())

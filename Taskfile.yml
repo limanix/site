@@ -16,8 +16,30 @@ includes:
     vars:
       NODE_VERSION: '22.23.1'
     internal: true
+  markdown:
+    # v0.1.1
+    taskfile: https://raw.githubusercontent.com/mr-chelyshkin/tasks/e5f54f4dfede3ff779454355eab901b3b757cd18/taskfiles/markdown/Taskfile.yml
+    internal: true
+
+vars:
+  markdown_paths:
+    sh: git ls-files --cached --others --exclude-standard -- '*.md'
 
 tasks:
+  ci/markdown/fmt:
+    desc: Check source Markdown formatting without modifying files
+    cmds:
+      - task: markdown:fmt
+        vars:
+          FMT_ARGS: '{{range splitList "\n" .markdown_paths}}{{. | shellQuote}} {{end}}'
+
+  markdown/fix:
+    desc: Format source Markdown with the same settings used in CI
+    cmds:
+      - task: markdown:fmt/fix
+        vars:
+          FMT_ARGS: '{{range splitList "\n" .markdown_paths}}{{. | shellQuote}} {{end}}'
+
   run/app:
     desc: Run the app at http://localhost:5173
     cmds:

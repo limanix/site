@@ -14,11 +14,23 @@ const promptShells = {
 }
 
 export function renderPage(markdown, source, ref, routes) {
-  let insideCode = false
+  let fence = null
 
   const lines = markdown.split('\n').map((line) => {
-    if (/^\s*(```|~~~)/.test(line)) insideCode = !insideCode
-    if (insideCode) return line
+    const marker = line.match(/^\s*(`{3,}|~{3,})(.*)$/)
+    if (marker) {
+      const [, delimiter, suffix] = marker
+      if (!fence) fence = delimiter
+      else if (
+        delimiter[0] === fence[0] &&
+        delimiter.length >= fence.length &&
+        suffix.trim() === ''
+      ) {
+        fence = null
+      }
+      return line
+    }
+    if (fence) return line
 
     return line.replace(/\]\(([^)\s]+)\)/g, (_, href) => {
       return `](${pageLink(href, source, ref, routes)})`

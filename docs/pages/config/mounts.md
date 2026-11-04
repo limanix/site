@@ -56,7 +56,8 @@ mode   = "ro"
 
 Each source must be a folder that exists when you create or update the VM:
 create `../fixtures` on the Mac first. With `ro`, programs in the VM can read
-`/mnt/fixtures` but not change it.
+`/mnt/fixtures` but not change it. A read-only folder also suits a Git key; see
+[Git and SSH keys](/vms/git-keys).
 
 A guest of your Mac's architecture shares folders with virtiofs. A guest of the
 other architecture uses 9p, which is slower for builds that touch many small

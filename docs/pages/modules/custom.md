@@ -224,3 +224,6 @@ service that needs a secret, use its secret-file option, if it has one, and
 create that file inside the VM.
 
 :::
+
+[Git and SSH keys](/vms/git-keys#with-a-module) shows a module that points SSH
+to a key in a shared folder: the key itself stays out of the module.

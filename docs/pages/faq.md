@@ -80,6 +80,12 @@ See [Editors and IDEs](/vms/editors). You can also edit a shared project folder
 on the Mac directly while builds and tests run in the VM; see
 [Shared folders](/config/mounts).
 
+## How do I clone a private repository?
+
+Share a Git key with the VM as a read-only folder, then point SSH to it with a
+module or in `~/.ssh/config`. The VM does not see the keys or the SSH agent of
+your Mac. See [Git and SSH keys](/vms/git-keys).
+
 ## How do I add a package?
 
 Name it in `[nixos] packages`, then apply the file:
@@ -163,7 +169,9 @@ the build, and a failed build does not undo them. See
    `http://ADDRESS:8080`. LimaNix does not forward ports to the Mac's
    `localhost`.
 
-See [Network](/vms/network).
+See [Network](/vms/network). To use `localhost` on the Mac, forward the port
+over SSH; see
+[Forward a port to localhost](/vms/network#forward-a-port-to-localhost).
 
 ## Can I script LimaNix?
 

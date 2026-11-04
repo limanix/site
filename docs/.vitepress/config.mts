@@ -125,11 +125,9 @@ export default defineConfig({
         items: [
           { text: 'Using virtual machines', link: '/vms/' },
           { text: 'Shell and sessions', link: '/vms/shell' },
-          { text: 'Editors and IDEs', link: '/vms/editors' },
           { text: 'Changing a VM', link: '/vms/update' },
           { text: 'Files and storage', link: '/vms/storage' },
           { text: 'Resources and architecture', link: '/vms/resources' },
-          { text: 'Network', link: '/vms/network' },
         ],
       },
       {
@@ -144,6 +142,14 @@ export default defineConfig({
           { text: 'Dotfiles', link: '/config/dotfiles' },
           { text: 'Environment and account', link: '/config/environment' },
           { text: 'Themes', link: '/config/themes' },
+        ],
+      },
+      {
+        text: 'From the Mac',
+        items: [
+          { text: 'Editors and IDEs', link: '/vms/editors' },
+          { text: 'Network', link: '/vms/network' },
+          { text: 'Git and SSH keys', link: '/vms/git-keys' },
         ],
       },
       {

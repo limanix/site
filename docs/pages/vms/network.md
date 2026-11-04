@@ -1,12 +1,13 @@
 ---
-description: Reach services in a VM from the Mac, open firewall ports and check a connection.
+description: Reach services in a VM from the Mac, open firewall ports, forward a port to localhost and check a connection.
 ---
 
 # Network
 
 Each VM has its own IP address on a private network between your Mac and its
 VMs. You reach a service in a VM at that address: LimaNix forwards no ports to
-the Mac's `localhost`.
+the Mac's `localhost`. When a client needs `localhost`, an SSH tunnel brings a
+port there; see [Forward a port to localhost](#forward-a-port-to-localhost).
 
 ## The shared network
 
@@ -119,6 +120,87 @@ Test the path with a small web server before you set up your own service:
 1. On the Mac, open `http://ADDRESS:8080/` with the `ADDRESS` from
    `limanix list`. The page shows `Hello from LimaNix`. Press Ctrl-C in the VM
    to stop the server.
+
+## Forward a port to localhost
+
+An SSH tunnel brings a port of the VM to the Mac's `localhost`. Use it when a
+client must connect to `localhost`, or for a service that listens on `127.0.0.1`
+in the VM. The tunnel runs over SSH: it needs no port in `[network.ports]`, and
+the service sees a connection from `127.0.0.1`.
+
+With SSH set up for your VMs, as in
+[Editors and IDEs](/vms/editors#set-up-ssh-once):
+
+::: code-group
+
+```sh [Mac]
+ssh -N -L 8080:127.0.0.1:8080 dev-box.limanix
+```
+
+:::
+
+While the command runs, `localhost:8080` on the Mac reaches port 8080 in the VM.
+Press Ctrl-C to close the tunnel. The first number is the port on the Mac, which
+must be free; `127.0.0.1:8080` is the address and port inside the VM.
+
+To open the tunnel with every SSH connection to the VM, add it to your own
+`~/.ssh/config`, below the `Include` line:
+
+::: code-group
+
+```text [~/.ssh/config]
+Host dev-box.limanix
+  LocalForward 8080 127.0.0.1:8080
+```
+
+:::
+
+A second connection that finds the port taken prints
+`Could not request local forwarding.` and works without the tunnel.
+
+## Examples
+
+### A dev server in the browser
+
+Dev servers such as Vite listen on `localhost` by default. Forward the port and
+open `http://localhost:5173` on the Mac:
+
+::: code-group
+
+```sh [Mac]
+ssh -N -L 5173:127.0.0.1:5173 dev-box.limanix
+```
+
+:::
+
+To open it at the VM's address instead, start the server on all addresses, such
+as with `npm run dev -- --host 0.0.0.0`, and open port 5173 in
+`[network.ports]`.
+
+### A database client on the Mac
+
+A database that listens on `127.0.0.1` in the VM can stay there. Forward its
+port, then connect the client on the Mac to `localhost:5432`:
+
+::: code-group
+
+```sh [Mac]
+ssh -N -L 5432:127.0.0.1:5432 dev-box.limanix
+```
+
+:::
+
+The database sees a connection from `127.0.0.1`: it needs no firewall port and
+no access rule for the Mac's address. If the Mac already uses port 5432, choose
+another first number, such as `15432:127.0.0.1:5432`. To connect at the VM's
+address instead, see [PostgreSQL](/modules/postgres).
+
+### A sign-in callback
+
+An app that signs you in through the browser, such as with OAuth, often has
+`http://localhost:PORT` registered as its callback. Forward that port to the
+same number on the Mac and open the app at `http://localhost:PORT`: the browser
+returns to the address that the sign-in provider expects.
 
 ## Check a port
 

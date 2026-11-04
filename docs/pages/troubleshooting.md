@@ -494,6 +494,17 @@ escape sequences, or through tmux inside tmux. The terminal must allow it.
 See [Clipboard](/inside/clipboard#allow-it-in-your-terminal) for the settings of
 common terminals.
 
+### Git cannot sign in
+
+`git clone`, `git pull` or `git push` over SSH fails with
+`Permission denied (publickey)`.
+
+Cause: SSH in the VM offers no key that the server accepts. A VM has no keys of
+its own, and LimaNix does not forward the SSH agent of your Mac.
+
+Fix: share a key with the VM and point SSH to it; see
+[Git and SSH keys](/vms/git-keys).
+
 ## Network
 
 ### A port is unreachable
@@ -549,7 +560,8 @@ the Mac is not the port `8080` of the VM.
 
 Fix: connect to the address of the VM, which `limanix list` shows in `ADDRESS`,
 such as `http://ADDRESS:8080`. The address is not fixed; check it again when you
-reconnect.
+reconnect. When the client needs `localhost`, forward the port over SSH; see
+[Forward a port to localhost](/vms/network#forward-a-port-to-localhost).
 
 ### No address in the list
 

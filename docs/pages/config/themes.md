@@ -68,10 +68,10 @@ tools keep colors of their own:
 
 ## Match your terminal
 
-A theme paints the backgrounds of tmux, the editor and the full-screen tools,
-while the output of the shell itself sits on the terminal's background. Choose
-the same theme in your terminal on the Mac, or a terminal theme with a close
-background.
+A theme paints the backgrounds of tmux, Neovim and the full-screen tools, while
+AstroNvim and the output of the shell itself sit on the terminal's background.
+Choose the same theme in your terminal on the Mac, or a terminal theme with a
+close background.
 
 ## Your own settings
 

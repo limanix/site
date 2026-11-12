@@ -76,10 +76,13 @@ limanix --help
 
 `--version` prints the client version, and `--help` lists the commands.
 
-::: warning macOS may block the first run
+::: info Signed and notarized
 
-The binary has an ad-hoc signature with the virtualization entitlement, and
-Apple has not notarized it. Check that it came from limanix.dev or the GitHub
+Releases from v0.3.2 on are signed with a Developer ID certificate and notarized
+by Apple, so macOS opens the binary without a prompt.
+
+Earlier releases have an ad-hoc signature and no notarization, so macOS may
+block their first run. Check that the file came from limanix.dev or the GitHub
 releases, then allow it in
 
 <span class="settings-path">System Settings › Privacy & Security</span>

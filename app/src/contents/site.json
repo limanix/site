@@ -361,9 +361,8 @@
         "$ limanix --version"
       ],
       "approval": {
-        "title": "macOS may block the first run.",
-        "text": "Apple has not notarized the binary. Check that it came from limanix.dev or the GitHub releases, then allow it in",
-        "path": "System Settings > Privacy & Security"
+        "title": "Signed and notarized by Apple.",
+        "text": "macOS opens the binary without a prompt."
       }
     },
     "guide": "Getting started",

@@ -560,8 +560,8 @@ the Mac is not the port `8080` of the VM.
 
 Fix: connect to the address of the VM, which `limanix list` shows in `ADDRESS`,
 such as `http://ADDRESS:8080`. The address is not fixed; check it again when you
-reconnect. When the client needs `localhost`, forward the port over SSH; see
-[Forward a port to localhost](/vms/network#forward-a-port-to-localhost).
+reconnect. When the client needs `localhost`, run `limanix forward NAME PORT`;
+see [Forward a port to localhost](/vms/network#forward-a-port-to-localhost).
 
 ### No address in the list
 

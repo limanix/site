@@ -217,6 +217,66 @@ limanix shell dev-box -- bash -lc 'cd /workspace && pwd'
 
 Guide: [Shell and sessions](/vms/shell).
 
+## `limanix forward`
+
+<!-- @include: ../../.reference/cli.md#limanix-forward-about -->
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-forward-usage -->
+
+:::
+
+<!-- @include: ../../.reference/cli.md#limanix-forward-arguments -->
+
+`forward` prints a line for every port it forwards or closes, and runs until you
+stop it:
+
+::: code-group
+
+<!-- @include: ../../.reference/cli.md#limanix-forward-output -->
+
+:::
+
+- Without `PORT`, `forward` asks the VM once a second which ports its programs
+  listen on, and forwards each of them while it listens, except the system ports
+  `22` and `53`. A new port is forwarded within about a second. When a program
+  stops listening, its port closes and the output shows `localhost:PORT closed`.
+- Without `PORT`, a port that is in use on the Mac moves to the next free one,
+  up to 100 above it, and the output names the port that was in use. When none
+  is free, `VM port PORT is not forwarded: REASON` appears once, the other ports
+  stay forwarded, and `forward` tries again every second.
+- `PORT` forwards that port of the VM to the same port on the Mac, and
+  `LOCAL:REMOTE` forwards the port `REMOTE` of the VM to the port `LOCAL` on the
+  Mac. A Mac port in use ends the command with `port N is in use on this Mac`.
+  You can start `forward` before the service does.
+- Ports listen on `127.0.0.1` and `::1` of the Mac only.
+- `forward` connects to the address that the program listens on in the VM. A
+  service that listens on the guest's address only is reachable too. Until a
+  program listens on a `PORT` that you named, `forward` connects to `localhost`
+  in the VM.
+- `forward` uses one SSH connection and needs no entry in
+  [`[network.ports]`](/vms/network#open-ports). It refuses a VM whose SSH host
+  key differs from the key that Lima pinned in `ssh.known_hosts`.
+- When the VM does not answer a poll, `forward` prints the error once and keeps
+  the open ports.
+- Ctrl-C, `SIGTERM` or a closed terminal stops it with status `130`. When the VM
+  stops or the connection is lost, it ends with status `1` and
+  `the connection to the VM was lost`. Nothing stays forwarded.
+- A stopped VM fails with `VM 'NAME' is not running; use limanix start NAME`.
+
+::: code-group
+
+```sh [Mac]
+limanix forward dev-box
+limanix forward dev-box 8080
+limanix forward dev-box 15432:5432
+```
+
+:::
+
+Guide: [Forward a port to localhost](/vms/network#forward-a-port-to-localhost).
+
 ## `limanix list`
 
 <!-- @include: ../../.reference/cli.md#limanix-list-about -->

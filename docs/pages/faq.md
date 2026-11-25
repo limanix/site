@@ -82,9 +82,10 @@ on the Mac directly while builds and tests run in the VM; see
 
 ## How do I clone a private repository?
 
-Share a Git key with the VM as a read-only folder, then point SSH to it with a
-module or in `~/.ssh/config`. The VM does not see the keys or the SSH agent of
-your Mac. See [Git and SSH keys](/vms/git-keys).
+Open `limanix shell dev-box --forward-agent` and clone with the repository's SSH
+URL. SSH in the VM uses your Mac's agent for that connection. See
+[Git and SSH keys](/vms/git-keys) for checking access and setting up unattended
+jobs.
 
 ## How do I add a package?
 

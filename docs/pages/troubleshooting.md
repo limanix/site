@@ -500,11 +500,10 @@ common terminals.
 `git clone`, `git pull` or `git push` over SSH fails with
 `Permission denied (publickey)`.
 
-Cause: SSH in the VM offers no key that the server accepts. A VM has no keys of
-its own, and LimaNix does not forward the SSH agent of your Mac.
-
-Fix: share a key with the VM and point SSH to it; see
-[Git and SSH keys](/vms/git-keys).
+Open `limanix shell dev-box --forward-agent` and run `ssh-add -l` inside the VM.
+Check that the agent has the key whose public half is registered with your Git
+server. If you use a mounted key, check that SSH is configured to offer it. See
+[Git and SSH keys](/vms/git-keys#if-something-fails).
 
 ## Network
 

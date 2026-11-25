@@ -50,7 +50,8 @@ managed home and the Lima instance. These messages stop it before the VM starts;
 | -- | -- |
 | `required flag --config was not provided` | Name the file: `limanix create --config limanix.toml`. |
 | A key and a problem, such as `resources.mem: …`, or `config: invalid TOML at line …, column …` | Fix that key. Unknown keys and wrong types are rejected, including typos such as `resources.cpus`. See [limanix.toml](/reference/config). |
-| An error about a path from `[[mounts]]`, or one that starts with `shell.dotfiles:` | Create the directory or correct the path. A relative path starts from the directory of `limanix.toml`, not from the directory of your terminal. |
+| `mounts[0].source: …` | A `ro` folder must exist: create it on the Mac or correct the path. A `rw` folder is created, so the error means that it could not be, for example the path is a file or its parent is not writable. Relative paths start from the directory of `limanix.toml`. |
+| `shell.dotfiles: …` | Create the directory or correct the path. Relative paths start from the directory of `limanix.toml`. |
 | `… set home.root to a writable directory` | Set `[home] root` to a directory your Mac account can write to. |
 | `run Limanix as your regular host user, not root` | Run the command without `sudo`. |
 | `VM '…' already has state; use update or delete` | A VM of this name exists. Check `limanix list`, then run `limanix update` to retry it, or `limanix delete` only if you mean to remove it. |
@@ -499,11 +500,10 @@ common terminals.
 `git clone`, `git pull` or `git push` over SSH fails with
 `Permission denied (publickey)`.
 
-Cause: SSH in the VM offers no key that the server accepts. A VM has no keys of
-its own, and LimaNix does not forward the SSH agent of your Mac.
-
-Fix: share a key with the VM and point SSH to it; see
-[Git and SSH keys](/vms/git-keys).
+Open `limanix shell dev-box --forward-agent` and run `ssh-add -l` inside the VM.
+Check that the agent has the key whose public half is registered with your Git
+server. If you use a mounted key, check that SSH is configured to offer it. See
+[Git and SSH keys](/vms/git-keys#if-something-fails).
 
 ## Network
 

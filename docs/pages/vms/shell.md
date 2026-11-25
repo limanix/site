@@ -35,6 +35,30 @@ The VM must be running. Start a stopped one with `limanix start dev-box`.
 
 :::
 
+## Forward your SSH agent
+
+Use `--forward-agent` to let SSH in the VM use the agent from your current Mac
+terminal for this connection.
+
+::: code-group
+
+```sh [Mac]
+limanix shell dev-box --forward-agent
+```
+
+:::
+
+The client opens a separate SSH connection as `user.name` and checks the VM's
+saved SSH host key before forwarding. The agent needs to be available to your
+Mac terminal. You can also pass a command after `--`. Use an ordinary shell
+connection for agent forwarding, since `--session` keeps work running beyond
+that connection. For Git setup and an access check, see
+[Git and SSH keys](/vms/git-keys#use-the-ssh-agent-on-your-mac).
+
+If an older VM has no saved SSH host key, run `limanix stop dev-box` and then
+`limanix start dev-box` with the updated client. Lima records the key during
+startup. Retry `limanix shell dev-box --forward-agent` once the VM is running.
+
 ## Run one command
 
 Put the command after `--`:

@@ -196,6 +196,10 @@ Guide: [Using virtual machines](/vms/).
   exits with its status. For `cd`, pipes or variables, run a guest shell such as
   `bash -lc '...'`. Single quotes keep the Mac's shell from expanding them
   first.
+- `--forward-agent` forwards the SSH agent from the current Mac terminal for the
+  lifetime of the SSH connection. It requires a saved SSH host key for the VM.
+  It works with `-- COMMAND` and cannot be combined with `--session`. See
+  [Git and SSH keys](/vms/git-keys#use-the-ssh-agent-on-your-mac).
 - `--session SESSION`, or `--session=SESSION`, goes before or after the VM name,
   at most once, with a nonempty name. It runs `limanix-session SESSION` in the
   VM, which creates the session or attaches to it with the provider:
@@ -208,6 +212,7 @@ Guide: [Using virtual machines](/vms/).
 
 ```sh [Mac]
 limanix shell dev-box
+limanix shell dev-box --forward-agent
 limanix shell dev-box --session work
 limanix shell dev-box -- id
 limanix shell dev-box -- bash -lc 'cd /workspace && pwd'

@@ -25,7 +25,7 @@ mode   = "rw"
 
 | Key | Value |
 | -- | -- |
-| `source` | The folder on the Mac. Required. |
+| `source` | The folder on the Mac. Required. A missing `rw` folder is created. |
 | `target` | Where the folder appears in the VM, an absolute path. Required. |
 | `mode` | `rw` to read and write, the default, or `ro` for read-only in the VM |
 
@@ -54,9 +54,19 @@ mode   = "ro"
 
 :::
 
-Each source must be a folder that exists when you create or update the VM:
-create `../fixtures` on the Mac first. With `ro`, programs in the VM can read
-`/mnt/fixtures` but not change it. A read-only folder also suits a Git key; see
+A `rw` folder that does not exist yet is created, parent folders included, when
+you run `limanix create` or `limanix update`, and the command says so, for
+example:
+
+```text
+limanix: created /Users/you/data for mounts[2].source
+```
+
+If you did not expect that line, check the path: a typo makes an empty folder. A
+`ro` folder must exist already, so create `../fixtures` on the Mac first;
+without it the command stops with `mounts[1].source: …` before it changes
+anything. With `ro`, programs in the VM can read `/mnt/fixtures` but not change
+it. A read-only folder also suits a Git key; see
 [Git and SSH keys](/vms/git-keys).
 
 A guest of your Mac's architecture shares folders with virtiofs. A guest of the

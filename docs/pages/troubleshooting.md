@@ -50,7 +50,8 @@ managed home and the Lima instance. These messages stop it before the VM starts;
 | -- | -- |
 | `required flag --config was not provided` | Name the file: `limanix create --config limanix.toml`. |
 | A key and a problem, such as `resources.mem: …`, or `config: invalid TOML at line …, column …` | Fix that key. Unknown keys and wrong types are rejected, including typos such as `resources.cpus`. See [limanix.toml](/reference/config). |
-| An error about a path from `[[mounts]]`, or one that starts with `shell.dotfiles:` | Create the directory or correct the path. A relative path starts from the directory of `limanix.toml`, not from the directory of your terminal. |
+| `mounts[0].source: …` | A `ro` folder must exist: create it on the Mac or correct the path. A `rw` folder is created, so the error means that it could not be, for example the path is a file or its parent is not writable. Relative paths start from the directory of `limanix.toml`. |
+| `shell.dotfiles: …` | Create the directory or correct the path. Relative paths start from the directory of `limanix.toml`. |
 | `… set home.root to a writable directory` | Set `[home] root` to a directory your Mac account can write to. |
 | `run Limanix as your regular host user, not root` | Run the command without `sudo`. |
 | `VM '…' already has state; use update or delete` | A VM of this name exists. Check `limanix list`, then run `limanix update` to retry it, or `limanix delete` only if you mean to remove it. |

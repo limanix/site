@@ -167,8 +167,8 @@ limanix forward dev-box 15432:5432
 
 :::
 
-Ports listen on `127.0.0.1` and `::1` of the Mac only. Press Ctrl-C to close
-the tunnels; they also close when the VM stops. Nothing stays forwarded. See
+Ports listen on `127.0.0.1` and `::1` of the Mac only. Press Ctrl-C to close the
+tunnels; they also close when the VM stops. Nothing stays forwarded. See
 [`limanix forward`](/reference/cli#limanix-forward) for every case.
 
 ### With SSH
@@ -184,10 +184,9 @@ ssh -N -L 8080:127.0.0.1:8080 dev-box.limanix
 
 :::
 
-The first number is the port on the Mac, which must be free; `127.0.0.1:8080`
-is the address and port inside the VM. To open the tunnel with every SSH
-connection to the VM, add it to your own `~/.ssh/config`, below the `Include`
-line:
+The first number is the port on the Mac, which must be free; `127.0.0.1:8080` is
+the address and port inside the VM. To open the tunnel with every SSH connection
+to the VM, add it to your own `~/.ssh/config`, below the `Include` line:
 
 ::: code-group
 

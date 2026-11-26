@@ -170,8 +170,8 @@ the build, and a failed build does not undo them. See
    `http://ADDRESS:8080`. LimaNix does not forward ports to the Mac's
    `localhost`.
 
-See [Network](/vms/network). To use `localhost` on the Mac, forward the port
-over SSH; see
+See [Network](/vms/network). To use `localhost` on the Mac, run
+`limanix forward NAME PORT`; see
 [Forward a port to localhost](/vms/network#forward-a-port-to-localhost).
 
 ## Can I script LimaNix?

@@ -6,8 +6,9 @@ description: Reach services in a VM from the Mac, open firewall ports, forward a
 
 Each VM has its own IP address on a private network between your Mac and its
 VMs. You reach a service in a VM at that address: LimaNix forwards no ports to
-the Mac's `localhost`. When a client needs `localhost`, an SSH tunnel brings a
-port there; see [Forward a port to localhost](#forward-a-port-to-localhost).
+the Mac's `localhost` on its own. When a client needs `localhost`,
+`limanix forward` brings a port there while it runs; see
+[Forward a port to localhost](#forward-a-port-to-localhost).
 
 ## The shared network
 
@@ -20,10 +21,10 @@ its own address. Other computers on your network do not reach the VM.
 | Your Mac's architecture | The native NAT of Apple Virtualization |
 | The other architecture | Lima's shared network, which `limanix network setup` prepares; see [Set up QEMU](/vms/resources#set-up-qemu) |
 
-Without port forwarding, `localhost:8080` on the Mac is not the VM's port
-`8080`. In return, two VMs can serve the same port, and a service in a VM never
-takes a port on the Mac. Only SSH goes through a port on the Mac's `127.0.0.1`;
-see [SSH ports](/reference/paths#ssh-ports).
+Unless `limanix forward` runs, `localhost:8080` on the Mac is not the VM's port
+`8080`. In return, two VMs can serve the same port, and a service in a VM takes
+a port on the Mac only while you forward it. Only SSH goes through a port on the
+Mac's `127.0.0.1`; see [SSH ports](/reference/paths#ssh-ports).
 
 ## Find the address
 
@@ -123,12 +124,56 @@ Test the path with a small web server before you set up your own service:
 
 ## Forward a port to localhost
 
-An SSH tunnel brings a port of the VM to the Mac's `localhost`. Use it when a
-client must connect to `localhost`, or for a service that listens on `127.0.0.1`
-in the VM. The tunnel runs over SSH: it needs no port in `[network.ports]`, and
-the service sees a connection from `127.0.0.1`.
+`limanix forward` brings ports of a running VM to the Mac's `localhost` while
+the command runs. Use it when a client must connect to `localhost`, or for a
+service that listens on `127.0.0.1` in the VM. The tunnels run over one SSH
+connection: they need no port in `[network.ports]`, and the service sees a
+connection from inside the VM.
 
-With SSH set up for your VMs, as in
+::: code-group
+
+```sh [Mac]
+limanix forward dev-box
+```
+
+:::
+
+Without a port, every port that a program in the VM listens on is forwarded
+while it listens, to the same port on the Mac or, when that is in use, the next
+free one. A program that starts later is forwarded within about a second:
+
+::: code-group
+
+```text [Output]
+Forwarding ports of dev-box to localhost. Press Ctrl-C to stop.
+localhost:8080 -> VM port 8080
+localhost:5433 -> VM port 5432 (port 5432 is in use on this Mac)
+localhost:8080 closed
+```
+
+:::
+
+To choose the ports, name them: `8080` forwards port 8080 of the VM to port 8080
+on the Mac, and `LOCAL:REMOTE` uses another port on the Mac, such as
+`15432:5432`. The port on the Mac must be free. You can start `forward` before
+the service does.
+
+::: code-group
+
+```sh [Mac]
+limanix forward dev-box 8080
+limanix forward dev-box 15432:5432
+```
+
+:::
+
+Ports listen on `127.0.0.1` and `::1` of the Mac only. Press Ctrl-C to close the
+tunnels; they also close when the VM stops. Nothing stays forwarded. See
+[`limanix forward`](/reference/cli#limanix-forward) for every case.
+
+### With SSH
+
+Plain SSH forwards one port too, with SSH set up for your VMs, as in
 [Editors and IDEs](/vms/editors#set-up-ssh-once):
 
 ::: code-group
@@ -139,12 +184,9 @@ ssh -N -L 8080:127.0.0.1:8080 dev-box.limanix
 
 :::
 
-While the command runs, `localhost:8080` on the Mac reaches port 8080 in the VM.
-Press Ctrl-C to close the tunnel. The first number is the port on the Mac, which
-must be free; `127.0.0.1:8080` is the address and port inside the VM.
-
-To open the tunnel with every SSH connection to the VM, add it to your own
-`~/.ssh/config`, below the `Include` line:
+The first number is the port on the Mac, which must be free; `127.0.0.1:8080` is
+the address and port inside the VM. To open the tunnel with every SSH connection
+to the VM, add it to your own `~/.ssh/config`, below the `Include` line:
 
 ::: code-group
 
@@ -168,7 +210,7 @@ open `http://localhost:5173` on the Mac:
 ::: code-group
 
 ```sh [Mac]
-ssh -N -L 5173:127.0.0.1:5173 dev-box.limanix
+limanix forward dev-box 5173
 ```
 
 :::
@@ -185,15 +227,15 @@ port, then connect the client on the Mac to `localhost:5432`:
 ::: code-group
 
 ```sh [Mac]
-ssh -N -L 5432:127.0.0.1:5432 dev-box.limanix
+limanix forward dev-box 5432
 ```
 
 :::
 
-The database sees a connection from `127.0.0.1`: it needs no firewall port and
+The database sees a connection from inside the VM: it needs no firewall port and
 no access rule for the Mac's address. If the Mac already uses port 5432, choose
-another first number, such as `15432:127.0.0.1:5432`. To connect at the VM's
-address instead, see [PostgreSQL](/modules/postgres).
+another port on the Mac, such as `15432:5432`. To connect at the VM's address
+instead, see [PostgreSQL](/modules/postgres).
 
 ### A sign-in callback
 

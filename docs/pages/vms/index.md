@@ -21,6 +21,8 @@ user, without `sudo`. This page follows a VM from `create` to `delete`.
   Shuts the VM down and keeps its disk and home.
 - [`limanix shell`](/vms/shell)\
   Opens a shell in the VM, or runs one command there.
+- [`limanix forward`](/vms/network#forward-a-port-to-localhost)\
+  Brings ports of the VM to `localhost` on the Mac until you press Ctrl-C.
 - [`ssh dev-box.limanix`](/vms/editors)\
   Connects over SSH, as editors do.
 - [`limanix list`](#list-your-vms)\
